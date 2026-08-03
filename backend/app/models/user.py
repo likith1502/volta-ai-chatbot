@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING, Optional
 from sqlalchemy import Boolean, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.database.base import Base
-from app.database.mixins import AuditMixin, SoftDeleteMixin, TimestampMixin, UUIDMixin
+from app.db.base import Base
+from app.db.mixins import AuditMixin, SoftDeleteMixin, TimestampMixin, UUIDMixin
 
 if TYPE_CHECKING:
     from app.models.conversation import Conversation

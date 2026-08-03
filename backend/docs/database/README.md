@@ -1,9 +1,10 @@
 # VOLTA AI Chatbot - Database Documentation Hub
 
 ## Purpose
-This directory contains architectural designs, database constitutions, domain model specifications, ER blueprints, and request flow diagrams governing data persistence for the VOLTA AI Chatbot platform.
+This directory contains architectural designs, database constitutions, domain model specifications, repository pattern guides, ER blueprints, and request flow diagrams governing data persistence for the VOLTA AI Chatbot platform.
 
 ## Contents
+- `repository-pattern.md`: Architecture, generic inheritance strategy, soft delete behavior, and transaction ownership guidelines for data repositories.
 - `database-models.md`: Comprehensive specification of all 10 domain models defined in Chapter 2.4.
 - `entity-relationship.md`: ASCII ER diagrams, cardinality tables, and normalization standards.
 - `relationship-guidelines.md`: Relationship rules, `back_populates` conventions, and `selectin` loading strategies.

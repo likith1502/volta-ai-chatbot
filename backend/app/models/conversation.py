@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING, Optional
 from sqlalchemy import DateTime, Enum, ForeignKey, String, UUID, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.database.base import Base
-from app.database.mixins import AuditMixin, SoftDeleteMixin, TimestampMixin, UUIDMixin
+from app.db.base import Base
+from app.db.mixins import AuditMixin, SoftDeleteMixin, TimestampMixin, UUIDMixin
 from app.models.enums import ConversationSource, ConversationStatus
 
 if TYPE_CHECKING:

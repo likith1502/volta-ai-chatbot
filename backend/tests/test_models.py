@@ -1,6 +1,6 @@
 import uuid
 from sqlalchemy import UUID, Enum
-from app.database.base import Base
+from app.db.base import Base
 from app.models import (
     AuditLog,
     Booking,

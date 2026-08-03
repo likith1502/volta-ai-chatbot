@@ -1,9 +1,9 @@
 import pytest
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
-from app.database.base import Base
-from app.database.connection import get_engine
-from app.database.health import check_database_health
-from app.database.session import get_db_session, get_sessionmaker
+from app.db.base import Base
+from app.db.connection import get_engine
+from app.db.health import check_database_health
+from app.db.session import get_db_session, get_sessionmaker
 
 
 def test_engine_creation():

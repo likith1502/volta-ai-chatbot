@@ -72,8 +72,8 @@ from typing import Optional
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.database.base import Base
-from app.database.mixins import AuditMixin, SoftDeleteMixin, TimestampMixin, UUIDMixin
+from app.db.base import Base
+from app.db.mixins import AuditMixin, SoftDeleteMixin, TimestampMixin, UUIDMixin
 
 
 class User(UUIDMixin, TimestampMixin, SoftDeleteMixin, AuditMixin, Base):

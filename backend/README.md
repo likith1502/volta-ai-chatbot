@@ -18,7 +18,7 @@ Business Services Layer (app/services/)
 Data Repositories Layer (app/repositories/)
        │
        ▼
-Infrastructure & Persistence (app/database/, app/cache/)
+Infrastructure & Persistence (app/db/, app/cache/)
 ```
 
 All application configuration is centrally managed via Pydantic `Settings` (`app/config/settings.py`). Database operations execute asynchronously through SQLAlchemy `AsyncSession` and `asyncpg`.
@@ -43,24 +43,13 @@ All application configuration is centrally managed via Pydantic `Settings` (`app
 backend/
 ├── app/
 │   ├── api/          # Route handlers & API routers (v1)
-│   ├── booking/      # Ride booking domain logic
-│   ├── cache/        # Redis caching layer
 │   ├── config/       # Settings & constants
-│   ├── context/      # Short-term dialogue context tracking
-│   ├── conversation/ # LangGraph AI workflow graphs
 │   ├── core/         # Exception handlers & logging setup
-│   ├── database/     # AsyncEngine, AsyncSession, Base metadata
-│   ├── entities/     # Entity extraction module
-│   ├── intent/       # Intent classification engine
-│   ├── llm/          # LLM integrations
-│   ├── memory/       # Episodic & user long-term memory
-│   ├── middleware/   # Custom FastAPI middleware
+│   ├── db/           # AsyncEngine, AsyncSession, Base metadata, Mixins
+│   ├── dependencies/ # FastAPI dependency injection utilities
+│   ├── exceptions/   # Application exceptions
 │   ├── models/       # SQLAlchemy ORM models
-│   ├── notifications/ # Transactional notification service
-│   ├── prediction/   # Travel intent prediction engine
-│   ├── profile/      # User profile management
-│   ├── prompts/      # Prompt templates directory
-│   ├── recommendation/ # Ride recommendation engine
+│   ├── repositories/ # Data access repository layer
 │   ├── schemas/      # Pydantic DTO validation schemas
 │   ├── services/     # Third-party integrations & domain services
 │   ├── utils/        # Response helpers & utility functions
@@ -161,24 +150,16 @@ pytest -v
 - [Database Design Principles](docs/database/database-design-principles.md)
 - [Database Request Flow Architecture](docs/database/database-architecture.md)
 - [Engineering Principles & Constitution](docs/engineering/engineering-principles.md)
-- [Project Coding Standards](docs/engineering/project-standards.md)
+- [Official Project Standards](docs/engineering/project-standards.md)
 - [Alembic Migration Strategy](docs/architecture/010-alembic-migration-strategy.md)
 - [Infrastructure Foundation Lock Record](docs/architecture/011-infrastructure-lock.md)
 
 ---
 
-## Development Workflow & Roadmap
+## Development Roadmap & Releases
 
-1. **Milestone 1**: FastAPI Core Platform Scaffolding *(Completed)*
-2. **Milestone 2**: Infrastructure Layer *(PostgreSQL & Alembic Frozen, Mixins & Models Next)*
-3. **Milestone 3**: Authentication & User Profile Management *(Planned)*
-4. **Milestone 4**: Shared AI Brain & Conversational Pipeline *(Planned)*
-
----
-
-## Contribution Notes
-
-- Strictly follow guidelines in `CONTRIBUTING.md`.
-- All database schema changes **must** go through Alembic migration scripts.
-- Never write business logic inside route handlers or repository abstractions.
-- All new endpoints and service modules require accompanying pytest coverage.
+- **Release v1.0**: Infrastructure Foundation *(Completed & Locked)*
+- **Release v1.1**: Database Base Mixins *(Completed & Locked)*
+- **Release v2.0**: Domain Models *(Completed & Locked)*
+- **Release v2.5**: Repository Pattern *(Completed & Locked)*
+- **Chapter 3.0**: Application Services & Pydantic Schemas *(Next)*

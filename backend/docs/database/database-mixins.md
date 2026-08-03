@@ -67,8 +67,8 @@ When domain models are defined in Chapter 2.4, they will compose mixins alongsid
 
 ```python
 # Future User Model Example (Chapter 2.4)
-from app.database.base import Base
-from app.database.mixins import AuditMixin, SoftDeleteMixin, TimestampMixin, UUIDMixin
+from app.db.base import Base
+from app.db.mixins import AuditMixin, SoftDeleteMixin, TimestampMixin, UUIDMixin
 
 
 class User(UUIDMixin, TimestampMixin, SoftDeleteMixin, AuditMixin, Base):

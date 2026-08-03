@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING, Any
 from sqlalchemy import Enum, Float, ForeignKey, Integer, JSON, String, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.database.base import Base
-from app.database.mixins import AuditMixin, SoftDeleteMixin, TimestampMixin, UUIDMixin
+from app.db.base import Base
+from app.db.mixins import AuditMixin, SoftDeleteMixin, TimestampMixin, UUIDMixin
 from app.models.enums import RecommendationStatus
 
 if TYPE_CHECKING:

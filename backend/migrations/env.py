@@ -3,27 +3,23 @@ from logging.config import fileConfig
 
 from alembic import context
 from sqlalchemy import pool
-from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from app.config.settings import settings
-from app.database.base import Base
+from app.db.base import Base
 
-# Alembic Config object, giving access to the values within alembic.ini
+# Alembic Config object
 config = context.config
 
-# Interpret the config file for Python logging.
-if config.config_file_name:
+if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Set target metadata for autogenerate support
+# Model metadata for autogenerate support
 target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
-    """Run migrations in 'offline' mode.
-
-    Generates SQL scripts without connecting to a live DB.
-    """
+    """Run migrations in 'offline' mode."""
     url = settings.get_database_url()
     context.configure(
         url=url,
@@ -39,7 +35,7 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection) -> None:
-    """Helper function to configure migration context with connection."""
+    """Execute migrations against connected database."""
     context.configure(
         connection=connection,
         target_metadata=target_metadata,
@@ -52,9 +48,13 @@ def do_run_migrations(connection) -> None:
 
 
 async def run_async_migrations() -> None:
-    """Run migrations in 'online' mode using AsyncEngine."""
-    connectable = create_async_engine(
-        settings.get_database_url(),
+    """Run migrations in 'online' mode with AsyncEngine."""
+    configuration = config.get_section(config.config_ini_section, {})
+    configuration["sqlalchemy.url"] = settings.get_database_url()
+
+    connectable = async_engine_from_config(
+        configuration,
+        prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
 

@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING, Optional
 from sqlalchemy import Enum, ForeignKey, Integer, String, Text, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.database.base import Base
-from app.database.mixins import AuditMixin, SoftDeleteMixin, TimestampMixin, UUIDMixin
+from app.db.base import Base
+from app.db.mixins import AuditMixin, SoftDeleteMixin, TimestampMixin, UUIDMixin
 from app.models.enums import MessageRole
 
 if TYPE_CHECKING:

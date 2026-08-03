@@ -1,8 +1,8 @@
 import uuid
 from datetime import datetime
 from sqlalchemy import UUID, DateTime
-from app.database.base import Base
-from app.database.mixins import AuditMixin, SoftDeleteMixin, TimestampMixin, UUIDMixin
+from app.db.base import Base
+from app.db.mixins import AuditMixin, SoftDeleteMixin, TimestampMixin, UUIDMixin
 
 
 class DummyModel(UUIDMixin, TimestampMixin, SoftDeleteMixin, AuditMixin, Base):

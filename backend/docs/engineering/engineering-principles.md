@@ -18,6 +18,7 @@
 - `app/services/`: Implements domain business logic, AI orchestration, and service workflows.
 - `app/repositories/`: Manages database querying and data persistence operations. Contains zero business logic.
 - `app/config/`: Single source of truth for application configuration (`settings.py`) loading from environment variables.
+- `app/db/`: Database engine setup, declarative base, mixins, and session factories.
 
 ---
 

@@ -2,9 +2,9 @@ import logging
 from typing import Optional
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
-from app.database.connection import get_engine
+from app.db.connection import get_engine
 
-logger = logging.getLogger("app.database.health")
+logger = logging.getLogger("app.db.health")
 
 
 async def check_database_health(

@@ -4,8 +4,8 @@ from typing import Any, Optional
 from sqlalchemy import JSON, String, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.database.base import Base
-from app.database.mixins import TimestampMixin, UUIDMixin
+from app.db.base import Base
+from app.db.mixins import TimestampMixin, UUIDMixin
 
 
 class AuditLog(UUIDMixin, TimestampMixin, Base):
