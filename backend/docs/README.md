@@ -8,7 +8,7 @@ Welcome to the central technical documentation hub for the VOLTA AI Chatbot back
 
 - 📘 [Project Governance Framework](PROJECT_GOVERNANCE.md): Decision-making rules, ADR processes, code review philosophy, and git strategies.
 - 🎯 [Project Milestones & Roadmap](PROJECT_MILESTONES.md): Official status, completion dates, and roadmap versions across all development phases.
-- 🔒 [Foundation Lock Status Record](FOUNDATION_STATUS.md): Official lock records for Infrastructure Foundation v1.0 and Database Base Mixins v1.1.
+- 🔒 [Foundation Lock Status Record](FOUNDATION_STATUS.md): Official lock records for Infrastructure v1.0, Base Mixins v1.1, Domain Models v2.0, Repositories v2.5, and Services v3.0.
 
 ---
 
@@ -30,6 +30,7 @@ Welcome to the central technical documentation hub for the VOLTA AI Chatbot back
 - [013 - Model Inheritance Strategy & Composable Mixins](architecture/013-model-inheritance-strategy.md)
 - [014 - ORM Relationship & Cascade Strategy](architecture/014-relationship-strategy.md)
 - [015 - Database Enum Strategy & Migration Governance](architecture/015-enum-strategy.md)
+- [016 - Service Layer Architecture & Transaction Governance](architecture/016-service-layer-architecture.md)
 
 ---
 
