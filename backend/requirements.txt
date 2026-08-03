@@ -1,0 +1,18 @@
+# VOLTA AI Chatbot Backend Dependencies - Milestone 1 Foundation
+# Strategy: SemVer compatible range pinning during development.
+# Note: Lock files (e.g. poetry.lock or pip-compile requirements.lock) should be generated prior to production deployment.
+
+# Web Framework & Async Server
+fastapi>=0.100.0,<1.0.0
+uvicorn[standard]>=0.22.0,<1.0.0
+
+# Configuration & Settings Management
+pydantic-settings>=2.0.0,<3.0.0
+python-dotenv>=1.0.0,<2.0.0
+
+# HTTP Testing & Client Capabilities
+httpx>=0.24.0,<1.0.0
+
+# Automated Testing Framework
+pytest>=7.3.0,<9.0.0
+pytest-asyncio>=0.21.0,<1.0.0

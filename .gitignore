@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDEs & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# OS Generated Files
+.DS_Store
+Thumbs.db
+
+# Node / Frontend (Testing UI)
+node_modules/
+dist/
+build/
+.npm
+
+# Testing & Coverage
+coverage/
+.coverage
+.coverage.*
+.pytest_cache/
+.mypy_cache/
