@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db_session
 from app.services.booking import BookingService
+from app.services.chat import ChatService
 from app.services.conversation import ConversationService
 from app.services.notification import NotificationService
 from app.services.recommendation import RecommendationService
@@ -32,3 +33,8 @@ def get_booking_service(session: AsyncSession = Depends(get_db_session)) -> Book
 def get_notification_service(session: AsyncSession = Depends(get_db_session)) -> NotificationService:
     """Dependency provider yielding a NotificationService instance."""
     return NotificationService(session)
+
+
+def get_chat_service(session: AsyncSession = Depends(get_db_session)) -> ChatService:
+    """Dependency provider yielding a ChatService instance."""
+    return ChatService(session)

@@ -1,4 +1,5 @@
 from app.schemas.booking import BookingCreate, BookingResponse
+from app.schemas.chat import ChatMessage, ChatRequest, ChatResponse, ChatUsage
 from app.schemas.common import ResponseEnvelope
 from app.schemas.conversation import ConversationCreate, ConversationResponse
 from app.schemas.notification import NotificationCreate, NotificationResponse
@@ -18,4 +19,8 @@ __all__ = [
     "BookingResponse",
     "NotificationCreate",
     "NotificationResponse",
+    "ChatRequest",
+    "ChatResponse",
+    "ChatMessage",
+    "ChatUsage",
 ]

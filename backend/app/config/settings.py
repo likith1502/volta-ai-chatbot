@@ -32,6 +32,17 @@ class Settings(BaseSettings):
     DATABASE_MAX_OVERFLOW: int = 20
     DATABASE_POOL_RECYCLE: int = 3600
 
+    # AI Configuration (Chapter 5.0)
+    AI_PROVIDER: str = "openai"
+    OPENAI_API_KEY: str = ""
+    OPENAI_MODEL: str = "gpt-4o-mini"
+    OPENAI_TEMPERATURE: float = 0.7
+    OPENAI_MAX_TOKENS: int = 1000
+    OPENAI_TIMEOUT: float = 30.0
+
+    # Memory Strategy Configuration
+    MEMORY_STRATEGY: str = "recent"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
