@@ -1,6 +1,7 @@
 from app.database.base import Base
 from app.database.connection import dispose_engine, get_engine
 from app.database.health import check_database_health
+from app.database.mixins import AuditMixin, SoftDeleteMixin, TimestampMixin, UUIDMixin
 from app.database.session import get_db_session, get_sessionmaker
 
 __all__ = [
@@ -10,4 +11,8 @@ __all__ = [
     "get_sessionmaker",
     "get_db_session",
     "check_database_health",
+    "UUIDMixin",
+    "TimestampMixin",
+    "SoftDeleteMixin",
+    "AuditMixin",
 ]

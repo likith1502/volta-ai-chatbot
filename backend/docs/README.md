@@ -1,12 +1,20 @@
-# VOLTA AI Chatbot - Backend Technical Documentation
+# VOLTA AI Chatbot - Backend Technical Documentation Hub
 
-## Overview
-Welcome to the central technical documentation hub for the VOLTA AI Chatbot backend. This directory serves as the engineering knowledge base, containing architectural decision records (ADRs), system designs, response envelope standards, database request flows, and development roadmaps.
+Welcome to the central technical documentation hub for the VOLTA AI Chatbot backend platform. This directory serves as the engineering knowledge base, containing architectural decision records (ADRs), system design blueprints, project milestones, governance rules, database constitutions, and coding standards.
 
 ---
 
-## Architecture Documents Index
+## Core Governance & Status Documents
 
+- 📘 [Project Governance Framework](PROJECT_GOVERNANCE.md): Decision-making rules, ADR processes, code review philosophy, and git strategies.
+- 🎯 [Project Milestones & Roadmap](PROJECT_MILESTONES.md): Official status, completion dates, and roadmap versions across all development phases.
+- 🔒 [Foundation Lock Status Record](FOUNDATION_STATUS.md): Official lock records for Infrastructure Foundation v1.0 and Database Base Mixins v1.1.
+
+---
+
+## Architecture Documents & ADR Index
+
+- [ADR Template](architecture/ADR_TEMPLATE.md): Standard template for writing new Architecture Decision Records.
 - [001 - FastAPI Framework Adoption](architecture/001-fastapi-framework.md)
 - [002 - Modular Project Structure & Layered Architecture](architecture/002-project-structure.md)
 - [003 - URI Path API Versioning Strategy](architecture/003-api-versioning.md)
@@ -18,47 +26,24 @@ Welcome to the central technical documentation hub for the VOLTA AI Chatbot back
 - [009 - Database Request Flow Architecture](architecture/009-database-request-flow.md)
 - [010 - Alembic Database Migration Strategy](architecture/010-alembic-migration-strategy.md)
 - [011 - Infrastructure Foundation Lock Record](architecture/011-infrastructure-lock.md)
+- [012 - Domain Modeling Guidelines](architecture/012-domain-modeling-guidelines.md)
+- [013 - Model Inheritance Strategy & Composable Mixins](architecture/013-model-inheritance-strategy.md)
 
 ---
 
-## Architecture Decision Records (ADR Index)
-ADRs capture significant architectural choices, context, alternatives evaluated, and long-term consequences:
+## Technical Constitutions & Sub-Directories
 
-| ADR ID | Title | Status | Date |
-| :--- | :--- | :--- | :--- |
-| **ADR 001** | Adoption of FastAPI Web Framework | Accepted | 2026-08-03 |
-| **ADR 002** | Modular Project Structure & Layered Architecture | Accepted | 2026-08-03 |
-| **ADR 003** | URI Path API Versioning Strategy | Accepted | 2026-08-03 |
-| **ADR 004** | Centralized Application Exception Handling | Accepted | 2026-08-03 |
-
----
-
-## Technical Constitutions & Guidelines
+### 🗄️ [Database Documentation](database/README.md)
+- [Database Base Mixins Architecture](database/database-mixins.md)
 - [Database Design Principles](database/database-design-principles.md)
 - [Database Request & Migration Architecture](database/database-architecture.md)
+
+### 🛠️ [Engineering Documentation](engineering/README.md)
 - [Engineering Principles & Constitution](engineering/engineering-principles.md)
 - [Official Project Standards](engineering/project-standards.md)
 
----
+### 🌐 [API Documentation](api/README.md)
+- OpenAPI specs, versioning contracts (`/api/v1/`), and payload standards.
 
-## API Standards
-- **Versioning**: All public REST APIs are prefix-versioned under `/api/v1/`.
-- **Payload Envelope**: All endpoints return standardized JSON structures containing `success`, `message`, `data`, and `errors`.
-- **Documentation**: Automatically generated interactive documentation is served at `/docs` (Swagger) and `/redoc` (ReDoc).
-
----
-
-## Development Roadmap
-- **Milestone 1**: FastAPI Core Platform & Foundation Scaffolding *(Completed)*
-- **Milestone 2**: Infrastructure Layer (PostgreSQL, SQLAlchemy, Alembic, Base Mixins, Domain Models, Repositories, Redis) *(In Progress)*
-- **Milestone 3**: Authentication & User Profile Management *(Future)*
-- **Milestone 4**: Shared AI Brain & Conversational Pipeline *(Future)*
-
----
-
-## Directory Organization
-- `api/`: API specifications, route contracts, and OpenAPI exported schemas.
-- `architecture/`: Architecture Decision Records (ADRs), system design blueprints, and phase plans.
-- `database/`: Database design principles, request flow diagrams, ERDs, and migration notes.
-- `engineering/`: Engineering constitutions, Definition of Done, and project standards.
-- `deployment/`: Deployment runbooks, container specs, and release guidelines.
+### 🚀 [Deployment Documentation](deployment/README.md)
+- Deployment runbooks, container specs, and release guidelines.
