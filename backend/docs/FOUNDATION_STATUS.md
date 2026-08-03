@@ -1,12 +1,12 @@
-# VOLTA AI Chatbot - Infrastructure Foundation Status & Lock Record
+# VOLTA AI Chatbot - Foundation Status & Lock Record
 
-This document records the official lock status of the core infrastructure and database foundation layers for the VOLTA AI Chatbot backend.
+This document records the official lock status of the core infrastructure, database base mixins, and domain model layers for the VOLTA AI Chatbot backend.
 
 ---
 
 ## 1. Infrastructure Foundation (Chapters 2.1 & 2.2)
 
-- **Version**: `v1.0`
+- **Release Version**: `v1.0`
 - **Status**: **LOCKED**
 - **Git Tag**: `v1.0-infrastructure`
 - **Completion Date**: 2026-08-03
@@ -29,7 +29,7 @@ This document records the official lock status of the core infrastructure and da
 
 ## 2. Database Base Mixins (Chapter 2.3)
 
-- **Version**: `v1.1`
+- **Release Version**: `v1.1`
 - **Status**: **LOCKED**
 - **Completion Date**: 2026-08-03
 
@@ -39,5 +39,19 @@ This document records the official lock status of the core infrastructure and da
 - `SoftDeleteMixin`: Idempotent logical non-destructive deletion (`is_deleted`, `deleted_at`, `soft_delete()`, `restore()`).
 - `AuditMixin`: Audit attribution properties (`created_by`, `updated_by`).
 
+---
+
+## 3. Domain Models Layer (Chapter 2.4)
+
+- **Release Version**: `v2.0`
+- **Status**: **LOCKED**
+- **Completion Date**: 2026-08-03
+
+### Locked Components Included
+- `User`, `Conversation`, `Message`, `Memory`, `Intent`, `Entity`, `Recommendation`, `Booking`, `Notification`, `AuditLog`.
+- `enums.py`: `MessageRole`, `ConversationStatus`, `ConversationSource`, `MemoryType`, `RecommendationStatus`, `BookingStatus`, `NotificationType`.
+- Relationship & Cascade Strategy: `back_populates`, `passive_deletes=True`, `lazy="selectin"`, `ondelete="CASCADE"` / `ondelete="SET NULL"`.
+- ADRs: ADR 013, ADR 014, ADR 015.
+
 ### Stability Declaration
-> Future ORM models should reuse these mixins. Avoid duplicating database concerns across models. Future improvements should extend rather than replace these mixins.
+> The domain model layer is frozen and stable. Future work moves to Chapter 2.5 (Repository Pattern) and Chapter 2.6 (Redis Infrastructure).

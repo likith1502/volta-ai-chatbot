@@ -28,12 +28,32 @@ Welcome to the central technical documentation hub for the VOLTA AI Chatbot back
 - [011 - Infrastructure Foundation Lock Record](architecture/011-infrastructure-lock.md)
 - [012 - Domain Modeling Guidelines](architecture/012-domain-modeling-guidelines.md)
 - [013 - Model Inheritance Strategy & Composable Mixins](architecture/013-model-inheritance-strategy.md)
+- [014 - ORM Relationship & Cascade Strategy](architecture/014-relationship-strategy.md)
+- [015 - Database Enum Strategy & Migration Governance](architecture/015-enum-strategy.md)
+
+---
+
+## Architecture Decision Records (ADR Index)
+ADRs capture significant architectural choices, context, alternatives evaluated, and long-term consequences:
+
+| ADR ID | Title | Status | Date |
+| :--- | :--- | :--- | :--- |
+| **ADR 001** | Adoption of FastAPI Web Framework | Accepted | 2026-08-03 |
+| **ADR 002** | Modular Project Structure & Layered Architecture | Accepted | 2026-08-03 |
+| **ADR 003** | URI Path API Versioning Strategy | Accepted | 2026-08-03 |
+| **ADR 004** | Centralized Application Exception Handling | Accepted | 2026-08-03 |
+| **ADR 013** | Model Inheritance Strategy & Composable Mixins | Accepted | 2026-08-03 |
+| **ADR 014** | ORM Relationship & Cascade Strategy | Accepted | 2026-08-03 |
+| **ADR 015** | Database Enum Strategy & Migration Governance | Accepted | 2026-08-03 |
 
 ---
 
 ## Technical Constitutions & Sub-Directories
 
 ### 🗄️ [Database Documentation](database/README.md)
+- [Domain Models Specification](database/database-models.md)
+- [Entity Relationship (ER) Blueprint](database/entity-relationship.md)
+- [Relationship & Loading Guidelines](database/relationship-guidelines.md)
 - [Database Base Mixins Architecture](database/database-mixins.md)
 - [Database Design Principles](database/database-design-principles.md)
 - [Database Request & Migration Architecture](database/database-architecture.md)
