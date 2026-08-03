@@ -1,7 +1,7 @@
 # VOLTA AI Chatbot - Backend Technical Documentation
 
 ## Overview
-Welcome to the central technical documentation hub for the VOLTA AI Chatbot backend. This directory serves as the engineering knowledge base, containing architectural decision records (ADRs), system designs, response envelope standards, and development roadmaps.
+Welcome to the central technical documentation hub for the VOLTA AI Chatbot backend. This directory serves as the engineering knowledge base, containing architectural decision records (ADRs), system designs, response envelope standards, database request flows, and development roadmaps.
 
 ---
 
@@ -14,6 +14,10 @@ Welcome to the central technical documentation hub for the VOLTA AI Chatbot back
 - [005 - Code Quality & Static Analysis Roadmap](architecture/005-code-quality-roadmap.md)
 - [006 - API Response Envelope Standard](architecture/006-api-response-standard.md)
 - [007 - Milestone 2 Infrastructure Implementation Plan](architecture/007-milestone-2-plan.md)
+- [008 - Architectural Plan: Future Database Mixins](architecture/008-future-database-mixins.md)
+- [009 - Database Request Flow Architecture](architecture/009-database-request-flow.md)
+- [010 - Alembic Database Migration Strategy](architecture/010-alembic-migration-strategy.md)
+- [011 - Infrastructure Foundation Lock Record](architecture/011-infrastructure-lock.md)
 
 ---
 
@@ -29,6 +33,14 @@ ADRs capture significant architectural choices, context, alternatives evaluated,
 
 ---
 
+## Technical Constitutions & Guidelines
+- [Database Design Principles](database/database-design-principles.md)
+- [Database Request & Migration Architecture](database/database-architecture.md)
+- [Engineering Principles & Constitution](engineering/engineering-principles.md)
+- [Official Project Standards](engineering/project-standards.md)
+
+---
+
 ## API Standards
 - **Versioning**: All public REST APIs are prefix-versioned under `/api/v1/`.
 - **Payload Envelope**: All endpoints return standardized JSON structures containing `success`, `message`, `data`, and `errors`.
@@ -38,7 +50,7 @@ ADRs capture significant architectural choices, context, alternatives evaluated,
 
 ## Development Roadmap
 - **Milestone 1**: FastAPI Core Platform & Foundation Scaffolding *(Completed)*
-- **Milestone 2**: Infrastructure Layer (PostgreSQL, SQLAlchemy, Alembic, Repository Pattern, Redis) *(Next)*
+- **Milestone 2**: Infrastructure Layer (PostgreSQL, SQLAlchemy, Alembic, Base Mixins, Domain Models, Repositories, Redis) *(In Progress)*
 - **Milestone 3**: Authentication & User Profile Management *(Future)*
 - **Milestone 4**: Shared AI Brain & Conversational Pipeline *(Future)*
 
@@ -47,4 +59,6 @@ ADRs capture significant architectural choices, context, alternatives evaluated,
 ## Directory Organization
 - `api/`: API specifications, route contracts, and OpenAPI exported schemas.
 - `architecture/`: Architecture Decision Records (ADRs), system design blueprints, and phase plans.
-- `database/`: Entity-relationship diagrams (ERD), database schema designs, and migration notes.
+- `database/`: Database design principles, request flow diagrams, ERDs, and migration notes.
+- `engineering/`: Engineering constitutions, Definition of Done, and project standards.
+- `deployment/`: Deployment runbooks, container specs, and release guidelines.

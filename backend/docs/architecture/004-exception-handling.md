@@ -21,5 +21,24 @@ We established a **Centralized Global Exception Interceptor** mechanism using Fa
 - **Positive**: Consistent client error experience, internal stack trace logging without exposing raw errors to API consumers, clean domain exception triggering via `AppException`.
 - **Negative**: Requires all custom application exceptions to inherit from `AppException`.
 
+---
+
+## Planned Future Exception Hierarchy
+As business modules are added in future milestones, `app/core/exceptions.py` will be extended with the following structured exception tree:
+
+```
+AppException (Base Application Exception)
+├── DomainException
+│   ├── NotFoundException (HTTP 404)
+│   ├── ValidationException (HTTP 422)
+│   ├── UnauthorizedException (HTTP 401)
+│   ├── ForbiddenException (HTTP 403)
+│   └── ConflictException (HTTP 409)
+└── InfrastructureException
+    ├── DatabaseException (HTTP 500)
+    ├── CacheException (HTTP 500)
+    └── ExternalServiceException (HTTP 502 / 503)
+```
+
 ## Future Review
 Review error code taxonomy when adding localized multi-language error message payloads.

@@ -1,9 +1,10 @@
-from typing import List, Union
+from typing import List, Optional, Union
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    # Application Config
     APP_NAME: str = "VOLTA AI Chatbot"
     APP_VERSION: str = "0.1.0"
     APP_DESCRIPTION: str = "AI-powered messaging chatbot and voice agent backend for VOLTA"
@@ -19,6 +20,17 @@ class Settings(BaseSettings):
         "http://127.0.0.1:3000",
     ]
     API_V1_PREFIX: str = "/api/v1"
+
+    # Database Config
+    DATABASE_HOST: str = "localhost"
+    DATABASE_PORT: int = 5432
+    DATABASE_NAME: str = "volta_db"
+    DATABASE_USER: str = "postgres"
+    DATABASE_PASSWORD: str = "postgres"
+    DATABASE_URL: Optional[str] = None
+    DATABASE_POOL_SIZE: int = 10
+    DATABASE_MAX_OVERFLOW: int = 20
+    DATABASE_POOL_RECYCLE: int = 3600
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -37,6 +49,18 @@ class Settings(BaseSettings):
                 return json.loads(v)
             return [i.strip() for i in v.split(",") if i.strip()]
         return v
+
+    def get_database_url(self) -> str:
+        """Returns normalized async PostgreSQL connection URL."""
+        if self.DATABASE_URL and self.DATABASE_URL.strip():
+            url = self.DATABASE_URL.strip()
+            if url.startswith("postgresql://"):
+                return url.replace("postgresql://", "postgresql+asyncpg://", 1)
+            return url
+        return (
+            f"postgresql+asyncpg://{self.DATABASE_USER}:{self.DATABASE_PASSWORD}"
+            f"@{self.DATABASE_HOST}:{self.DATABASE_PORT}/{self.DATABASE_NAME}"
+        )
 
 
 settings = Settings()
