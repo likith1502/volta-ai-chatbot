@@ -51,24 +51,41 @@ To maintain clear project tracking:
 - **Includes Chapters**:
   - **Chapter 6.1**: Conversation State Foundation (`backend/app/context/`: `state.py`, `state_manager.py`, `events.py`, `types.py`, `__init__.py`). Strongly typed, immutable state transport container with sub-models, snapshot lineage, node history, ABC contracts, and unit tests.
 
+### Release v6.2 — Graph Orchestration Foundation
+- **Status**: **COMPLETED, VERIFIED, LOCKED**
+- **Version**: `v6.2`
+- **Completion Date**: 2026-08-04
+- **Includes Chapters**:
+  - **Chapter 6.2**: Graph Orchestration Foundation (`backend/app/graph/`: `contracts.py`, `node.py`, `edge.py`, `graph.py`, `builder.py`, `registry.py`, `exceptions.py`). Provider-independent, framework-isolated orchestration layer with base nodes, conditional edges, graph builder, cycle detection, and template registry.
+
 ---
 
 ## Future Release Roadmap
 
-### Release v6.2 — LangGraph Foundation
+### Release v6.3 — Workflow Node Library
 - **Status**: **NEXT PLANNED MILESTONE**
 - **Target Chapters**:
-  - **Chapter 6.2**: LangGraph State Graph & Node Pipeline Architecture Foundation
+  - **Chapter 6.3**: Reusable Workflow Node Component Library (Intent, Memory, Entity, Guardrail, LLM Router Nodes)
 
-### Release v6.3 — Redis State Store & Persistence
+### Release v6.4 — Graph Execution Engine & Runner
 - **Status**: Planned
 - **Target Chapters**:
-  - **Chapter 6.3**: Async Redis State Store & Session Checkpoint Persistence
+  - **Chapter 6.4**: Async Graph Execution Engine & ExecutionResult Tracking
 
-### Release v6.4 — Real-Time Streaming & Orchestration
+### Release v6.5 — Redis State Store & Persistence
 - **Status**: Planned
 - **Target Chapters**:
-  - **Chapter 6.4**: Real-time SSE / WebSocket Streaming & Workflow Orchestration
+  - **Chapter 6.5**: Async Redis State Store & Session Checkpoint Persistence
+
+### Release v6.6 — Streaming & Event Engine
+- **Status**: Planned
+- **Target Chapters**:
+  - **Chapter 6.6**: Real-time SSE / WebSocket Streaming & Event Bus Integration
+
+### Release v6.7 — Human-in-the-Loop & Approval Interrupts
+- **Status**: Planned
+- **Target Chapters**:
+  - **Chapter 6.7**: Human Approval Interrupts & Execution Resume Operations
 
 ### Release v7.0 — Voice Agent & Real-Time Audio Engine
 - **Status**: Planned

@@ -8,7 +8,7 @@ Welcome to the central technical documentation hub for the VOLTA AI Chatbot back
 
 - 📘 [Project Governance Framework](PROJECT_GOVERNANCE.md): Decision-making rules, ADR processes, code review philosophy, and git strategies.
 - 🎯 [Project Milestones & Roadmap](PROJECT_MILESTONES.md): Official status, completion dates, and roadmap versions across all development phases.
-- 🔒 [Foundation Lock Status Record](FOUNDATION_STATUS.md): Official lock records for Infrastructure v1.0, Base Mixins v1.1, Domain Models v2.0, Repositories v2.5, Services v3.0, REST API Layer v4.0, AI Foundation v5.0, and Conversation State Foundation v6.1.
+- 🔒 [Foundation Lock Status Record](FOUNDATION_STATUS.md): Official lock records for Infrastructure v1.0, Base Mixins v1.1, Domain Models v2.0, Repositories v2.5, Services v3.0, REST API Layer v4.0, AI Foundation v5.0, Conversation State Foundation v6.1, and Graph Orchestration Foundation v6.2.
 
 ---
 
@@ -36,6 +36,8 @@ Welcome to the central technical documentation hub for the VOLTA AI Chatbot back
 - [019 - AI Engine Request & Execution Flow Architecture](architecture/019-ai-engine-request-flow.md)
 - [020 - Phase 6 Readiness Review & Architecture Audit](architecture/020-phase-6-readiness-review.md)
 - [021 - Conversation State Architecture](architecture/021-conversation-state-architecture.md)
+- [022 - Graph Orchestration Foundation Architecture](architecture/022-graph-orchestration-foundation.md)
+- [023 - Graph Orchestration Foundation Lock Record](architecture/023-graph-foundation-lock.md)
 
 ---
 

@@ -70,4 +70,13 @@ Strongly-typed, immutable-friendly, provider-agnostic conversation state archite
 
 ---
 
-> **Project Rule**: No further architectural or functional changes to the Conversation State Foundation should be made without a new Architecture Decision Record (ADR).
+## 9. Graph Orchestration Foundation (Chapter 6.2)
+- **Release Version**: `v6.2`
+- **Status**: 🔒 **LOCKED**
+- **Completion Date**: 2026-08-04
+
+Vendor-independent, framework-isolated graph orchestration layer (`app/graph/`), comprising base node abstractions (`BaseNode`), directed conditional edges (`GraphEdge`), immutable compiled graph models (`Graph`), graph builder with cycle detection (`GraphBuilder`), template registry (`GraphRegistry`), and DTO contracts (`GraphMetadata`, `GraphBuildOptions`, `GraphValidationResult`, `ExecutionResult`).
+
+---
+
+> **Project Rule**: No further architectural or functional changes to the Conversation State Foundation or Graph Orchestration Foundation should be made without a new Architecture Decision Record (ADR).
