@@ -1,38 +1,56 @@
 import uuid
 from abc import ABC, abstractmethod
-from datetime import datetime, timezone
 from typing import Any, Optional
 
-from pydantic import BaseModel, Field
-
-
-class ConversationState(BaseModel):
-    """Data transfer object representing the runtime conversation state for workflow orchestration."""
-
-    conversation_id: uuid.UUID
-    session_id: str
-    current_step: str = "initialized"
-    status: str = "active"
-    session_variables: dict[str, Any] = Field(default_factory=dict)
-    pending_tool_calls: list[dict[str, Any]] = Field(default_factory=list)
-    temporary_runtime_state: dict[str, Any] = Field(default_factory=dict)
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+from app.context.state import ConversationState
 
 
 class ConversationStateManager(ABC):
-    """Abstract manager interface for retrieving, persisting, and clearing session workflow states."""
+    """Abstract interface contract for persisting, loading, and managing ConversationState."""
 
     @abstractmethod
-    async def get_state(self, conversation_id: uuid.UUID) -> Optional[ConversationState]:
-        """Retrieves active conversation state or returns None if omitted."""
+    async def create_state(
+        self,
+        conversation_id: Optional[uuid.UUID | str] = None,
+        user_id: Optional[str] = None,
+        **kwargs: Any,
+    ) -> ConversationState:
+        """Initializes and returns a new ConversationState object."""
+        pass
+
+    @abstractmethod
+    async def load_state(self, conversation_id: uuid.UUID | str) -> Optional[ConversationState]:
+        """Retrieves active conversation state by conversation ID or returns None if omitted."""
         pass
 
     @abstractmethod
     async def save_state(self, state: ConversationState) -> None:
-        """Persists or updates the conversation state payload."""
+        """Persists or updates the conversation state object."""
         pass
 
     @abstractmethod
-    async def clear_state(self, conversation_id: uuid.UUID) -> None:
-        """Clears or invalidates state for a completed conversation session."""
+    async def update_state(
+        self, conversation_id: uuid.UUID | str, updates: dict[str, Any]
+    ) -> ConversationState:
+        """Applies updates to an existing conversation state and persists the result."""
+        pass
+
+    @abstractmethod
+    async def clear_state(self, conversation_id: uuid.UUID | str) -> None:
+        """Clears or invalidates state for a conversation session."""
+        pass
+
+    @abstractmethod
+    async def exists(self, conversation_id: uuid.UUID | str) -> bool:
+        """Checks if a state record exists for the given conversation ID."""
+        pass
+
+    @abstractmethod
+    async def delete(self, conversation_id: uuid.UUID | str) -> None:
+        """Deletes state entry for the given conversation ID."""
+        pass
+
+    @abstractmethod
+    async def list_states(self) -> list[uuid.UUID | str]:
+        """Returns a list of all active conversation state identifiers."""
         pass

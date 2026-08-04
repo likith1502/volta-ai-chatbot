@@ -6,7 +6,7 @@ This document records the official lock status of all application tiers for the 
 
 ## 1. Infrastructure Foundation (Chapters 2.1 & 2.2)
 - **Release Version**: `v1.0`
-- **Status**: **LOCKED**
+- **Status**: 🔒 **LOCKED**
 
 FastAPI engine, settings configuration, console logging, exception handlers, PostgreSQL Async engine pooling, AsyncSession dependency, declarative base metadata naming conventions, and Alembic migrations.
 
@@ -14,7 +14,7 @@ FastAPI engine, settings configuration, console logging, exception handlers, Pos
 
 ## 2. Database Base Mixins (Chapter 2.3)
 - **Release Version**: `v1.1`
-- **Status**: **LOCKED**
+- **Status**: 🔒 **LOCKED**
 
 `UUIDMixin`, `TimestampMixin`, `SoftDeleteMixin`, `AuditMixin`.
 
@@ -22,7 +22,7 @@ FastAPI engine, settings configuration, console logging, exception handlers, Pos
 
 ## 3. Domain Models Layer (Chapter 2.4)
 - **Release Version**: `v2.0`
-- **Status**: **LOCKED**
+- **Status**: 🔒 **LOCKED**
 
 `User`, `Conversation`, `Message`, `Memory`, `Intent`, `Entity`, `Recommendation`, `Booking`, `Notification`, `AuditLog`, `enums.py`.
 
@@ -30,7 +30,7 @@ FastAPI engine, settings configuration, console logging, exception handlers, Pos
 
 ## 4. Repository Pattern & Structure Standardization (Chapters 2.5 & 2.6)
 - **Release Version**: `v2.5` & `v2.6`
-- **Status**: **LOCKED**
+- **Status**: 🔒 **LOCKED**
 
 `BaseRepository[T]`, `UserRepository`, `ConversationRepository`, `RecommendationRepository`, `BookingRepository`, clean `app/db/` package layout.
 
@@ -38,7 +38,7 @@ FastAPI engine, settings configuration, console logging, exception handlers, Pos
 
 ## 5. Application Service Layer (Chapter 3.0)
 - **Release Version**: `v3.0`
-- **Status**: **LOCKED**
+- **Status**: 🔒 **LOCKED**
 
 `BaseService`, `UserService`, `ConversationService`, `RecommendationService`, `BookingService`, `NotificationService`, Service Domain Exceptions.
 
@@ -46,11 +46,28 @@ FastAPI engine, settings configuration, console logging, exception handlers, Pos
 
 ## 6. REST API Presentation Layer (Chapter 4.0)
 - **Release Version**: `v4.0`
-- **Status**: **LOCKED**
+- **Status**: 🔒 **LOCKED**
 - **Completion Date**: 2026-08-03
 
-### Components Included
-- **Pydantic v2 DTO Schemas** (`app/schemas/`): `UserCreate`, `UserUpdate`, `UserResponse`, `ConversationCreate`, `ConversationResponse`, `RecommendationCreate`, `RecommendationResponse`, `BookingCreate`, `BookingResponse`, `NotificationCreate`, `NotificationResponse`, `ResponseEnvelope`.
-- **FastAPI Service Dependencies** (`app/api/dependencies/services.py`): `get_user_service`, `get_conversation_service`, `get_recommendation_service`, `get_booking_service`, `get_notification_service`.
-- **REST API Routers** (`app/api/v1/routers/`): `users.py`, `conversations.py`, `recommendations.py`, `bookings.py`, `notifications.py`.
-- **Aggregate Router** (`app/api/v1/router.py`): Versioned route aggregation under `/api/v1/`.
+Pydantic v2 DTO Schemas (`app/schemas/`), FastAPI Service Dependencies (`app/api/dependencies/services.py`), REST API Routers (`app/api/v1/routers/`), and Aggregate Router (`app/api/v1/router.py`).
+
+---
+
+## 7. AI Foundation (Chapter 5.0)
+- **Release Version**: `v5.0`
+- **Status**: 🔒 **LOCKED**
+
+Multi-provider AI service layer (`app/ai/`, `app/llm/`, `app/prompts/`), provider adapters (OpenAI, Claude, Gemini), provider factory, unified model interfaces, prompt templates, cost and token tracking, and provider exception mapping.
+
+---
+
+## 8. Conversation State Foundation (Chapter 6.1)
+- **Release Version**: `v6.1`
+- **Status**: 🔒 **LOCKED**
+- **Completion Date**: 2026-08-04
+
+Strongly-typed, immutable-friendly, provider-agnostic conversation state architecture (`app/context/`), composing sub-models (`StateMetadata`, `ConversationData`, `RuntimeState`, `ExecutionState`, `MemoryState`), snapshot lineage (`state_id`, `parent_state_id`), execution order tracking (`executed_nodes`), abstract state manager contracts (`ConversationStateManager`), and generic domain types/events (`WorkflowStatus`, `WorkflowEventType`).
+
+---
+
+> **Project Rule**: No further architectural or functional changes to the Conversation State Foundation should be made without a new Architecture Decision Record (ADR).
