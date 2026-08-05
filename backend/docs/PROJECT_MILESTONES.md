@@ -58,34 +58,45 @@ To maintain clear project tracking:
 - **Includes Chapters**:
   - **Chapter 6.2**: Graph Orchestration Foundation (`backend/app/graph/`: `contracts.py`, `node.py`, `edge.py`, `graph.py`, `builder.py`, `registry.py`, `exceptions.py`). Provider-independent, framework-isolated orchestration layer with base nodes, conditional edges, graph builder, cycle detection, and template registry.
 
+### Release v6.3 — Workflow Node Library
+- **Status**: **COMPLETED, VERIFIED, LOCKED**
+- **Version**: `v6.3`
+- **Completion Date**: 2026-08-05
+- **Includes Chapters**:
+  - **Chapter 6.3**: Workflow Node Library (`backend/app/workflow/`). Reusable workflow node contracts, concrete placeholder nodes (`StartNode`, `EndNode`, `DecisionNode`, `LLMNode`, `ToolNode`, `MemoryNode`, `IntentNode`, `EntityNode`, `ResponseNode`), capabilities, metadata, config, execution context, node result, and node registry.
+
+### Release v6.4 — Graph Execution Engine
+- **Status**: **COMPLETED, VERIFIED, LOCKED**
+- **Version**: `v6.4`
+- **Completion Date**: 2026-08-05
+- **Includes Chapters**:
+  - **Chapter 6.4**: Graph Execution Engine (`backend/app/execution/`). Provider-independent execution engine (`GraphExecutor`), mandatory pre-execution graph validation, depth protection (`max_depth`), execution policy (`ExecutionPolicy`), state snapshots (`ExecutionSnapshot`), status tracking (`ExecutionStatus`), dispatcher lifecycle (`ExecutionDispatcher`), and edge scheduler (`ExecutionScheduler`).
+
+### Release v6.5 — Workflow Event & Observability Foundation
+- **Status**: **COMPLETED, VERIFIED, LOCKED**
+- **Version**: `v6.5`
+- **Completion Date**: 2026-08-05
+- **Includes Chapters**:
+  - **Chapter 6.5**: Workflow Event & Observability Foundation (`backend/app/events/`). Provider-independent event infrastructure (`WorkflowEvent`, `WorkflowEventBus`, `WorkflowEventDispatcher`, `WorkflowEventRegistry`, `WorkflowEventListener`, `WorkflowEventFilter`, `EventEnvelope`, `EventSubscription`, `WorkflowEventSerializer`).
+
 ---
 
 ## Future Release Roadmap
 
-### Release v6.3 — Workflow Node Library
+### Release v6.6 — Checkpoint & Replay Foundation
 - **Status**: **NEXT PLANNED MILESTONE**
 - **Target Chapters**:
-  - **Chapter 6.3**: Reusable Workflow Node Component Library (Intent, Memory, Entity, Guardrail, LLM Router Nodes)
+  - **Chapter 6.6**: Session Checkpointing, State Persistence Stores, & Execution Replay Engine
 
-### Release v6.4 — Graph Execution Engine & Runner
+### Release v6.7 — Streaming & Real-Time Foundation
 - **Status**: Planned
 - **Target Chapters**:
-  - **Chapter 6.4**: Async Graph Execution Engine & ExecutionResult Tracking
+  - **Chapter 6.7**: Real-Time WebSockets / SSE Streaming Transports & Event Listeners
 
-### Release v6.5 — Redis State Store & Persistence
+### Release v6.8 — Human-in-the-Loop & Approval Interrupts
 - **Status**: Planned
 - **Target Chapters**:
-  - **Chapter 6.5**: Async Redis State Store & Session Checkpoint Persistence
-
-### Release v6.6 — Streaming & Event Engine
-- **Status**: Planned
-- **Target Chapters**:
-  - **Chapter 6.6**: Real-time SSE / WebSocket Streaming & Event Bus Integration
-
-### Release v6.7 — Human-in-the-Loop & Approval Interrupts
-- **Status**: Planned
-- **Target Chapters**:
-  - **Chapter 6.7**: Human Approval Interrupts & Execution Resume Operations
+  - **Chapter 6.8**: Human Approval Interrupts, Pause/Resume Operations, & Governance Operations
 
 ### Release v7.0 — Voice Agent & Real-Time Audio Engine
 - **Status**: Planned

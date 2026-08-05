@@ -70,13 +70,46 @@ Strongly-typed, immutable-friendly, provider-agnostic conversation state archite
 
 ---
 
-## 9. Graph Orchestration Foundation (Chapter 6.2)
-- **Release Version**: `v6.2`
+## 10. Workflow Node Library (Chapter 6.3)
+- **Release Version**: `v6.3`
 - **Status**: 🔒 **LOCKED**
-- **Completion Date**: 2026-08-04
+- **Completion Date**: 2026-08-05
 
-Vendor-independent, framework-isolated graph orchestration layer (`app/graph/`), comprising base node abstractions (`BaseNode`), directed conditional edges (`GraphEdge`), immutable compiled graph models (`Graph`), graph builder with cycle detection (`GraphBuilder`), template registry (`GraphRegistry`), and DTO contracts (`GraphMetadata`, `GraphBuildOptions`, `GraphValidationResult`, `ExecutionResult`).
+Reusable workflow node contracts (`app/workflow/`), concrete placeholder nodes (`StartNode`, `EndNode`, `DecisionNode`, `LLMNode`, `ToolNode`, `MemoryNode`, `IntentNode`, `EntityNode`, `ResponseNode`), capabilities model (`NodeCapability`), metadata, execution context (`NodeExecutionContext`), result containers (`NodeResult`), and registry discovery (`WorkflowNodeRegistry`).
 
 ---
 
-> **Project Rule**: No further architectural or functional changes to the Conversation State Foundation or Graph Orchestration Foundation should be made without a new Architecture Decision Record (ADR).
+## 11. Graph Execution Engine (Chapter 6.4)
+- **Release Version**: `v6.4`
+- **Status**: 🔒 **LOCKED**
+- **Completion Date**: 2026-08-05
+
+Provider-independent graph execution engine (`app/execution/`), mandatory pre-execution graph validation, depth protection (`max_depth`), execution policy (`ExecutionPolicy`), state snapshot lineage (`ExecutionSnapshot`), execution status tracking (`ExecutionStatus`), dispatcher lifecycle management (`ExecutionDispatcher`), and priority-based edge scheduler (`ExecutionScheduler`).
+
+---
+
+## 12. Workflow Event & Observability Foundation (Chapter 6.5)
+- **Release Version**: `v6.5`
+- **Status**: 🔒 **LOCKED**
+- **Completion Date**: 2026-08-05
+
+Provider-independent in-memory event infrastructure (`app/events/`), immutable event domain objects (`WorkflowEvent`), transport wrapper (`EventEnvelope`), subscription models (`EventSubscription`), read-only observer listeners (`WorkflowEventListener`), event filtering engine (`WorkflowEventFilter`), dispatcher with priority ordering and error isolation (`WorkflowEventDispatcher`), and at-most-once in-memory event bus (`WorkflowEventBus`).
+
+---
+
+## Master Foundation Lock Record
+
+- 🔒 Infrastructure Foundation v1.0 — LOCKED
+- 🔒 Database Base Mixins v1.1 — LOCKED
+- 🔒 Domain Models v2.0 — LOCKED
+- 🔒 Repository Pattern v2.6 — LOCKED
+- 🔒 Application Service Layer v3.0 — LOCKED
+- 🔒 REST API Layer v4.0 — LOCKED
+- 🔒 Enterprise AI Foundation v5.0 — LOCKED
+- 🔒 Conversation State Foundation v6.1 — LOCKED
+- 🔒 Graph Orchestration Foundation v6.2 — LOCKED
+- 🔒 Workflow Node Library v6.3 — LOCKED
+- 🔒 Graph Execution Engine v6.4 — LOCKED
+- 🔒 Workflow Event & Observability Foundation v6.5 — LOCKED
+
+> **Project Rule**: No further architectural or functional changes to completed foundation tiers should be made without an official Architecture Decision Record (ADR).
