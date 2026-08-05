@@ -46,16 +46,22 @@ backend/
 ├── app/
 │   ├── ai/           # Provider-agnostic AI engine (base, factory, prompts, providers)
 │   ├── api/          # Route handlers & API routers (v1)
+│   ├── checkpoints/  # Checkpoint & Replay Foundation (v6.6)
 │   ├── config/       # Settings & constants
+│   ├── context/      # Conversation State Foundation (v6.1)
 │   ├── core/         # Exception handlers & logging setup
 │   ├── db/           # AsyncEngine, AsyncSession, Base metadata, Mixins
 │   ├── dependencies/ # FastAPI dependency injection utilities
+│   ├── events/       # Workflow Event & Observability Foundation (v6.5)
 │   ├── exceptions/   # Application & AI exceptions
+│   ├── execution/    # Graph Execution Engine (v6.4)
+│   ├── graph/        # Graph Orchestration Foundation (v6.2)
 │   ├── models/       # SQLAlchemy ORM models
 │   ├── repositories/ # Data access repository layer
 │   ├── schemas/      # Pydantic DTO validation schemas
 │   ├── services/     # Domain services & ChatService orchestrator
 │   ├── utils/        # Response helpers & utility functions
+│   ├── workflow/     # Workflow Node Library (v6.3)
 │   └── main.py       # FastAPI application entry point
 ├── docs/             # Technical architecture & engineering docs
 ├── logs/             # Local runtime execution logs

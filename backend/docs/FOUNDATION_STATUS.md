@@ -97,6 +97,15 @@ Provider-independent in-memory event infrastructure (`app/events/`), immutable e
 
 ---
 
+## 13. Checkpoint & Replay Foundation (Chapter 6.6)
+- **Release Version**: `v6.6`
+- **Status**: 🔒 **LOCKED**
+- **Completion Date**: 2026-08-05
+
+Provider-independent checkpoint and replay framework (`app/checkpoints/`), immutable checkpoint model (`Checkpoint`), versioning container (`CheckpointVersion`), validation result container (`CheckpointValidationResult`), in-memory storage layer (`InMemoryCheckpointStore`), manager (`CheckpointManager`), replay history log (`ReplayHistory`), context (`ReplayContext`), strategy engine (`SequentialReplayStrategy`), and framework orchestrator (`ReplayEngine`).
+
+---
+
 ## Master Foundation Lock Record
 
 - 🔒 Infrastructure Foundation v1.0 — LOCKED
@@ -111,5 +120,6 @@ Provider-independent in-memory event infrastructure (`app/events/`), immutable e
 - 🔒 Workflow Node Library v6.3 — LOCKED
 - 🔒 Graph Execution Engine v6.4 — LOCKED
 - 🔒 Workflow Event & Observability Foundation v6.5 — LOCKED
+- 🔒 Checkpoint & Replay Foundation v6.6 — LOCKED
 
 > **Project Rule**: No further architectural or functional changes to completed foundation tiers should be made without an official Architecture Decision Record (ADR).

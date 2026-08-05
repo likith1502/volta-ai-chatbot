@@ -79,17 +79,19 @@ To maintain clear project tracking:
 - **Includes Chapters**:
   - **Chapter 6.5**: Workflow Event & Observability Foundation (`backend/app/events/`). Provider-independent event infrastructure (`WorkflowEvent`, `WorkflowEventBus`, `WorkflowEventDispatcher`, `WorkflowEventRegistry`, `WorkflowEventListener`, `WorkflowEventFilter`, `EventEnvelope`, `EventSubscription`, `WorkflowEventSerializer`).
 
+### Release v6.6 — Checkpoint & Replay Foundation
+- **Status**: **COMPLETED, VERIFIED, LOCKED**
+- **Version**: `v6.6`
+- **Completion Date**: 2026-08-05
+- **Includes Chapters**:
+  - **Chapter 6.6**: Checkpoint & Replay Foundation (`backend/app/checkpoints/`). Provider-independent checkpointing and replay framework (`Checkpoint`, `CheckpointVersion`, `CheckpointValidationResult`, `InMemoryCheckpointStore`, `CheckpointManager`, `ReplayContext`, `ReplayMetrics`, `ReplayHistory`, `ReplayEngine`).
+
 ---
 
 ## Future Release Roadmap
 
-### Release v6.6 — Checkpoint & Replay Foundation
-- **Status**: **NEXT PLANNED MILESTONE**
-- **Target Chapters**:
-  - **Chapter 6.6**: Session Checkpointing, State Persistence Stores, & Execution Replay Engine
-
 ### Release v6.7 — Streaming & Real-Time Foundation
-- **Status**: Planned
+- **Status**: **NEXT PLANNED MILESTONE**
 - **Target Chapters**:
   - **Chapter 6.7**: Real-Time WebSockets / SSE Streaming Transports & Event Listeners
 
