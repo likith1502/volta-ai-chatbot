@@ -106,6 +106,15 @@ Provider-independent checkpoint and replay framework (`app/checkpoints/`), immut
 
 ---
 
+## 14. Streaming & Real-Time Foundation (Chapter 6.7)
+- **Release Version**: `v6.7`
+- **Status**: 🔒 **LOCKED**
+- **Completion Date**: 2026-08-05
+
+Provider-independent real-time streaming framework (`app/streaming/`), immutable stream message model (`StreamMessage`), transport envelope (`StreamEnvelope`), channel container (`StreamChannel`), subscription model (`StreamSubscription`), priority dispatcher (`StreamDispatcher`), adapter contracts (`StreamAdapter`, `AdapterCapabilities`), serializer interface (`StreamSerializer`), telemetry (`StreamMetrics`, `StreamHistory`), and stream manager (`StreamManager`).
+
+---
+
 ## Master Foundation Lock Record
 
 - 🔒 Infrastructure Foundation v1.0 — LOCKED
@@ -121,5 +130,6 @@ Provider-independent checkpoint and replay framework (`app/checkpoints/`), immut
 - 🔒 Graph Execution Engine v6.4 — LOCKED
 - 🔒 Workflow Event & Observability Foundation v6.5 — LOCKED
 - 🔒 Checkpoint & Replay Foundation v6.6 — LOCKED
+- 🔒 Streaming & Real-Time Foundation v6.7 — LOCKED
 
 > **Project Rule**: No further architectural or functional changes to completed foundation tiers should be made without an official Architecture Decision Record (ADR).

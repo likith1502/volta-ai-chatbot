@@ -86,17 +86,19 @@ To maintain clear project tracking:
 - **Includes Chapters**:
   - **Chapter 6.6**: Checkpoint & Replay Foundation (`backend/app/checkpoints/`). Provider-independent checkpointing and replay framework (`Checkpoint`, `CheckpointVersion`, `CheckpointValidationResult`, `InMemoryCheckpointStore`, `CheckpointManager`, `ReplayContext`, `ReplayMetrics`, `ReplayHistory`, `ReplayEngine`).
 
+### Release v6.7 — Streaming & Real-Time Foundation
+- **Status**: **COMPLETED, VERIFIED, LOCKED**
+- **Version**: `v6.7`
+- **Completion Date**: 2026-08-05
+- **Includes Chapters**:
+  - **Chapter 6.7**: Streaming & Real-Time Foundation (`backend/app/streaming/`). Provider-independent streaming framework (`StreamMessage`, `StreamEnvelope`, `StreamChannel`, `StreamSubscription`, `StreamDispatcher`, `StreamRegistry`, `StreamManager`, `StreamAdapter`, `StreamSerializer`, `StreamMetrics`, `StreamHistory`).
+
 ---
 
 ## Future Release Roadmap
 
-### Release v6.7 — Streaming & Real-Time Foundation
-- **Status**: **NEXT PLANNED MILESTONE**
-- **Target Chapters**:
-  - **Chapter 6.7**: Real-Time WebSockets / SSE Streaming Transports & Event Listeners
-
 ### Release v6.8 — Human-in-the-Loop & Approval Interrupts
-- **Status**: Planned
+- **Status**: **NEXT PLANNED MILESTONE**
 - **Target Chapters**:
   - **Chapter 6.8**: Human Approval Interrupts, Pause/Resume Operations, & Governance Operations
 
