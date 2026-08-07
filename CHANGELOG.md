@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v1.0.0] - 2026-08-07
+
+### Graduated
+- 🏆 **VOLTA AI Platform v1.0.0 Master Platform Graduation**: Official public platform graduation release uniting the complete 9-tier frozen Enterprise Runtime Stack (v7.0–v7.8) under `v1.0.0`.
+- **Single Source of Truth**: Published [`PLATFORM_VERSION.md`](PLATFORM_VERSION.md) and [`FINAL_PLATFORM_CHECKLIST.md`](FINAL_PLATFORM_CHECKLIST.md) at repository root.
+- **Future Versioning Policy**: All subsequent releases transition permanently to Semantic Versioning (`v1.0.1`, `v1.1.0`, `v2.0.0`).
+- **Official Architecture Diagram**: Added canonical single-page architecture flowchart.
+- **Git Tags**: Created and published git tag `v1.0.0`.
+
+---
+
 ## [v7.8.0] - 2026-08-07
 
 ### Added
