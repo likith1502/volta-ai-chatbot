@@ -134,3 +134,18 @@ async def list_execution_history(limit: int = Query(default=20, ge=1, le=100)) -
         data=[r.model_dump() for r in records],
         message="Recent execution history retrieved",
     )
+
+
+@router.get(
+    "/health",
+    status_code=status.HTTP_200_OK,
+    summary="Check LLM Runtime Health",
+)
+async def get_runtime_health() -> dict[str, Any]:
+    """Returns health status report for LLM Runtime Engine."""
+    providers_health = await _runtime_manager.health_manager.check_all_providers()
+    data = {k: v.model_dump() for k, v in providers_health.items()}
+    return success_response(
+        data=data,
+        message="LLM Runtime Engine health report retrieved",
+    )
