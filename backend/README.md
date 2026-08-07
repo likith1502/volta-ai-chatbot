@@ -1,6 +1,6 @@
 # VOLTA AI Chatbot - Backend Platform
 
-A production-grade, asynchronous AI-powered messaging chatbot and voice agent backend for the VOLTA urban mobility platform. Built with Python 3.11+, FastAPI, Async PostgreSQL, SQLAlchemy 2.0, Alembic, and Provider-Agnostic Conversational AI.
+A production-grade, asynchronous AI-powered messaging chatbot backend for the VOLTA urban mobility platform. Built with Python 3.11+, FastAPI, Async PostgreSQL, SQLAlchemy 2.0, Alembic, and Provider-Agnostic Conversational AI.
 
 ---
 
@@ -105,6 +105,7 @@ pytest
 
 ## Development Roadmap & Releases
 
+### Completed Foundations (v1.0 – v6.8.1)
 - **Release v1.0**: Infrastructure Foundation *(Completed & Locked)*
 - **Release v1.1**: Database Base Mixins *(Completed & Locked)*
 - **Release v2.0**: Domain Models *(Completed & Locked)*
@@ -122,4 +123,24 @@ pytest
 - **Release v6.7**: Streaming & Real-Time Foundation *(Completed & Locked)*
 - **Release v6.8**: Human-in-the-Loop Foundation *(Completed & Locked)*
 - **Release v6.8.1**: Documentation & Repository Synchronization *(Completed & Locked)*
+
+### Active & Future Roadmap
+- 🚀 **Phase 7 — Enterprise Messaging Runtime** *(Active Target)*
+  - `7.0` LLM Runtime Engine
+  - `7.1` Prompt Execution Engine
+  - `7.2` Memory Runtime
+  - `7.3` Tool Runtime
+  - `7.4` Graph Runtime Integration
+  - `7.5` Multi-Agent Runtime
+  - `7.6` RAG Engine
+  - `7.7` Production Integrations
+  - `7.8` Deployment & Scaling
+- 📅 **Phase 8 — Voice Platform** *(Future Expansion)*
+  - `8.0` Speech-to-Text (STT)
+  - `8.1` Text-to-Speech (TTS)
+  - `8.2` Audio Streaming
+  - `8.3` Voice Sessions
+  - `8.4` Telephony Integrations
+  - `8.5` Multimodal Conversations
+
 

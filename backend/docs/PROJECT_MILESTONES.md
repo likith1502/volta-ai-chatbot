@@ -111,12 +111,25 @@ To maintain clear project tracking:
 
 ## Future Release Roadmap
 
-### Release v7.0 — Voice Agent & Real-Time Audio Engine
-- **Status**: Planned (Approved for Execution)
-- **Target Chapters**:
-  - **Chapter 7.1**: Low-Latency WebSocket Audio Streaming & Voice Agent Core
+### Phase 7 — Enterprise Messaging Runtime (Current Target)
+- **Status**: **ACTIVE MILESTONE TARGET**
+- **Target Sub-Phases**:
+  - **Phase 7.0**: LLM Runtime Engine ✅ **COMPLETED (`v7.0.0`)**
+  - **Phase 7.1**: Prompt Execution Engine
+  - **Phase 7.2**: Memory Runtime
+  - **Phase 7.3**: Tool Runtime
+  - **Phase 7.4**: Graph Runtime Integration
+  - **Phase 7.5**: Multi-Agent Runtime
+  - **Phase 7.6**: RAG Engine
+  - **Phase 7.7**: Production Integrations
+  - **Phase 7.8**: Deployment & Scaling
 
-### Release v8.0 — Production Cloud Deployment
-- **Status**: Planned
-- **Target Chapters**:
-  - **Chapter 8.1**: Docker Optimization, Kubernetes Manifests, Nginx Load Balancing & CI/CD Pipelines
+### Phase 8 — Voice Platform (Future Expansion)
+- **Status**: **PLANNED FUTURE HORIZON**
+- **Target Sub-Phases**:
+  - **Phase 8.0**: Speech-to-Text (STT)
+  - **Phase 8.1**: Text-to-Speech (TTS)
+  - **Phase 8.2**: Audio Streaming
+  - **Phase 8.3**: Voice Sessions
+  - **Phase 8.4**: Telephony Integrations
+  - **Phase 8.5**: Multimodal Conversations

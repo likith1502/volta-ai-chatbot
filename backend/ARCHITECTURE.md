@@ -8,8 +8,8 @@
 VOLTA AI Chatbot is an enterprise-grade, multi-modal conversational AI ecosystem built to transform urban mobility, ride booking, and personalized travel recommendations.
 
 ### Goals
-- Deliver real-time, context-aware conversational ride booking and assistance.
-- Establish a decoupled backend capable of powering both messaging (text) chatbots and low-latency voice agents.
+- Deliver real-time, context-aware conversational ride booking and assistance over enterprise messaging channels.
+- Establish a decoupled backend capable of powering both enterprise messaging runtimes and future low-latency voice platforms.
 - Ensure modular extensibility for third-party transport, hospitality, and event integrations.
 
 ### Vision
@@ -42,7 +42,7 @@ To serve as the universal intelligence layer (Shared AI Brain) for urban transit
 ### Scalability Goals
 - Handle thousands of concurrent active conversations.
 - Maintain sub-second API response times for standard queries.
-- Support low-latency audio stream processing for future voice agent capabilities.
+- Support high-throughput message processing for Phase 7 Enterprise Messaging Runtime and future Phase 8 Voice Platform capabilities.
 
 ---
 
@@ -568,9 +568,9 @@ Validate all input boundaries strictly, apply principle of least privilege, and 
 
 ## 13. Future Roadmap
 
-- **Messaging Chatbot**: Complete text-based multi-channel integration (Web, WhatsApp, Telegram).
-- **Voice Agent**: Low-latency bidirectional WebSockets for real-time audio streaming.
-- **Shared AI Brain**: Cross-channel context synchronization across voice and text interactions.
+- **Phase 7 — Enterprise Messaging Runtime**: Complete text-based multi-channel integration (Web, WhatsApp, Telegram), LLM runtime, prompt engine, memory runtime, and multi-agent coordination.
+- **Phase 8 — Voice Platform**: Speech-to-Text (STT), Text-to-Speech (TTS), low-latency bidirectional WebSockets, telephony (SIP), and multimodal voice interactions.
+- **Shared AI Brain**: Cross-channel context synchronization across messaging and voice platforms.
 - **Corporate Features**: Enterprise accounts, split billing, team travel management.
 - **Hotel Integration**: Contextual ride suggestions tied to hotel check-in/out schedules.
 - **Airport Integration**: Real-time flight tracking triggers for automated airport pick-up scheduling.

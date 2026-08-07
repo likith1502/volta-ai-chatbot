@@ -1,13 +1,13 @@
 # VOLTA AI Chatbot
 
-A production-grade, multi-modal AI-powered messaging chatbot and voice agent backend designed for the VOLTA urban mobility and ride-booking platform.
+A production-grade, asynchronous AI-powered messaging chatbot backend designed for the VOLTA urban mobility platform.
 
 ---
 
 ## Project Goals
 
-- **Conversational Mobility**: Provide real-time, context-aware ride discovery, booking, and travel assistance.
-- **Shared AI Brain**: Maintain persistent multi-turn conversational state across messaging (text) and real-time audio (voice) channels.
+- **Conversational Mobility**: Provide real-time, context-aware ride discovery, booking, and travel assistance over enterprise messaging channels.
+- **Enterprise AI Messaging Runtime**: Maintain persistent multi-turn conversational state, graph workflows, and tool integration across messaging interactions.
 - **Enterprise Performance**: Deliver sub-second response times using asynchronous non-blocking Python architecture (FastAPI, Async PostgreSQL, SQLAlchemy 2.0).
 
 ---
@@ -73,6 +73,9 @@ Graph Execution & State Engine            Domain Repositories (app/repositories/
        ▼                 ▼
 Event & Stream Bus     HITL Governance & Replay Engine
 (app/events/, streaming/)  (app/hitl/, app/checkpoints/)
+       │
+       ▼
+Enterprise Messaging Runtime (Phase 7) ──► Voice Platform (Phase 8 Expansion)
 ```
 
 ---
@@ -88,7 +91,7 @@ Key Documents:
 - [ADR Index (ADRs 001 – 035)](backend/docs/architecture/README.md)
 - [Foundation Status & Lock Record](backend/docs/FOUNDATION_STATUS.md)
 - [Project Milestones & Release History](backend/docs/PROJECT_MILESTONES.md)
-- [Engineering Principles & Constitution](backend/docs/engineering/engineering-principles.md)
+- [Foundation Graduation Certificate](backend/docs/FOUNDATION_CERTIFICATE_v6.8.1.md)
 
 ---
 
@@ -106,6 +109,7 @@ Key Documents:
 
 ## Development Status & Roadmap
 
+### Completed Foundations (Phase 1 – Phase 6.8.1)
 - ✅ **v1.0**: Infrastructure Foundation *(Locked)*
 - ✅ **v1.1**: Database Base Mixins *(Locked)*
 - ✅ **v2.0**: Domain Models Layer *(Locked)*
@@ -122,7 +126,25 @@ Key Documents:
 - ✅ **v6.7**: Streaming & Real-Time Foundation *(Locked)*
 - ✅ **v6.8**: Human-in-the-Loop Foundation *(Locked)*
 - ✅ **v6.8.1**: Documentation & Repository Synchronization *(Locked)*
-- 🚀 **v7.0**: Voice Agent & Real-Time Audio Engine *(Next Phase)*
+
+### Active Milestone Roadmap
+- 🚀 **Phase 7 — Enterprise Messaging Runtime** *(Current Target)*
+  - `7.0` LLM Runtime Engine
+  - `7.1` Prompt Execution Engine
+  - `7.2` Memory Runtime
+  - `7.3` Tool Runtime
+  - `7.4` Graph Runtime Integration
+  - `7.5` Multi-Agent Runtime
+  - `7.6` RAG Engine
+  - `7.7` Production Integrations
+  - `7.8` Deployment & Scaling
+- 📅 **Phase 8 — Voice Platform** *(Future Horizon)*
+  - `8.0` Speech-to-Text (STT)
+  - `8.1` Text-to-Speech (TTS)
+  - `8.2` Audio Streaming
+  - `8.3` Voice Sessions
+  - `8.4` Telephony Integrations
+  - `8.5` Multimodal Conversations
 
 ---
 

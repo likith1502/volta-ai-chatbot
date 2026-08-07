@@ -152,3 +152,27 @@ Provider-independent human-in-the-loop approval and governance framework (`app/h
 - 🔒 Human-in-the-Loop Foundation v6.8 — LOCKED
 
 > **Project Rule**: No further architectural or functional changes to completed foundation tiers should be made without an official Architecture Decision Record (ADR).
+
+---
+
+## Future Roadmap & Runtime Evolution
+
+### Phase 7 — Enterprise Messaging Runtime (Current Active Phase)
+- **Phase 7.0**: LLM Runtime Engine
+- **Phase 7.1**: Prompt Execution Engine
+- **Phase 7.2**: Memory Runtime
+- **Phase 7.3**: Tool Runtime
+- **Phase 7.4**: Graph Runtime Integration
+- **Phase 7.5**: Multi-Agent Runtime
+- **Phase 7.6**: RAG Engine
+- **Phase 7.7**: Production Integrations
+- **Phase 7.8**: Deployment & Scaling
+
+### Phase 8 — Voice Platform (Future Horizon Expansion)
+- **Phase 8.0**: Speech-to-Text (STT) Engine
+- **Phase 8.1**: Text-to-Speech (TTS) Engine
+- **Phase 8.2**: Low-Latency Audio Streaming
+- **Phase 8.3**: Voice Session Management
+- **Phase 8.4**: Telephony & SIP Integrations
+- **Phase 8.5**: Multimodal Voice & Text Conversations
+

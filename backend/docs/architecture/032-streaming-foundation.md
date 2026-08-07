@@ -98,9 +98,11 @@ sequenceDiagram
 
 ### Future Integration Roadmap
 - **Phase 6.8 — Human-in-the-Loop Foundation**: Human approval interrupt streams and governance notification handlers.
-- **Phase 7.0 — Voice Agent & Real-Time Audio Engine**:
+- **Phase 7 — Enterprise Messaging Runtime**:
   - WebSocket Transport Adapter
   - SSE Transport Adapter
   - CLI & Terminal Stream Adapters
-  - gRPC Audio & State Streaming Adapters
-  - Real-Time Audio & Telemetry Exporters
+  - Token-level Response Stream Adapters
+- **Phase 8 — Voice Platform**:
+  - gRPC Audio & Real-Time Voice Streaming Adapters
+  - Low-Latency Telemetry & Audio Exporters

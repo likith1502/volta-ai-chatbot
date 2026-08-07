@@ -43,3 +43,5 @@ This index lists all official Architecture Decision Records (ADRs) and technical
 | **[ADR 033](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/033-streaming-guidelines.md)** | Streaming & Real-Time Engineering Guidelines | Accepted | 2026-08-05 |
 | **[ADR 034](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/034-human-in-the-loop-foundation.md)** | Human-in-the-Loop (HITL) Foundation Architecture (v6.8) | Accepted | 2026-08-05 |
 | **[ADR 035](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/035-human-loop-guidelines.md)** | Human-in-the-Loop (HITL) Engineering Guidelines | Accepted | 2026-08-05 |
+| **[ADR 036](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/036-enterprise-llm-runtime-engine.md)** | Enterprise LLM Runtime Engine Architecture (v7.0) | Accepted | 2026-08-07 |
+| **[ADR 037](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/037-runtime-engineering-guidelines.md)** | Runtime Engineering Guidelines & Extension Standards | Accepted | 2026-08-07 |

@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VOLTA AI Chatbot — Developer Testing Console (v7.0)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      --panel-bg: rgba(30, 41, 59, 0.7);
+      --panel-border: rgba(255, 255, 255, 0.1);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-light: rgba(99, 102, 241, 0.15);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --card-bg: rgba(15, 23, 42, 0.6);
+      --input-bg: rgba(15, 23, 42, 0.8);
+      --font-main: 'Inter', system-ui, sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    [data-theme="light"] {
+      --bg-gradient: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      --panel-bg: rgba(255, 255, 255, 0.85);
+      --panel-border: rgba(0, 0, 0, 0.1);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --accent: #4f46e5;
+      --accent-hover: #4338ca;
+      --accent-light: rgba(79, 70, 229, 0.1);
+      --card-bg: rgba(248, 250, 252, 0.8);
+      --input-bg: #ffffff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-main);
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    header {
+      background: var(--panel-bg);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--panel-border);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .badge {
+      background: var(--accent-light);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      display: inline-block;
+    }
+    .status-dot.unhealthy { background: var(--error); }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      background: var(--card-bg);
+      color: var(--text-main);
+      border: 1px solid var(--panel-border);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn:hover { background: var(--accent-light); border-color: var(--accent); }
+    .btn-primary {
+      background: var(--accent);
+      color: #ffffff;
+      border: none;
+    }
+    .btn-primary:hover { background: var(--accent-hover); }
+
+    .main-container {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 340px 1fr 380px;
+      gap: 16px;
+      padding: 16px;
+      height: calc(100vh - 65px);
+    }
+
+    .panel {
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--panel-border);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-body {
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    /* Controls Panel */
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--text-muted);
+    }
+    .form-control {
+      width: 100%;
+      background: var(--input-bg);
+      color: var(--text-main);
+      border: 1px solid var(--panel-border);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      outline: none;
+      font-family: inherit;
+    }
+    .form-control:focus { border-color: var(--accent); }
+
+    .range-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .range-wrap input { flex: 1; }
+
+    /* Chat Panel */
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .messages-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .message-bubble {
+      max-width: 85%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .message-bubble.user {
+      align-self: flex-end;
+      background: var(--accent);
+      color: #ffffff;
+      border-bottom-right-radius: 2px;
+    }
+    .message-bubble.assistant {
+      align-self: flex-start;
+      background: var(--card-bg);
+      border: 1px solid var(--panel-border);
+      border-bottom-left-radius: 2px;
+    }
+    .message-bubble pre {
+      background: rgba(0,0,0,0.3);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      margin: 8px 0;
+      overflow-x: auto;
+    }
+
+    .chat-input-wrap {
+      padding: 16px;
+      border-top: 1px solid var(--panel-border);
+      display: flex;
+      gap: 8px;
+    }
+    .chat-input-wrap textarea {
+      flex: 1;
+      height: 50px;
+      resize: none;
+    }
+
+    /* Diagnostics Panel */
+    .diag-metric {
+      background: var(--card-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .diag-title { font-size: 0.75rem; color: var(--text-muted); }
+    .diag-val { font-size: 1.1rem; font-weight: 700; font-family: var(--font-mono); color: var(--accent); }
+
+    .pipeline-flow {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.7rem;
+      margin: 12px 0;
+      flex-wrap: wrap;
+    }
+    .step-chip {
+      background: var(--card-bg);
+      border: 1px solid var(--panel-border);
+      padding: 3px 6px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+    }
+    .step-arrow { color: var(--text-muted); }
+
+    .raw-inspector {
+      background: var(--input-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      padding: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      max-height: 200px;
+      overflow: auto;
+      white-space: pre-wrap;
+    }
+
+    .error-banner {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid var(--error);
+      color: var(--error);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      margin-bottom: 12px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <span class="status-dot" id="healthDot" title="Health Indicator"></span>
+      <span class="brand-title">VOLTA AI Chatbot Console</span>
+      <span class="badge">Phase 7.0 Runtime</span>
+      <span class="badge" style="background:rgba(16,185,129,0.15); color:#10b981; border-color:#10b981;" id="demoBadge">DEMO_MODE</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn" id="btnThemeToggle">🌙 Theme</button>
+      <button class="btn" id="btnExportJson">📥 Export JSON</button>
+      <button class="btn" id="btnClearChat">🧹 Clear</button>
+    </div>
+  </header>
+
+  <main class="main-container">
+
+    <!-- Controls Panel -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Runtime Controls</span>
+        <span class="diag-title" id="providerHealthText">Checking...</span>
+      </div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label class="form-label" for="providerSelect">LLM Provider</label>
+          <select id="providerSelect" class="form-control">
+            <option value="gemini">Google Gemini (google.genai SDK)</option>
+            <option value="mock" selected>Mock Provider (Deterministic)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="modelSelect">Target Model</label>
+          <select id="modelSelect" class="form-control">
+            <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+            <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+            <option value="mock-model-v1" selected>mock-model-v1</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="tempRange">Temperature: <span id="tempVal">0.7</span></label>
+          <div class="range-wrap">
+            <input type="range" id="tempRange" min="0" max="2" step="0.1" value="0.7">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="maxTokensInput">Max Tokens</label>
+          <input type="number" id="maxTokensInput" class="form-control" value="1000" min="50" max="4096">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="systemPrompt">System Instruction</label>
+          <textarea id="systemPrompt" class="form-control" rows="3" placeholder="You are VOLTA AI Chatbot, an urban mobility assistant..."></textarea>
+        </div>
+
+        <div class="form-group" style="margin-top: 20px;">
+          <button class="btn btn-primary" style="width: 100%; justify-content: center;" id="btnHealthCheck">
+            🏥 Check Provider Health
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chat Panel -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Conversational Execution</span>
+        <span class="diag-title" id="chatStatusText">Ready</span>
+      </div>
+      <div class="chat-container">
+        <div class="messages-list" id="messagesList">
+          <div class="message-bubble assistant">
+            Hello! I am the VOLTA AI Chatbot Enterprise Runtime Engine (Phase 7.0). How can I assist with your ride booking or route discovery today?
+          </div>
+        </div>
+
+        <div class="chat-input-wrap">
+          <textarea id="messageInput" class="form-control" placeholder="Ask about ride booking, sedan prices, or ETA..."></textarea>
+          <button class="btn btn-primary" id="btnSendMessage">Send ➔</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Diagnostics Panel -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Developer Diagnostics</span>
+        <button class="btn" id="btnCopyResponse" style="padding: 2px 6px; font-size:0.7rem;">Copy</button>
+      </div>
+      <div class="panel-body">
+        <div class="error-banner" id="errorBanner"></div>
+
+        <div class="diag-metric">
+          <div class="diag-title">Execution Latency</div>
+          <div class="diag-val" id="metricLatency">0.00 ms</div>
+        </div>
+
+        <div class="diag-metric">
+          <div class="diag-title">Total Tokens (P / C)</div>
+          <div class="diag-val" id="metricTokens">0 (0 / 0)</div>
+        </div>
+
+        <div class="diag-metric">
+          <div class="diag-title">Estimated Cost</div>
+          <div class="diag-val" id="metricCost">$0.000000</div>
+        </div>
+
+        <div class="diag-title" style="margin-top: 12px;">Runtime Execution Pipeline</div>
+        <div class="pipeline-flow">
+          <span class="step-chip">REST API</span>
+          <span class="step-arrow">➔</span>
+          <span class="step-chip">RuntimeManager</span>
+          <span class="step-arrow">➔</span>
+          <span class="step-chip" id="pipeProvider">Provider</span>
+          <span class="step-arrow">➔</span>
+          <span class="step-chip">RuntimeResult</span>
+        </div>
+
+        <div class="diag-title" style="margin-top: 12px; margin-bottom: 6px;">Raw Envelope Inspector</div>
+        <pre class="raw-inspector" id="rawEnvelopeInspector">{ "status": "idle" }</pre>
+
+        <div class="diag-title" style="margin-top: 12px; margin-bottom: 6px;">Execution Event Stream</div>
+        <pre class="raw-inspector" id="eventStreamInspector" style="max-height: 120px;">[Idle]</pre>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const API_BASE = '/api/v1/runtime';
+
+    // State
+    const conversationHistory = [];
+    let lastResult = null;
+
+    // Elements
+    const providerSelect = document.getElementById('providerSelect');
+    const modelSelect = document.getElementById('modelSelect');
+    const tempRange = document.getElementById('tempRange');
+    const tempVal = document.getElementById('tempVal');
+    const maxTokensInput = document.getElementById('maxTokensInput');
+    const systemPrompt = document.getElementById('systemPrompt');
+    const messagesList = document.getElementById('messagesList');
+    const messageInput = document.getElementById('messageInput');
+    const btnSendMessage = document.getElementById('btnSendMessage');
+    const btnHealthCheck = document.getElementById('btnHealthCheck');
+    const btnClearChat = document.getElementById('btnClearChat');
+    const btnExportJson = document.getElementById('btnExportJson');
+    const btnThemeToggle = document.getElementById('btnThemeToggle');
+    const btnCopyResponse = document.getElementById('btnCopyResponse');
+
+    const metricLatency = document.getElementById('metricLatency');
+    const metricTokens = document.getElementById('metricTokens');
+    const metricCost = document.getElementById('metricCost');
+    const pipeProvider = document.getElementById('pipeProvider');
+    const rawEnvelopeInspector = document.getElementById('rawEnvelopeInspector');
+    const eventStreamInspector = document.getElementById('eventStreamInspector');
+    const healthDot = document.getElementById('healthDot');
+    const providerHealthText = document.getElementById('providerHealthText');
+    const chatStatusText = document.getElementById('chatStatusText');
+    const errorBanner = document.getElementById('errorBanner');
+
+    // Temperature slider sync
+    tempRange.addEventListener('input', (e) => {
+      tempVal.textContent = e.target.value;
+    });
+
+    // Theme toggle
+    btnThemeToggle.addEventListener('click', () => {
+      const currentTheme = document.body.getAttribute('data-theme');
+      if (currentTheme === 'light') {
+        document.body.removeAttribute('data-theme');
+        btnThemeToggle.textContent = '🌙 Theme';
+      } else {
+        document.body.setAttribute('data-theme', 'light');
+        btnThemeToggle.textContent = '☀️ Theme';
+      }
+    });
+
+    // Clear chat
+    btnClearChat.addEventListener('click', () => {
+      conversationHistory.length = 0;
+      messagesList.innerHTML = `
+        <div class="message-bubble assistant">
+          Conversation cleared. Send a message to start a new runtime execution turn.
+        </div>`;
+      rawEnvelopeInspector.textContent = '{ "status": "cleared" }';
+      eventStreamInspector.textContent = '[Cleared]';
+      errorBanner.style.display = 'none';
+    });
+
+    // Export JSON
+    btnExportJson.addEventListener('click', () => {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
+        history: conversationHistory,
+        lastResult: lastResult
+      }, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `runtime_session_${Date.now()}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    });
+
+    // Copy response
+    btnCopyResponse.addEventListener('click', () => {
+      if (lastResult && lastResult.response) {
+        navigator.clipboard.writeText(lastResult.response.content);
+        alert('Assistant response copied to clipboard!');
+      }
+    });
+
+    // Health Check
+    async function checkHealth() {
+      const provider = providerSelect.value;
+      providerHealthText.textContent = `Checking ${provider}...`;
+      try {
+        const res = await fetch(`${API_BASE}/providers/${provider}/health`);
+        const json = await res.json();
+        if (json.success && json.data && json.data.is_healthy) {
+          healthDot.className = 'status-dot';
+          providerHealthText.textContent = `${provider} Healthy`;
+        } else {
+          healthDot.className = 'status-dot unhealthy';
+          providerHealthText.textContent = `${provider} Warning`;
+        }
+      } catch (err) {
+        healthDot.className = 'status-dot unhealthy';
+        providerHealthText.textContent = 'Offline';
+      }
+    }
+
+    btnHealthCheck.addEventListener('click', checkHealth);
+    providerSelect.addEventListener('change', () => {
+      if (providerSelect.value === 'gemini') {
+        modelSelect.value = 'gemini-2.5-flash';
+      } else {
+        modelSelect.value = 'mock-model-v1';
+      }
+      checkHealth();
+    });
+
+    // Send Message
+    async function sendMessage() {
+      const text = messageInput.value.trim();
+      if (!text) return;
+
+      errorBanner.style.display = 'none';
+      chatStatusText.textContent = 'Executing...';
+      messageInput.value = '';
+
+      // Append user bubble
+      const userBubble = document.createElement('div');
+      userBubble.className = 'message-bubble user';
+      userBubble.textContent = text;
+      messagesList.appendChild(userBubble);
+      messagesList.scrollTop = messagesList.scrollHeight;
+
+      // Update history
+      conversationHistory.push({ role: 'user', content: text });
+
+      // Append pending assistant bubble
+      const assistantBubble = document.createElement('div');
+      assistantBubble.className = 'message-bubble assistant';
+      assistantBubble.textContent = 'Thinking...';
+      messagesList.appendChild(assistantBubble);
+      messagesList.scrollTop = messagesList.scrollHeight;
+
+      const payload = {
+        message: text,
+        provider: providerSelect.value,
+        model: modelSelect.value,
+        temperature: parseFloat(tempRange.value),
+        max_tokens: parseInt(maxTokensInput.value),
+        system_prompt: systemPrompt.value.trim() || undefined,
+        history: conversationHistory.slice(0, -1)
+      };
+
+      try {
+        const res = await fetch(`${API_BASE}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const json = await res.json();
+        rawEnvelopeInspector.textContent = JSON.stringify(json, null, 2);
+
+        if (json.success && json.data) {
+          lastResult = json.data;
+          const respContent = json.data.response ? json.data.response.content : 'No response content.';
+          assistantBubble.textContent = respContent;
+          conversationHistory.push({ role: 'assistant', content: respContent });
+
+          // Metrics update
+          const metrics = json.data.metrics || {};
+          const tokens = metrics.tokens || {};
+          metricLatency.textContent = `${(metrics.latency_ms || 0).toFixed(2)} ms`;
+          metricTokens.textContent = `${tokens.total_tokens || 0} (${tokens.prompt_tokens || 0} / ${tokens.completion_tokens || 0})`;
+          metricCost.textContent = `$${(metrics.estimated_cost_usd || 0).toFixed(6)}`;
+          pipeProvider.textContent = json.data.context ? json.data.context.provider : providerSelect.value;
+
+          eventStreamInspector.textContent = [
+            `[1] runtime.started (${json.data.context ? json.data.context.provider : providerSelect.value})`,
+            `[2] runtime.prompt_prepared (${conversationHistory.length} msgs)`,
+            `[3] runtime.provider_selected`,
+            `[4] runtime.response_received`,
+            `[5] runtime.tokens_calculated (${tokens.total_tokens || 0})`,
+            `[6] runtime.completed (${(metrics.latency_ms || 0).toFixed(2)}ms)`
+          ].join('\n');
+
+          chatStatusText.textContent = 'Done';
+        } else {
+          assistantBubble.textContent = `[Error] ${json.message || 'Execution failed'}`;
+          errorBanner.textContent = json.message || 'Runtime execution returned an error.';
+          errorBanner.style.display = 'block';
+          chatStatusText.textContent = 'Failed';
+        }
+      } catch (err) {
+        assistantBubble.textContent = `[System Error] ${err.message}`;
+        errorBanner.textContent = `Network / System error: ${err.message}`;
+        errorBanner.style.display = 'block';
+        chatStatusText.textContent = 'Error';
+      }
+
+      messagesList.scrollTop = messagesList.scrollHeight;
+    }
+
+    btnSendMessage.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    // Initial Health Check
+    checkHealth();
+  </script>
+</body>
+</html>

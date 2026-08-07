@@ -7,7 +7,7 @@ Accepted
 2026-08-03
 
 ## Context
-The VOLTA AI Chatbot backend requires a modern, high-performance Python web framework capable of handling asynchronous I/O operations, complex AI agent workflows, real-time audio streams (future voice agent), and dynamic REST APIs.
+The VOLTA AI Chatbot backend requires a modern, high-performance Python web framework capable of handling asynchronous I/O operations, complex AI agent workflows, enterprise messaging runtime, real-time audio streams (future Voice Platform in Phase 8), and dynamic REST APIs.
 
 ## Decision
 We have selected **FastAPI** as the primary web framework for the backend platform.

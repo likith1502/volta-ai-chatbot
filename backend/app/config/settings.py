@@ -40,6 +40,23 @@ class Settings(BaseSettings):
     OPENAI_MAX_TOKENS: int = 1000
     OPENAI_TIMEOUT: float = 30.0
 
+    # Google Gemini API Settings (Phase 7.0)
+    GEMINI_API_KEY: str = ""
+    GOOGLE_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-2.5-flash"
+    GEMINI_TEMPERATURE: float = 0.7
+    GEMINI_MAX_TOKENS: int = 1000
+    GEMINI_TIMEOUT: float = 30.0
+
+    # Enterprise LLM Runtime Engine Settings (Phase 7.0)
+    RUNTIME_DEFAULT_PROVIDER: str = "mock"
+    RUNTIME_DEFAULT_MODEL: str = "gemini-2.5-flash"
+    RUNTIME_TIMEOUT: float = 30.0
+    RUNTIME_MAX_RETRIES: int = 3
+    RUNTIME_TEMPERATURE: float = 0.7
+    RUNTIME_MAX_TOKENS: int = 1000
+    DEMO_MODE: bool = True
+
     # Memory Strategy Configuration
     MEMORY_STRATEGY: str = "recent"
 

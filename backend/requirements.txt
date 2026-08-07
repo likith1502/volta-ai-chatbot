@@ -19,6 +19,9 @@ alembic>=1.11.0,<2.0.0
 # HTTP Testing & Client Capabilities
 httpx>=0.24.0,<1.0.0
 
+# Enterprise LLM Runtime Engine (Phase 7.0)
+google-genai>=0.1.0,<1.0.0
+
 # Automated Testing Framework
 pytest>=7.3.0,<9.0.0
 pytest-asyncio>=0.21.0,<1.0.0
