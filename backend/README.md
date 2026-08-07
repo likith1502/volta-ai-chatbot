@@ -2,8 +2,8 @@
 
 A production-grade, asynchronous AI-powered messaging chatbot backend for the VOLTA urban mobility platform. Built with Python 3.11+, FastAPI, Async PostgreSQL, SQLAlchemy 2.0, Alembic, Google Gemini SDK, and Provider-Agnostic Conversational AI.
 
-[![Release](https://img.shields.io/badge/Release-v7.3-blue.svg)](https://github.com/likith1502/volta-ai-chatbot/releases/tag/v7.3)
-[![Tests](https://img.shields.io/badge/Tests-162%20Passing-success.svg)](tests/)
+[![Release](https://img.shields.io/badge/Release-v7.4-blue.svg)](https://github.com/likith1502/volta-ai-chatbot/releases/tag/v7.4)
+[![Tests](https://img.shields.io/badge/Tests-167%20Passing-success.svg)](tests/)
 
 ---
 
@@ -19,10 +19,13 @@ Application Services & AI Orchestrator (app/services/chat.py)
        │
        ├─────────────────────────────────────────┐
        ▼                                         ▼
-Enterprise Tool Runtime (app/tools/ v7.3)     Domain Repositories (app/repositories/)
+Enterprise Graph Runtime (app/graph_runtime/ v7.4) Domain Repositories (app/repositories/)
        │                                         │
        ▼                                         ▼
-Enterprise Memory Runtime (app/memory/ v7.2)  Infrastructure & Persistence (app/db/)
+Enterprise Tool Runtime (app/tools/ v7.3)     Infrastructure & Persistence (app/db/)
+       │
+       ▼
+Enterprise Memory Runtime (app/memory/ v7.2)
        │
        ▼
 Prompt Execution Engine (app/prompt/ v7.1)
@@ -49,8 +52,9 @@ All application configuration is centrally managed via Pydantic `Settings` (`app
 - **Prompt Engine**: PromptManager, PromptProfiles, PromptCompiler, PromptLinter, PromptPipeline, PromptRepository
 - **Memory Engine**: MemoryManager, MemoryLifecycleManager, ContextAssemblyStrategy, MemoryScorer
 - **Tool Engine**: ToolManager, BaseTool ABC, ToolSchema, ToolManifest, ToolPipeline, ToolChain, ToolDiscoveryService
+- **Graph Engine**: GraphRuntimeManager, GraphPlanner, GraphScheduler, GraphExecutionPlan, GraphCursor, GraphRuntimePipeline
 - **Settings**: Pydantic BaseSettings (`pydantic-settings`)
-- **Testing**: pytest & `httpx` (`TestClient`) — **162 Tests Passing**
+- **Testing**: pytest & `httpx` (`TestClient`) — **167 Tests Passing**
 
 ---
 
@@ -71,6 +75,7 @@ backend/
 │   ├── exceptions/   # Application & AI exceptions
 │   ├── execution/    # Graph Execution Engine (v6.4)
 │   ├── graph/        # Graph Orchestration Foundation (v6.2)
+│   ├── graph_runtime/# Enterprise Graph Runtime Integration (v7.4)
 │   ├── hitl/         # Human-in-the-Loop & Governance Foundation (v6.8)
 │   ├── memory/       # Enterprise Memory Runtime (v7.2)
 │   ├── models/       # SQLAlchemy ORM models
@@ -84,11 +89,11 @@ backend/
 │   ├── utils/        # Response helpers & utility functions
 │   ├── workflow/     # Workflow Node Library (v6.3)
 │   └── main.py       # FastAPI application entry point
-├── docs/             # Technical architecture & engineering docs (ADRs 001–043)
+├── docs/             # Technical architecture & engineering docs (ADRs 001–045)
 ├── logs/             # Local runtime execution logs
 ├── migrations/       # Alembic versioned migration environment
 ├── scripts/          # Operations and seed scripts
-├── tests/            # Automated pytest test suites (162 passed)
+├── tests/            # Automated pytest test suites (167 passed)
 ├── .env
 ├── .env.example
 ├── ARCHITECTURE.md
@@ -107,19 +112,20 @@ python -m uvicorn app.main:app --reload
 
 The application will be accessible at:
 - **Root**: http://127.0.0.1:8000/
-- **Developer Console, Prompt Studio, Memory Studio & Tool Studio**: http://127.0.0.1:8000/console
+- **Developer Console, Prompt Studio, Memory Studio, Tool Studio & Graph Studio**: http://127.0.0.1:8000/console
 - **V1 Health Check**: http://127.0.0.1:8000/api/v1/health
 - **V1 Chat Endpoint**: http://127.0.0.1:8000/api/v1/chat
 - **V1 Runtime Endpoint**: http://127.0.0.1:8000/api/v1/runtime/chat
 - **V1 Memory Endpoint**: http://127.0.0.1:8000/api/v1/memory
 - **V1 Tools Endpoint**: http://127.0.0.1:8000/api/v1/tools
+- **V1 Graph Runtime Endpoint**: http://127.0.0.1:8000/api/v1/graph-runtime
 - **Swagger Documentation**: http://127.0.0.1:8000/docs
 
 ---
 
 ## Testing Commands
 
-Run the complete automated test suite (162 passed in ~3.6s):
+Run the complete automated test suite (167 passed in ~3.5s):
 ```bash
 pytest
 ```

@@ -4,10 +4,14 @@ This index lists all official Architecture Decision Records (ADRs) and technical
 
 ---
 
-## Architecture Decision Records & Guidelines (ADRs 001 – 043)
+## Architecture Decision Records & Guidelines (ADRs 001 – 045)
 
 | ADR ID | Title | Status | Date |
 | :--- | :--- | :---: | :---: |
+| **[ADR 042](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/042-enterprise-tool-runtime.md)** | Enterprise Tool Runtime Architecture (v7.3) | Accepted | 2026-08-07 |
+| **[ADR 043](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/043-tool-engineering-guidelines.md)** | Tool Engineering Guidelines & Extension Standards | Accepted | 2026-08-07 |
+| **[ADR 044](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/044-enterprise-graph-runtime.md)** | Enterprise Graph Runtime Architecture (v7.4) | Accepted | 2026-08-07 |
+| **[ADR 045](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/045-graph-runtime-guidelines.md)** | Graph Runtime Engineering Guidelines & Extension Standards | Accepted | 2026-08-07 |
 | **[ADR 001](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/001-fastapi-framework.md)** | FastAPI Core Framework & Pydantic Configuration | Accepted | 2026-08-03 |
 | **[ADR 002](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/002-project-structure.md)** | Backend Project Directory Structure Standardization | Accepted | 2026-08-03 |
 | **[ADR 003](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/003-api-versioning.md)** | API Versioning Strategy & Routing Standards | Accepted | 2026-08-03 |

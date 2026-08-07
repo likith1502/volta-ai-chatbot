@@ -345,6 +345,7 @@
       <button class="tab-btn" id="tabNavPrompt">Prompt Studio</button>
       <button class="tab-btn" id="tabNavMemory">Memory Studio</button>
       <button class="tab-btn" id="tabNavTool">Tool Studio</button>
+      <button class="tab-btn" id="tabNavGraph">Graph Studio</button>
     </div>
 
     <div class="header-actions">
@@ -745,8 +746,78 @@
 
   </main>
 
+  <!-- TAB 5: GRAPH STUDIO -->
+  <main class="main-container view-tab" id="viewGraph">
+
+    <!-- Panel A: Live DAG Visualizer & Controls -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Panel A: Live DAG Workflow Visualizer</span>
+        <button class="btn" id="btnRefreshGraphHealth" style="padding:2px 6px; font-size:0.7rem;">Health Check</button>
+      </div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label class="form-label" for="graphWorkflowSelect">Workflow ID</label>
+          <select id="graphWorkflowSelect" class="form-control">
+            <option value="mobility_booking_workflow" selected>mobility_booking_workflow (v7.4)</option>
+            <option value="ride_discovery_workflow">ride_discovery_workflow (v7.4)</option>
+            <option value="support_escalation_workflow">support_escalation_workflow (v7.4)</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="display: flex; gap: 8px;">
+          <button class="btn btn-primary" id="btnExecuteGraph" style="flex:1; justify-content:center;">Execute Graph ➔</button>
+          <button class="btn" id="btnPauseGraph" style="flex:1; justify-content:center;">Pause</button>
+          <button class="btn" id="btnResumeGraph" style="flex:1; justify-content:center;">Resume</button>
+        </div>
+
+        <div class="diag-title" style="margin-top: 12px; margin-bottom: 6px;">Live Graph DAG Traversal</div>
+        <div class="pipeline-flow" style="margin-bottom: 12px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px;">
+          <span class="step-chip" id="dagStartChip" style="background:#3b82f6; color:#fff;">START</span> ➔
+          <span class="step-chip" id="dagInputChip">input_node</span> ➔
+          <span class="step-chip" id="dagLlmChip">llm_node</span> ➔
+          <span class="step-chip" id="dagToolChip">tool_node</span> ➔
+          <span class="step-chip" id="dagEndChip">END</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Panel B: Execution Timeline -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Panel B: Execution Timeline & Event Stream</span>
+      </div>
+      <div class="panel-body">
+        <pre class="diff-box" id="graphTimelineInspector" style="height: 380px;">[Click 'Execute Graph' to view execution timeline events and trace steps]</pre>
+      </div>
+    </section>
+
+    <!-- Panel C: Execution Inspector & Metrics -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Panel C: Node Execution Inspector</span>
+      </div>
+      <div class="panel-body">
+        <div class="diag-metric">
+          <div class="diag-title">Execution State</div>
+          <div class="diag-val" id="graphExecutionStateVal">IDLE</div>
+        </div>
+
+        <div class="diag-metric">
+          <div class="diag-title">Total Duration</div>
+          <div class="diag-val" id="graphDurationVal">0.00ms</div>
+        </div>
+
+        <div class="diag-title" style="margin-top: 12px; margin-bottom: 6px;">Node Context & Output Details</div>
+        <pre class="raw-inspector" id="graphNodeInspector" style="max-height: 260px;">[Select or execute a node to inspect inputs, outputs, memory, prompt, tool, and runtime context]</pre>
+      </div>
+    </section>
+
+  </main>
+
   <script>
     const TOOL_BASE = '/api/v1/tools';
+    const GRAPH_BASE = '/api/v1/graph-runtime';
 
     // State
     const conversationHistory = [];
@@ -757,22 +828,26 @@
     const tabNavPrompt = document.getElementById('tabNavPrompt');
     const tabNavMemory = document.getElementById('tabNavMemory');
     const tabNavTool = document.getElementById('tabNavTool');
+    const tabNavGraph = document.getElementById('tabNavGraph');
 
     const viewRuntime = document.getElementById('viewRuntime');
     const viewPrompt = document.getElementById('viewPrompt');
     const viewMemory = document.getElementById('viewMemory');
     const viewTool = document.getElementById('viewTool');
+    const viewGraph = document.getElementById('viewGraph');
 
     tabNavRuntime.addEventListener('click', () => {
       tabNavRuntime.classList.add('active');
       tabNavPrompt.classList.remove('active');
       tabNavMemory.classList.remove('active');
       tabNavTool.classList.remove('active');
+      tabNavGraph.classList.remove('active');
 
       viewRuntime.classList.add('active');
       viewPrompt.classList.remove('active');
       viewMemory.classList.remove('active');
       viewTool.classList.remove('active');
+      viewGraph.classList.remove('active');
     });
 
     tabNavPrompt.addEventListener('click', () => {
@@ -780,11 +855,13 @@
       tabNavRuntime.classList.remove('active');
       tabNavMemory.classList.remove('active');
       tabNavTool.classList.remove('active');
+      tabNavGraph.classList.remove('active');
 
       viewPrompt.classList.add('active');
       viewRuntime.classList.remove('active');
       viewMemory.classList.remove('active');
       viewTool.classList.remove('active');
+      viewGraph.classList.remove('active');
     });
 
     tabNavMemory.addEventListener('click', () => {
@@ -792,11 +869,13 @@
       tabNavRuntime.classList.remove('active');
       tabNavPrompt.classList.remove('active');
       tabNavTool.classList.remove('active');
+      tabNavGraph.classList.remove('active');
 
       viewMemory.classList.add('active');
       viewRuntime.classList.remove('active');
       viewPrompt.classList.remove('active');
       viewTool.classList.remove('active');
+      viewGraph.classList.remove('active');
       refreshMemories();
     });
 
@@ -805,12 +884,29 @@
       tabNavRuntime.classList.remove('active');
       tabNavPrompt.classList.remove('active');
       tabNavMemory.classList.remove('active');
+      tabNavGraph.classList.remove('active');
 
       viewTool.classList.add('active');
       viewRuntime.classList.remove('active');
       viewPrompt.classList.remove('active');
       viewMemory.classList.remove('active');
+      viewGraph.classList.remove('active');
       refreshTools();
+    });
+
+    tabNavGraph.addEventListener('click', () => {
+      tabNavGraph.classList.add('active');
+      tabNavRuntime.classList.remove('active');
+      tabNavPrompt.classList.remove('active');
+      tabNavMemory.classList.remove('active');
+      tabNavTool.classList.remove('active');
+
+      viewGraph.classList.add('active');
+      viewRuntime.classList.remove('active');
+      viewPrompt.classList.remove('active');
+      viewMemory.classList.remove('active');
+      viewTool.classList.remove('active');
+      refreshGraphHealth();
     });
 
     // Elements - Runtime
@@ -1267,6 +1363,60 @@
     if (btnRunToolPipeline) btnRunToolPipeline.addEventListener('click', runToolPipeline);
     if (btnRefreshTools) btnRefreshTools.addEventListener('click', refreshTools);
     if (toolSelect) toolSelect.addEventListener('change', (e) => populateToolCard(e.target.value));
+
+    // GRAPH STUDIO HANDLERS
+    const graphWorkflowSelect = document.getElementById('graphWorkflowSelect');
+    const btnExecuteGraph = document.getElementById('btnExecuteGraph');
+    const btnPauseGraph = document.getElementById('btnPauseGraph');
+    const btnResumeGraph = document.getElementById('btnResumeGraph');
+    const btnRefreshGraphHealth = document.getElementById('btnRefreshGraphHealth');
+    const graphTimelineInspector = document.getElementById('graphTimelineInspector');
+    const graphNodeInspector = document.getElementById('graphNodeInspector');
+    const graphExecutionStateVal = document.getElementById('graphExecutionStateVal');
+    const graphDurationVal = document.getElementById('graphDurationVal');
+
+    let currentGraphSessionId = null;
+
+    async function executeGraphRuntime() {
+      const wId = graphWorkflowSelect ? graphWorkflowSelect.value : 'mobility_booking_workflow';
+      graphTimelineInspector.textContent = `Executing workflow graph '${wId}'...`;
+      graphExecutionStateVal.textContent = "RUNNING";
+
+      try {
+        const res = await fetch(`${GRAPH_BASE}/execute`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ workflow_id: wId, inputs: { user_intent: "book_ride" } })
+        });
+        const json = await res.json();
+        if (json.success && json.data) {
+          currentGraphSessionId = json.data.session_id;
+          graphTimelineInspector.textContent = JSON.stringify(json.data.trace || json.data, null, 2);
+          graphNodeInspector.textContent = JSON.stringify(json.data.final_output || json.data, null, 2);
+          graphExecutionStateVal.textContent = json.data.status || "COMPLETED";
+          graphDurationVal.textContent = `${json.data.total_latency_ms || 0.0}ms`;
+        } else {
+          graphTimelineInspector.textContent = `[Graph Execution Failed: ${json.detail || json.message}]`;
+        }
+      } catch (err) {
+        graphTimelineInspector.textContent = `[Network Error: ${err.message}]`;
+      }
+    }
+
+    async function refreshGraphHealth() {
+      try {
+        const res = await fetch(`${GRAPH_BASE}/health`);
+        const json = await res.json();
+        if (json.success && json.data) {
+          graphNodeInspector.textContent = JSON.stringify(json.data, null, 2);
+        }
+      } catch (err) {
+        graphNodeInspector.textContent = `[Error loading health: ${err.message}]`;
+      }
+    }
+
+    if (btnExecuteGraph) btnExecuteGraph.addEventListener('click', executeGraphRuntime);
+    if (btnRefreshGraphHealth) btnRefreshGraphHealth.addEventListener('click', refreshGraphHealth);
 
     btnRenderPrompt.addEventListener('click', renderPrompt);
     btnExecutePrompt.addEventListener('click', executePrompt);

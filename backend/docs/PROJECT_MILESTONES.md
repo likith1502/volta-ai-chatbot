@@ -126,7 +126,14 @@ To maintain clear project tracking:
 - **Version**: `v7.3.0`
 - **Completion Date**: 2026-08-07
 - **Includes Sub-Phases**:
-  - **Phase 7.3**: Enterprise Tool Runtime (`backend/app/tools/`). Provider-independent tool orchestration, `ToolManager`, `BaseTool` ABC, `ToolSchema`, `ToolManifest` (with `deprecated` and `replacement_tool`), `ToolPipeline`, `ToolChain`, `ToolDiscoveryService`, `ToolCapabilities`, `ToolContext`, `ToolSession`, `ToolPolicy`, `ToolPermission`, `ToolRepository` ABC, `ToolFactory`, `ToolRegistry`, `ToolHealthManager`, `ToolStatistics`, `WorkflowEventBus` integration (v6.5), built-in tools (`EchoTool`, `CalculatorTool`, `DatetimeTool`, `UUIDTool`), reserved `adapters/` directory, and Tool Studio UI (`testing-ui/index.html`). 162 tests passing. Architecture score: 10/10, Future compatibility: 10/10.
+  - **Phase 7.3**: Enterprise Tool Runtime (`backend/app/tools/`). Provider-independent tool orchestration, `ToolManager`, `BaseTool` ABC, `ToolSchema`, `ToolManifest`, `ToolPipeline`, `ToolChain`, `ToolDiscoveryService`, built-in tools (`EchoTool`, `CalculatorTool`, `DatetimeTool`, `UUIDTool`), reserved `adapters/` directory, and Tool Studio UI (`testing-ui/index.html`). 162 tests passing.
+
+### Release v7.4 — Enterprise Graph Runtime Integration
+- **Status**: **COMPLETED, VERIFIED, LOCKED**
+- **Version**: `v7.4.0`
+- **Completion Date**: 2026-08-07
+- **Includes Sub-Phases**:
+  - **Phase 7.4**: Enterprise Graph Runtime Integration (`backend/app/graph_runtime/`). Decoupled runtime orchestration engine, `GraphRuntimeManager`, `GraphPlanner`, `GraphExecutionPlan`, `GraphScheduler`, `GraphCursor`, `GraphRuntimePipeline` middleware, `RetryPolicy`, `TimeoutPolicy`, `NodeExecutionContext`, `ExecutionTrace`, `GraphCheckpointIntegration`, `GraphInterruptIntegration`, reserved `extensions/` directory, REST router `/api/v1/graph-runtime`, and Graph Studio 3-panel UI (`testing-ui/index.html`). 167 tests passing. Architecture score: 10/10, Future compatibility: 10/10.
 
 ---
 
@@ -139,8 +146,8 @@ To maintain clear project tracking:
   - **Phase 7.1**: Prompt Execution Engine ✅ **COMPLETED (`v7.1.0`)**
   - **Phase 7.2**: Memory Runtime ✅ **COMPLETED (`v7.2.0`)**
   - **Phase 7.3**: Tool Runtime ✅ **COMPLETED (`v7.3.0`)**
-  - **Phase 7.4**: Graph Runtime Integration ⏳ **NEXT SUB-PHASE**
-  - **Phase 7.5**: Multi-Agent Runtime
+  - **Phase 7.4**: Graph Runtime Integration ✅ **COMPLETED (`v7.4.0`)**
+  - **Phase 7.5**: Multi-Agent Runtime ⏳ **NEXT SUB-PHASE**
   - **Phase 7.6**: RAG Engine
   - **Phase 7.7**: Production Integrations
   - **Phase 7.8**: Deployment & Scaling

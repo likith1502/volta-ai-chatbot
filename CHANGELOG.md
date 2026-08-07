@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v7.4.0] - 2026-08-07
+
+### Added
+- **Enterprise Graph Runtime Integration** (`backend/app/graph_runtime/`): Decoupled runtime orchestration engine executing workflow DAG plans, scheduling, navigation, middleware pipelines, and runtime manager coordination.
+- **`GraphExecutionPlan` & `GraphPlanner`**: Execution DAG planning model separating graph planning from execution scheduling.
+- **`GraphScheduler` & `GraphCursor`**: Graph traversal scheduler tracking execution depth, parent/child nodes, and branch navigation.
+- **`GraphRuntimePipeline` Middleware**: 9-stage middleware pipeline (`Validation` ➔ `Authorization` ➔ `Memory Injection` ➔ `Tool Resolution` ➔ `Prompt Rendering` ➔ `Runtime Execution` ➔ `Checkpoint` ➔ `Streaming` ➔ `Events`).
+- **Execution Policies**: `GraphRuntimePolicy`, `RetryPolicy`, `RetryDecision`, `BackoffStrategy`, and `TimeoutPolicy`.
+- **State & Context Snapshots**: `NodeExecutionContext` and `ExecutionTrace` supporting exact step-by-step state replay and inspection.
+- **Integrations**: `GraphCheckpointIntegration` (Phase 6.6) and `GraphInterruptIntegration` (Phase 6.8 HITL).
+- **Reserved Extensions Architecture**: Created `backend/app/graph_runtime/extensions/` directory for custom planners, schedulers, and middleware.
+- **REST API Presentation Layer**: Router `/api/v1/graph-runtime` with endpoints `POST /execute`, `POST /resume`, `POST /pause`, `POST /cancel`, `GET /session`, `GET /health`, `GET /statistics`, `GET /analytics`.
+- **Developer Console — Graph Studio**: 3-panel UI (`testing-ui/index.html`) mounted at `/console` featuring Panel A (Live DAG Visualizer), Panel B (Execution Timeline), and Panel C (Node Execution Inspector).
+- **Architecture Decision Records & Graduation Suite**: `ADR 044` (Enterprise Graph Runtime Architecture), `ADR 045` (Graph Runtime Guidelines), `RUNTIME_BASELINE_v7.4.md`, and `RUNTIME_CERTIFICATE_v7.4.md`.
+
+---
+
 ## [v7.3.0] - 2026-08-07
 
 ### Added
