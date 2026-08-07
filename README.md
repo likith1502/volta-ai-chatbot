@@ -2,8 +2,8 @@
 
 A production-grade, asynchronous AI-powered messaging chatbot backend designed for the VOLTA urban mobility platform.
 
-[![Release](https://img.shields.io/badge/Release-v7.6-blue.svg)](https://github.com/likith1502/volta-ai-chatbot/releases/tag/v7.6)
-[![Tests](https://img.shields.io/badge/Tests-185%20Passing-success.svg)](backend/tests/)
+[![Release](https://img.shields.io/badge/Release-v7.7-blue.svg)](https://github.com/likith1502/volta-ai-chatbot/releases/tag/v7.7)
+[![Tests](https://img.shields.io/badge/Tests-242%20Passing-success.svg)](backend/tests/)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-v1.0-green.svg)](https://fastapi.tiangolo.com/)
 
@@ -39,6 +39,7 @@ Volta-AI-Chatbot/
 │   ├── graph/        # Graph Orchestration Foundation (v6.2)
 │   ├── graph_runtime/# Enterprise Graph Runtime Integration (v7.4)
 │   ├── hitl/         # Human-in-the-Loop & Governance Foundation (v6.8)
+│   ├── integrations/ # Enterprise Integration Platform (v7.7)
 │   ├── memory/       # Enterprise Memory Runtime (v7.2)
 │   ├── models/       # SQLAlchemy ORM domain models
 │   ├── prompt/       # Prompt Execution Engine (v7.1)
@@ -51,11 +52,11 @@ Volta-AI-Chatbot/
 │   ├── tools/        # Enterprise Tool Runtime (v7.3)
 │   ├── utils/        # Response helpers & utility functions
 │   └── workflow/     # Workflow Node Library (v6.3)
-├── docs/             # Technical architecture & engineering docs (ADRs 001–049)
+├── docs/             # Technical architecture & engineering docs (ADRs 001–051)
 ├── logs/             # Runtime execution log directory
 ├── migrations/       # Alembic versioned schema migrations
 ├── scripts/          # Operation & database seeding scripts
-├── tests/            # Automated pytest test suites (185 passed)
+├── tests/            # Automated pytest test suites (242 passed)
 │   ├── alembic.ini       # Alembic migration configuration
 │   ├── ARCHITECTURE.md   # Master backend architecture blueprint
 │   └── README.md         # Backend developer guide
