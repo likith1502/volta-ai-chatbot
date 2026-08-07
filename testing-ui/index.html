@@ -344,6 +344,7 @@
       <button class="tab-btn active" id="tabNavRuntime">Runtime Console</button>
       <button class="tab-btn" id="tabNavPrompt">Prompt Studio</button>
       <button class="tab-btn" id="tabNavMemory">Memory Studio</button>
+      <button class="tab-btn" id="tabNavTool">Tool Studio</button>
     </div>
 
     <div class="header-actions">
@@ -652,9 +653,88 @@
 
   </main>
 
+  <!-- TAB 4: TOOL STUDIO -->
+  <main class="main-container view-tab" id="viewTool">
+
+    <!-- Available Tools Cards & Selector -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Available Reference Tools</span>
+        <button class="btn" id="btnRefreshTools" style="padding:2px 6px; font-size:0.7rem;">Refresh</button>
+      </div>
+      <div class="panel-body">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+          <button class="btn" id="cardToolCalc" style="justify-content:center; text-align:center;">🧮 Calculator ✔</button>
+          <button class="btn" id="cardToolEcho" style="justify-content:center; text-align:center;">🗣️ Echo ✔</button>
+          <button class="btn" id="cardToolDate" style="justify-content:center; text-align:center;">📅 Datetime ✔</button>
+          <button class="btn" id="cardToolUuid" style="justify-content:center; text-align:center;">🔑 UUID ✔</button>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="toolSelect">Selected Tool</label>
+          <select id="toolSelect" class="form-control">
+            <option value="calculator" selected>calculator (MATH)</option>
+            <option value="echo">echo (TEXT)</option>
+            <option value="datetime">datetime (TIME)</option>
+            <option value="uuid">uuid (UTILITY)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="toolArgsJson">Arguments Payload (JSON)</label>
+          <textarea id="toolArgsJson" class="form-control" rows="5">{\n  "a": 10,\n  "b": 5,\n  "operation": "add"\n}</textarea>
+        </div>
+
+        <div class="form-group" style="display: flex; gap: 8px;">
+          <button class="btn btn-primary" id="btnExecuteTool" style="flex:1; justify-content:center;">Execute Tool ➔</button>
+          <button class="btn" id="btnRunToolPipeline" style="flex:1; justify-content:center;">Run Pipeline</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pipeline Trace Visualizer & Execution Results -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Pipeline Execution Trace & Output</span>
+      </div>
+      <div class="panel-body">
+        <div class="pipeline-flow" style="margin-bottom: 12px;">
+          <span class="step-chip" id="traceValChip">Validation ✔</span> ➔
+          <span class="step-chip" id="tracePermChip">Permission ✔</span> ➔
+          <span class="step-chip" id="tracePolChip">Policy ✔</span> ➔
+          <span class="step-chip" id="traceExecChip">Execution ✔</span> ➔
+          <span class="step-chip" id="traceEventChip">Events ✔</span> ➔
+          <span class="step-chip" id="traceAnalChip">Analytics ✔</span>
+        </div>
+        <pre class="diff-box" id="toolOutputInspector" style="height: 380px;">[Click 'Execute Tool' or 'Run Pipeline' to inspect execution trace and output]</pre>
+      </div>
+    </section>
+
+    <!-- Tool Manifest & Schema Viewer -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Tool Manifest & JSON Schema</span>
+      </div>
+      <div class="panel-body">
+        <div class="diag-metric">
+          <div class="diag-title">Registered Tools</div>
+          <div class="diag-val" id="toolRegisteredCountVal">4</div>
+        </div>
+
+        <div class="diag-metric">
+          <div class="diag-title">Execution Latency</div>
+          <div class="diag-val" id="toolLatencyVal">0.00ms</div>
+        </div>
+
+        <div class="diag-title" style="margin-top: 12px; margin-bottom: 6px;">JSON Schema & Manifest Viewer</div>
+        <pre class="raw-inspector" id="toolSchemaViewer" style="max-height: 260px;">[Select a tool card to inspect JSON schema details]</pre>
+      </div>
+    </section>
+
+  </main>
+
   <script>
-    const RUNTIME_BASE = '/api/v1/runtime';
-    const MEMORY_BASE = '/api/v1/memory';
+    const TOOL_BASE = '/api/v1/tools';
 
     // State
     const conversationHistory = [];
@@ -664,40 +744,61 @@
     const tabNavRuntime = document.getElementById('tabNavRuntime');
     const tabNavPrompt = document.getElementById('tabNavPrompt');
     const tabNavMemory = document.getElementById('tabNavMemory');
+    const tabNavTool = document.getElementById('tabNavTool');
 
     const viewRuntime = document.getElementById('viewRuntime');
     const viewPrompt = document.getElementById('viewPrompt');
     const viewMemory = document.getElementById('viewMemory');
+    const viewTool = document.getElementById('viewTool');
 
     tabNavRuntime.addEventListener('click', () => {
       tabNavRuntime.classList.add('active');
       tabNavPrompt.classList.remove('active');
       tabNavMemory.classList.remove('active');
+      tabNavTool.classList.remove('active');
 
       viewRuntime.classList.add('active');
       viewPrompt.classList.remove('active');
       viewMemory.classList.remove('active');
+      viewTool.classList.remove('active');
     });
 
     tabNavPrompt.addEventListener('click', () => {
       tabNavPrompt.classList.add('active');
       tabNavRuntime.classList.remove('active');
       tabNavMemory.classList.remove('active');
+      tabNavTool.classList.remove('active');
 
       viewPrompt.classList.add('active');
       viewRuntime.classList.remove('active');
       viewMemory.classList.remove('active');
+      viewTool.classList.remove('active');
     });
 
     tabNavMemory.addEventListener('click', () => {
       tabNavMemory.classList.add('active');
       tabNavRuntime.classList.remove('active');
       tabNavPrompt.classList.remove('active');
+      tabNavTool.classList.remove('active');
 
       viewMemory.classList.add('active');
       viewRuntime.classList.remove('active');
       viewPrompt.classList.remove('active');
+      viewTool.classList.remove('active');
       refreshMemories();
+    });
+
+    tabNavTool.addEventListener('click', () => {
+      tabNavTool.classList.add('active');
+      tabNavRuntime.classList.remove('active');
+      tabNavPrompt.classList.remove('active');
+      tabNavMemory.classList.remove('active');
+
+      viewTool.classList.add('active');
+      viewRuntime.classList.remove('active');
+      viewPrompt.classList.remove('active');
+      viewMemory.classList.remove('active');
+      refreshTools();
     });
 
     // Elements - Runtime
@@ -1041,8 +1142,119 @@
     }
 
     if (btnCreateMemory) btnCreateMemory.addEventListener('click', createMemory);
-    if (btnAssembleContext) btnAssembleContext.addEventListener('click', assembleContext);
-    if (btnRefreshMemories) btnRefreshMemories.addEventListener('click', refreshMemories);
+    // TOOL STUDIO HANDLERS
+    const toolSelect = document.getElementById('toolSelect');
+    const toolArgsJson = document.getElementById('toolArgsJson');
+    const btnExecuteTool = document.getElementById('btnExecuteTool');
+    const btnRunToolPipeline = document.getElementById('btnRunToolPipeline');
+    const btnRefreshTools = document.getElementById('btnRefreshTools');
+    const toolOutputInspector = document.getElementById('toolOutputInspector');
+    const toolSchemaViewer = document.getElementById('toolSchemaViewer');
+    const toolRegisteredCountVal = document.getElementById('toolRegisteredCountVal');
+    const toolLatencyVal = document.getElementById('toolLatencyVal');
+
+    const sampleArgsMap = {
+      calculator: '{\n  "a": 10,\n  "b": 5,\n  "operation": "add"\n}',
+      echo: '{\n  "message": "Hello from VOLTA Tool Studio v7.3"\n}',
+      datetime: '{}',
+      uuid: '{}'
+    };
+
+    function populateToolCard(toolName) {
+      if (toolSelect) toolSelect.value = toolName;
+      if (toolArgsJson && sampleArgsMap[toolName]) {
+        toolArgsJson.value = sampleArgsMap[toolName];
+      }
+      fetchToolSchema(toolName);
+    }
+
+    async function fetchToolSchema(toolName) {
+      try {
+        const res = await fetch(`${TOOL_BASE}/${toolName}`);
+        const json = await res.json();
+        if (json.success && json.data) {
+          toolSchemaViewer.textContent = JSON.stringify(json.data, null, 2);
+        }
+      } catch (err) {
+        toolSchemaViewer.textContent = `[Error loading schema: ${err.message}]`;
+      }
+    }
+
+    async function refreshTools() {
+      try {
+        const res = await fetch(`${TOOL_BASE}`);
+        const json = await res.json();
+        if (json.success && json.data) {
+          toolRegisteredCountVal.textContent = json.data.length;
+          fetchToolSchema(toolSelect.value || 'calculator');
+        }
+      } catch (err) {
+        toolSchemaViewer.textContent = `[Error loading tools: ${err.message}]`;
+      }
+    }
+
+    async function executeToolCall() {
+      const toolName = toolSelect.value;
+      let args = {};
+      try { args = JSON.parse(toolArgsJson.value); } catch (err) { alert('Invalid Arguments JSON'); return; }
+
+      toolOutputInspector.textContent = "Executing tool call...";
+      try {
+        const res = await fetch(`${TOOL_BASE}/execute`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tool_name: toolName, arguments: args })
+        });
+        const json = await res.json();
+        if (json.success && json.data) {
+          toolOutputInspector.textContent = JSON.stringify(json.data, null, 2);
+          toolLatencyVal.textContent = `${json.data.execution_time_ms || 0.0}ms`;
+        } else {
+          toolOutputInspector.textContent = `[Execution Failed: ${json.detail || json.message}]`;
+        }
+      } catch (err) {
+        toolOutputInspector.textContent = `[Network Error: ${err.message}]`;
+      }
+    }
+
+    async function runToolPipeline() {
+      const toolName = toolSelect.value;
+      let args = {};
+      try { args = JSON.parse(toolArgsJson.value); } catch (err) { alert('Invalid Arguments JSON'); return; }
+
+      toolOutputInspector.textContent = "Running ToolPipeline execution...";
+      try {
+        const res = await fetch(`${TOOL_BASE}/pipeline`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tool_name: toolName, arguments: args })
+        });
+        const json = await res.json();
+        if (json.success && json.data) {
+          toolOutputInspector.textContent = JSON.stringify(json.data, null, 2);
+          toolLatencyVal.textContent = `${json.data.total_latency_ms || 0.0}ms`;
+        } else {
+          toolOutputInspector.textContent = `[Pipeline Failed: ${json.detail || json.message}]`;
+        }
+      } catch (err) {
+        toolOutputInspector.textContent = `[Network Error: ${err.message}]`;
+      }
+    }
+
+    const cardToolCalc = document.getElementById('cardToolCalc');
+    const cardToolEcho = document.getElementById('cardToolEcho');
+    const cardToolDate = document.getElementById('cardToolDate');
+    const cardToolUuid = document.getElementById('cardToolUuid');
+
+    if (cardToolCalc) cardToolCalc.addEventListener('click', () => populateToolCard('calculator'));
+    if (cardToolEcho) cardToolEcho.addEventListener('click', () => populateToolCard('echo'));
+    if (cardToolDate) cardToolDate.addEventListener('click', () => populateToolCard('datetime'));
+    if (cardToolUuid) cardToolUuid.addEventListener('click', () => populateToolCard('uuid'));
+
+    if (btnExecuteTool) btnExecuteTool.addEventListener('click', executeToolCall);
+    if (btnRunToolPipeline) btnRunToolPipeline.addEventListener('click', runToolPipeline);
+    if (btnRefreshTools) btnRefreshTools.addEventListener('click', refreshTools);
+    if (toolSelect) toolSelect.addEventListener('change', (e) => populateToolCard(e.target.value));
 
     btnRenderPrompt.addEventListener('click', renderPrompt);
     btnExecutePrompt.addEventListener('click', executePrompt);

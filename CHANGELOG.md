@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v7.3.0] - 2026-08-07
+
+### Added
+- **Enterprise Tool Runtime** (`backend/app/tools/`): Provider-independent, framework-independent, secure tool orchestration, discovery, authorization, pipeline processing, chaining, and telemetry layer.
+- **`ToolSchema` & `ToolManifest`**: Structural JSON Schema parameter definitions, manifest metadata, capabilities, and future-proof deprecation fields (`deprecated`, `replacement_tool`).
+- **`ToolDiscoveryService`**: Tool query service searching registered manifests by type (`MATH`, `TIME`, `TEXT`, `UTILITY`), capability (`supports_async`, `supports_batch`), and permission.
+- **`ToolPipeline` & `PipelineResult`**: 6-step execution pipeline (`Validation` ➔ `Permission Check` ➔ `Policy Evaluation` ➔ `Execution` ➔ `Analytics` ➔ `Event Emission`).
+- **`ToolChain` & `ChainResult`**: Multi-step sequential tool execution engine feeding output of step $N$ into input of step $N+1$.
+- **Built-in Reference Tools** (`backend/app/tools/builtin/`): `EchoTool`, `CalculatorTool` (`add`, `subtract`, `multiply`, `divide`), `DatetimeTool`, `UUIDTool`.
+- **Reserved Adapter Architecture**: Created `backend/app/tools/adapters/` directory for future production integrations (Phase 7.7).
+- **Formal Tool Events**: `ToolRegistered`, `ToolValidated`, `ToolStarted`, `ToolCompleted`, `ToolFailed`, `ToolTimedOut`, `ToolSkipped`, `ToolCancelled` published directly to `WorkflowEventBus` (v6.5).
+- **REST API Presentation Layer**: Router `/api/v1/tools` with endpoints `POST /execute`, `GET /`, `GET /{tool_name}`, `GET /health`, `GET /statistics`, `POST /validate`, `POST /pipeline`, `POST /chain`.
+- **Developer Console — Tool Studio**: Interactive UI panel (`testing-ui/index.html`) mounted at `/console` featuring available tool cards, JSON argument editor, pipeline trace visualizer, and schema viewer.
+- **Architecture Decision Records**: `ADR 042` (Enterprise Tool Runtime Architecture) and `ADR 043` (Tool Engineering Guidelines).
+
+---
+
 ## [v7.2.0] - 2026-08-07
 
 ### Added

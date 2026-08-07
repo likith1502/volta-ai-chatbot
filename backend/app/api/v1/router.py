@@ -9,6 +9,7 @@ from app.api.v1.routers.notifications import router as notifications_router
 from app.api.v1.routers.prompts import router as prompts_router
 from app.api.v1.routers.recommendations import router as recommendations_router
 from app.api.v1.routers.runtime import router as runtime_router
+from app.api.v1.routers.tools import router as tools_router
 from app.api.v1.routers.users import router as users_router
 
 api_v1_router = APIRouter()
@@ -24,3 +25,4 @@ api_v1_router.include_router(chat_router)
 api_v1_router.include_router(runtime_router)
 api_v1_router.include_router(prompts_router)
 api_v1_router.include_router(memory_router)
+api_v1_router.include_router(tools_router)

@@ -121,6 +121,13 @@ To maintain clear project tracking:
 - **Includes Sub-Phases**:
   - **Phase 7.2**: Enterprise Memory Runtime (`backend/app/memory/`). Provider-independent memory orchestration, `MemoryManager`, `MemoryLifecycleManager` (`CREATED` ➔ `ACTIVE` ➔ `PINNED` ➔ `ARCHIVED` ➔ `EXPIRED` ➔ `DELETED`), `ContextAssemblyStrategy` ABC (`RecentStrategy`, `ImportanceStrategy`, `HybridStrategy`, `SlidingWindowStrategy`), `MemoryContextBuilder`, `MemoryVariableProvider`, `MemoryScorer`, `MemoryCompactor`, `ContextWindowBudget`, `MemoryRepository` ABC, `MemoryFactory`, `MemoryRegistry`, `MemoryHealthManager`, `MemoryStatistics`, `WorkflowEventBus` integration (v6.5), and Memory Studio UI (`testing-ui/index.html`). 156 tests passing.
 
+### Release v7.3 — Enterprise Tool Runtime
+- **Status**: **COMPLETED, VERIFIED, LOCKED**
+- **Version**: `v7.3.0`
+- **Completion Date**: 2026-08-07
+- **Includes Sub-Phases**:
+  - **Phase 7.3**: Enterprise Tool Runtime (`backend/app/tools/`). Provider-independent tool orchestration, `ToolManager`, `BaseTool` ABC, `ToolSchema`, `ToolManifest` (with `deprecated` and `replacement_tool`), `ToolPipeline`, `ToolChain`, `ToolDiscoveryService`, `ToolCapabilities`, `ToolContext`, `ToolSession`, `ToolPolicy`, `ToolPermission`, `ToolRepository` ABC, `ToolFactory`, `ToolRegistry`, `ToolHealthManager`, `ToolStatistics`, `WorkflowEventBus` integration (v6.5), built-in tools (`EchoTool`, `CalculatorTool`, `DatetimeTool`, `UUIDTool`), reserved `adapters/` directory, and Tool Studio UI (`testing-ui/index.html`). 162 tests passing. Architecture score: 10/10, Future compatibility: 10/10.
+
 ---
 
 ## Future Release Roadmap
@@ -131,8 +138,8 @@ To maintain clear project tracking:
   - **Phase 7.0**: LLM Runtime Engine ✅ **COMPLETED (`v7.0.0`)**
   - **Phase 7.1**: Prompt Execution Engine ✅ **COMPLETED (`v7.1.0`)**
   - **Phase 7.2**: Memory Runtime ✅ **COMPLETED (`v7.2.0`)**
-  - **Phase 7.3**: Tool Runtime ⏳ **NEXT SUB-PHASE**
-  - **Phase 7.4**: Graph Runtime Integration
+  - **Phase 7.3**: Tool Runtime ✅ **COMPLETED (`v7.3.0`)**
+  - **Phase 7.4**: Graph Runtime Integration ⏳ **NEXT SUB-PHASE**
   - **Phase 7.5**: Multi-Agent Runtime
   - **Phase 7.6**: RAG Engine
   - **Phase 7.7**: Production Integrations

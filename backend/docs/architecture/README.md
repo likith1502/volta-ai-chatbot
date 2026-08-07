@@ -4,7 +4,7 @@ This index lists all official Architecture Decision Records (ADRs) and technical
 
 ---
 
-## Architecture Decision Records & Guidelines (ADRs 001 – 041)
+## Architecture Decision Records & Guidelines (ADRs 001 – 043)
 
 | ADR ID | Title | Status | Date |
 | :--- | :--- | :---: | :---: |
@@ -49,3 +49,5 @@ This index lists all official Architecture Decision Records (ADRs) and technical
 | **[ADR 039](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/039-prompt-engineering-guidelines.md)** | Prompt Engineering Guidelines & Extension Standards | Accepted | 2026-08-07 |
 | **[ADR 040](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/040-enterprise-memory-runtime.md)** | Enterprise Memory Runtime Architecture (v7.2) | Accepted | 2026-08-07 |
 | **[ADR 041](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/041-memory-engineering-guidelines.md)** | Memory Engineering Guidelines & Extension Standards | Accepted | 2026-08-07 |
+| **[ADR 042](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/042-enterprise-tool-runtime.md)** | Enterprise Tool Runtime Architecture (v7.3) | Accepted | 2026-08-07 |
+| **[ADR 043](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/043-tool-engineering-guidelines.md)** | Tool Engineering Guidelines & Extension Standards | Accepted | 2026-08-07 |
