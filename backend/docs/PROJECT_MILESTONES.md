@@ -100,12 +100,19 @@ To maintain clear project tracking:
 - **Includes Chapters**:
   - **Chapter 6.8**: Human-in-the-Loop & Approval Interrupts (`backend/app/hitl/`). Provider-independent approval lifecycle (`HITLApprovalRequest`), resume contracts (`HITLResumePayload`), governance engine (`HITLGovernanceEngine`), interrupt manager (`HITLInterruptManager`), and registry (`HITLInterruptRegistry`).
 
-### Release v6.8.1 — Documentation & Repository Synchronization
+### Release v7.0 — LLM Runtime Engine
 - **Status**: **COMPLETED, VERIFIED, LOCKED**
-- **Version**: `v6.8.1`
+- **Version**: `v7.0.0`
 - **Completion Date**: 2026-08-07
-- **Includes Chapters**:
-  - **Pre-v7 Audit Cleanup**: Updated Root & Backend READMEs, synchronized ADR Index (001–035), fixed Foundation Status numbering, resolved circular import in AI tools package, purged stray workspace artifacts, and verified 124 passing automated tests.
+- **Includes Sub-Phases**:
+  - **Phase 7.0**: Enterprise LLM Runtime Engine (`backend/app/runtime/`). Provider-independent provider adapters (`GeminiProvider`, `MockProvider`), `RuntimeManager`, `RuntimeRegistry`, `RuntimeExecutionStore`, metrics, and Developer Testing Console UI (`/console`).
+
+### Release v7.1 — Prompt Execution Engine
+- **Status**: **COMPLETED, VERIFIED, LOCKED**
+- **Version**: `v7.1.0`
+- **Completion Date**: 2026-08-07
+- **Includes Sub-Phases**:
+  - **Phase 7.1**: Enterprise Prompt Execution Engine (`backend/app/prompt/`). Provider-independent prompt composition, `PromptManager` (decoupled `render()` vs `execute()`), `PromptProfile` separation, `PromptCompiler`, `PromptRepository` ABC, `PromptLinter`, `PromptOptimizer`, `PromptValidator`, `PromptSecurityPolicy`, `PromptChain` contracts, `PromptCostEstimator`, `PromptQualityAnalyzer`, `PromptBenchmarkRunner`, `PromptAnalyticsManager`, `VariableProvider` ABC, and Prompt Studio Mini-IDE (`testing-ui/index.html`). 146 tests passing.
 
 ---
 
@@ -116,7 +123,7 @@ To maintain clear project tracking:
 - **Target Sub-Phases**:
   - **Phase 7.0**: LLM Runtime Engine ✅ **COMPLETED (`v7.0.0`)**
   - **Phase 7.1**: Prompt Execution Engine ✅ **COMPLETED (`v7.1.0`)**
-  - **Phase 7.2**: Memory Runtime
+  - **Phase 7.2**: Memory Runtime ⏳ **NEXT SUB-PHASE**
   - **Phase 7.3**: Tool Runtime
   - **Phase 7.4**: Graph Runtime Integration
   - **Phase 7.5**: Multi-Agent Runtime

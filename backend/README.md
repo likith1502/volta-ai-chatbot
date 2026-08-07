@@ -1,6 +1,9 @@
 # VOLTA AI Chatbot - Backend Platform
 
-A production-grade, asynchronous AI-powered messaging chatbot backend for the VOLTA urban mobility platform. Built with Python 3.11+, FastAPI, Async PostgreSQL, SQLAlchemy 2.0, Alembic, and Provider-Agnostic Conversational AI.
+A production-grade, asynchronous AI-powered messaging chatbot backend for the VOLTA urban mobility platform. Built with Python 3.11+, FastAPI, Async PostgreSQL, SQLAlchemy 2.0, Alembic, Google Gemini SDK, and Provider-Agnostic Conversational AI.
+
+[![Release](https://img.shields.io/badge/Release-v7.1-blue.svg)](https://github.com/likith1502/volta-ai-chatbot/releases/tag/v7.1)
+[![Tests](https://img.shields.io/badge/Tests-146%20Passing-success.svg)](tests/)
 
 ---
 
@@ -16,10 +19,13 @@ Application Services & AI Orchestrator (app/services/chat.py)
        │
        ├─────────────────────────────────────────┐
        ▼                                         ▼
-AI Provider Layer (app/ai/)           Domain Repositories (app/repositories/)
- (OpenAI, Claude, Gemini, Ollama)                │
-                                                 ▼
-                                   Infrastructure & Persistence (app/db/)
+Prompt Execution Engine (app/prompt/ v7.1)   Domain Repositories (app/repositories/)
+       │                                         │
+       ▼                                         ▼
+Enterprise LLM Runtime Engine (app/runtime/ v7.0) Infrastructure & Persistence (app/db/)
+       │
+       ▼
+Google Gemini SDK / Mock Provider
 ```
 
 All application configuration is centrally managed via Pydantic `Settings` (`app/config/settings.py`). Database operations execute asynchronously through SQLAlchemy `AsyncSession` and `asyncpg`.
@@ -33,9 +39,10 @@ All application configuration is centrally managed via Pydantic `Settings` (`app
 - **Database**: PostgreSQL 15+
 - **Async ORM**: SQLAlchemy 2.0 (`asyncpg` driver)
 - **Migrations**: Alembic
-- **AI Engine**: Provider-Agnostic `AIProvider` Interface (`OpenAI`, Anthropic Claude, Gemini, Ollama)
+- **Runtime Engine**: Official `google-genai` SDK (`gemini-2.5-flash`, `gemini-2.5-pro`) & Provider-Independent Runtime Layer
+- **Prompt Engine**: PromptManager, PromptProfiles, PromptCompiler, PromptLinter, PromptPipeline, PromptRepository
 - **Settings**: Pydantic BaseSettings (`pydantic-settings`)
-- **Testing**: pytest & `httpx` (`TestClient`)
+- **Testing**: pytest & `httpx` (`TestClient`) — **146 Tests Passing**
 
 ---
 
@@ -58,18 +65,20 @@ backend/
 │   ├── graph/        # Graph Orchestration Foundation (v6.2)
 │   ├── hitl/         # Human-in-the-Loop & Governance Foundation (v6.8)
 │   ├── models/       # SQLAlchemy ORM models
+│   ├── prompt/       # Prompt Execution Engine (v7.1)
 │   ├── repositories/ # Data access repository layer
+│   ├── runtime/      # Enterprise LLM Runtime Engine (v7.0)
 │   ├── schemas/      # Pydantic DTO validation schemas
 │   ├── services/     # Domain services & ChatService orchestrator
 │   ├── streaming/    # Streaming & Real-Time Foundation (v6.7)
 │   ├── utils/        # Response helpers & utility functions
 │   ├── workflow/     # Workflow Node Library (v6.3)
 │   └── main.py       # FastAPI application entry point
-├── docs/             # Technical architecture & engineering docs
+├── docs/             # Technical architecture & engineering docs (ADRs 001–039)
 ├── logs/             # Local runtime execution logs
 ├── migrations/       # Alembic versioned migration environment
 ├── scripts/          # Operations and seed scripts
-├── tests/            # Automated pytest test suites
+├── tests/            # Automated pytest test suites (146 passed)
 ├── .env
 ├── .env.example
 ├── ARCHITECTURE.md
@@ -88,59 +97,18 @@ python -m uvicorn app.main:app --reload
 
 The application will be accessible at:
 - **Root**: http://127.0.0.1:8000/
+- **Developer Console & Prompt Studio**: http://127.0.0.1:8000/console
 - **V1 Health Check**: http://127.0.0.1:8000/api/v1/health
 - **V1 Chat Endpoint**: http://127.0.0.1:8000/api/v1/chat
+- **V1 Runtime Endpoint**: http://127.0.0.1:8000/api/v1/runtime/chat
+- **V1 Prompts Render Endpoint**: http://127.0.0.1:8000/api/v1/prompts/render
 - **Swagger Documentation**: http://127.0.0.1:8000/docs
 
 ---
 
 ## Testing Commands
 
-Run the complete automated test suite (124 passed in ~3.2s):
+Run the complete automated test suite (146 passed in ~3.6s):
 ```bash
 pytest
 ```
-
----
-
-## Development Roadmap & Releases
-
-### Completed Foundations (v1.0 – v6.8.1)
-- **Release v1.0**: Infrastructure Foundation *(Completed & Locked)*
-- **Release v1.1**: Database Base Mixins *(Completed & Locked)*
-- **Release v2.0**: Domain Models *(Completed & Locked)*
-- **Release v2.5**: Repository Pattern *(Completed & Locked)*
-- **Release v2.6**: Project Structure Standardization *(Completed & Locked)*
-- **Release v3.0**: Service Layer *(Completed & Locked)*
-- **Release v4.0**: REST API Layer *(Completed & Locked)*
-- **Release v5.0**: AI Foundation & Conversation Intelligence *(Completed & Locked)*
-- **Release v6.1**: Conversation State Foundation *(Completed & Locked)*
-- **Release v6.2**: Graph Orchestration Foundation *(Completed & Locked)*
-- **Release v6.3**: Workflow Node Library *(Completed & Locked)*
-- **Release v6.4**: Graph Execution Engine *(Completed & Locked)*
-- **Release v6.5**: Workflow Event & Observability Foundation *(Completed & Locked)*
-- **Release v6.6**: Checkpoint & Replay Foundation *(Completed & Locked)*
-- **Release v6.7**: Streaming & Real-Time Foundation *(Completed & Locked)*
-- **Release v6.8**: Human-in-the-Loop Foundation *(Completed & Locked)*
-- **Release v6.8.1**: Documentation & Repository Synchronization *(Completed & Locked)*
-
-### Active & Future Roadmap
-- 🚀 **Phase 7 — Enterprise Messaging Runtime** *(Active Target)*
-  - `7.0` LLM Runtime Engine
-  - `7.1` Prompt Execution Engine
-  - `7.2` Memory Runtime
-  - `7.3` Tool Runtime
-  - `7.4` Graph Runtime Integration
-  - `7.5` Multi-Agent Runtime
-  - `7.6` RAG Engine
-  - `7.7` Production Integrations
-  - `7.8` Deployment & Scaling
-- 📅 **Phase 8 — Voice Platform** *(Future Expansion)*
-  - `8.0` Speech-to-Text (STT)
-  - `8.1` Text-to-Speech (TTS)
-  - `8.2` Audio Streaming
-  - `8.3` Voice Sessions
-  - `8.4` Telephony Integrations
-  - `8.5` Multimodal Conversations
-
-

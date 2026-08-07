@@ -2,12 +2,17 @@
 
 A production-grade, asynchronous AI-powered messaging chatbot backend designed for the VOLTA urban mobility platform.
 
+[![Release](https://img.shields.io/badge/Release-v7.1-blue.svg)](https://github.com/likith1502/volta-ai-chatbot/releases/tag/v7.1)
+[![Tests](https://img.shields.io/badge/Tests-146%20Passing-success.svg)](backend/tests/)
+[![Python](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-v1.0-green.svg)](https://fastapi.tiangolo.com/)
+
 ---
 
 ## Project Goals
 
 - **Conversational Mobility**: Provide real-time, context-aware ride discovery, booking, and travel assistance over enterprise messaging channels.
-- **Enterprise AI Messaging Runtime**: Maintain persistent multi-turn conversational state, graph workflows, and tool integration across messaging interactions.
+- **Enterprise AI Messaging Runtime**: Maintain persistent multi-turn conversational state, graph workflows, prompt engineering, and tool integration across messaging interactions.
 - **Enterprise Performance**: Deliver sub-second response times using asynchronous non-blocking Python architecture (FastAPI, Async PostgreSQL, SQLAlchemy 2.0).
 
 ---
@@ -33,36 +38,38 @@ Volta-AI-Chatbot/
 │   │   ├── graph/        # Graph Orchestration Foundation (v6.2)
 │   │   ├── hitl/         # Human-in-the-Loop & Governance Foundation (v6.8)
 │   │   ├── models/       # SQLAlchemy ORM domain models
+│   │   ├── prompt/       # Prompt Execution Engine (v7.1)
 │   │   ├── repositories/ # Generic & specialized data access repositories
+│   │   ├── runtime/      # Enterprise LLM Runtime Engine (v7.0)
 │   │   ├── schemas/      # Pydantic DTO validation schemas
 │   │   ├── services/     # Domain business services & ChatService
 │   │   ├── streaming/    # Streaming & Real-Time Foundation (v6.7)
 │   │   ├── utils/        # Response helpers & utility functions
 │   │   └── workflow/     # Workflow Node Library (v6.3)
-│   ├── docs/             # Technical architecture & engineering docs (ADRs 001–035)
+│   ├── docs/             # Technical architecture & engineering docs (ADRs 001–039)
 │   ├── logs/             # Runtime execution log directory
 │   ├── migrations/       # Alembic versioned schema migrations
 │   ├── scripts/          # Operation & database seeding scripts
-│   ├── tests/            # Automated pytest test suites (124 passed)
+│   ├── tests/            # Automated pytest test suites (146 passed)
 │   ├── alembic.ini       # Alembic migration configuration
 │   ├── ARCHITECTURE.md   # Master backend architecture blueprint
 │   └── README.md         # Backend developer guide
 ├── docs/                 # General project documentation hub
 ├── infrastructure/       # Deployment manifests & container configs
-└── testing-ui/           # Lightweight testing frontend
+└── testing-ui/           # Developer Testing Console & Prompt Studio Mini-IDE
 ```
 
 ---
 
-## Architecture Overview
+## Master Architecture Overview
 
-The backend employs a **Modular Clean Architecture** enforcing clean boundary separation between HTTP Routers, Business Services, Repositories, AI Orchestration, and Persistent Infrastructure.
+The backend employs a **Modular Clean Architecture** enforcing clean boundary separation between HTTP Routers, Business Services, Prompt Engineering, LLM Runtime Execution, Repositories, and Persistent Infrastructure.
 
 ```
 FastAPI Router (app/api/v1/)
        │
        ▼
-Chat Service & AI Engine (app/services/, app/ai/)
+Chat Service & AI Orchestration (app/services/, app/ai/)
        │
        ├─────────────────────────────────────────┐
        ▼                                         ▼
@@ -75,23 +82,31 @@ Event & Stream Bus     HITL Governance & Replay Engine
 (app/events/, streaming/)  (app/hitl/, app/checkpoints/)
        │
        ▼
-Enterprise Messaging Runtime (Phase 7) ──► Voice Platform (Phase 8 Expansion)
+Prompt Execution Engine (app/prompt/ v7.1)
+       │
+       ▼
+Enterprise LLM Runtime Engine (app/runtime/ v7.0)
+       │
+       ▼
+Google Gemini SDK / Mock Provider
 ```
 
 ---
 
 ## Documentation Location
 
-All technical documentation, Architecture Decision Records (ADRs 001–035), database constitutions, and coding standards are maintained under:
+All technical documentation, Architecture Decision Records (ADRs 001–039), database constitutions, and coding standards are maintained under:
 
 👉 [backend/docs/](backend/docs/)
 
 Key Documents:
 - [Master Backend Architecture](backend/ARCHITECTURE.md)
-- [ADR Index (ADRs 001 – 035)](backend/docs/architecture/README.md)
+- [ADR Index (ADRs 001 – 039)](backend/docs/architecture/README.md)
 - [Foundation Status & Lock Record](backend/docs/FOUNDATION_STATUS.md)
 - [Project Milestones & Release History](backend/docs/PROJECT_MILESTONES.md)
 - [Foundation Graduation Certificate](backend/docs/FOUNDATION_CERTIFICATE_v6.8.1.md)
+- [ADR 038: Prompt Execution Engine Architecture](backend/docs/architecture/038-prompt-execution-engine.md)
+- [ADR 039: Prompt Engineering Guidelines](backend/docs/architecture/039-prompt-engineering-guidelines.md)
 
 ---
 
@@ -100,10 +115,10 @@ Key Documents:
 - **Backend**: Python 3.11+, FastAPI (ASGI), Uvicorn
 - **Database**: PostgreSQL 15+, Async SQLAlchemy 2.0 (`asyncpg` driver)
 - **Migrations**: Alembic
-- **AI Engine**: Multi-Provider Adapter Engine (OpenAI, Anthropic Claude, Google Gemini, Ollama)
-- **State & Graph**: Provider-Agnostic Graph Execution Engine & Node Library
-- **Testing**: pytest (124 passed in strict asyncio mode), `httpx`
-- **Frontend**: React (`testing-ui`)
+- **Runtime Engine**: Official `google-genai` SDK (`gemini-2.5-flash`, `gemini-2.5-pro`) & Provider-Independent Runtime Layer
+- **Prompt Engine**: Decoupled Prompt Manager, PromptProfiles, PromptCompiler, PromptLinter, PromptPipeline
+- **Testing**: pytest (146 passed in strict asyncio mode), `httpx`
+- **Developer UI**: HTML5/CSS3/Vanilla JS Developer Testing Console & Prompt Studio Mini-IDE (`testing-ui/index.html`)
 
 ---
 
@@ -128,10 +143,10 @@ Key Documents:
 - ✅ **v6.8.1**: Documentation & Repository Synchronization *(Locked)*
 
 ### Active Milestone Roadmap
-- 🚀 **Phase 7 — Enterprise Messaging Runtime** *(Current Target)*
-  - `7.0` LLM Runtime Engine
-  - `7.1` Prompt Execution Engine
-  - `7.2` Memory Runtime
+- 🚀 **Phase 7 — Enterprise Messaging Runtime** *(Active Phase)*
+  - ✅ `7.0` LLM Runtime Engine *(v7.0.0 Completed)*
+  - ✅ `7.1` Prompt Execution Engine *(v7.1.0 Completed)*
+  - ⏳ `7.2` Memory Runtime *(Next Sub-Phase)*
   - `7.3` Tool Runtime
   - `7.4` Graph Runtime Integration
   - `7.5` Multi-Agent Runtime

@@ -4,7 +4,7 @@ This index lists all official Architecture Decision Records (ADRs) and technical
 
 ---
 
-## Architecture Decision Records & Guidelines (ADRs 001 – 035)
+## Architecture Decision Records & Guidelines (ADRs 001 – 039)
 
 | ADR ID | Title | Status | Date |
 | :--- | :--- | :---: | :---: |

@@ -1,6 +1,6 @@
 # VOLTA AI Chatbot - Foundation Status & Lock Record
 
-This document records the official lock status of all application tiers for the VOLTA AI Chatbot backend platform.
+This document records the official lock status of all application tiers and runtime releases for the VOLTA AI Chatbot backend platform.
 
 ---
 
@@ -133,6 +133,24 @@ Provider-independent human-in-the-loop approval and governance framework (`app/h
 
 ---
 
+## 16. Enterprise LLM Runtime Engine (Phase 7.0)
+- **Release Version**: `v7.0.0`
+- **Status**: 🔒 **LOCKED**
+- **Completion Date**: 2026-08-07
+
+Provider-independent runtime package (`app/runtime/`), `GeminiProvider` using official `google-genai` SDK (`gemini-2.5-flash`, `gemini-2.5-pro`), `MockProvider`, `RuntimeManager`, `RuntimeExecutionStore`, developer console UI (`/console`).
+
+---
+
+## 17. Prompt Execution Engine (Phase 7.1)
+- **Release Version**: `v7.1.0`
+- **Status**: 🔒 **LOCKED**
+- **Completion Date**: 2026-08-07
+
+Provider-independent prompt composition package (`app/prompt/`), `PromptManager` (decoupled `render()` vs `execute()`), `PromptProfile` separation, `PromptCompiler`, `PromptRepository` ABC, `PromptLinter`, `PromptOptimizer`, `PromptValidator`, `PromptSecurityPolicy`, `PromptChain` contracts, `PromptCostEstimator`, `PromptQualityAnalyzer`, `PromptBenchmarkRunner`, `PromptAnalyticsManager`, `VariableProvider` ABC, and Prompt Studio Mini-IDE (`testing-ui/index.html`).
+
+---
+
 ## Master Foundation Lock Record
 
 - 🔒 Infrastructure Foundation v1.0 — LOCKED
@@ -150,17 +168,19 @@ Provider-independent human-in-the-loop approval and governance framework (`app/h
 - 🔒 Checkpoint & Replay Foundation v6.6 — LOCKED
 - 🔒 Streaming & Real-Time Foundation v6.7 — LOCKED
 - 🔒 Human-in-the-Loop Foundation v6.8 — LOCKED
+- 🔒 LLM Runtime Engine v7.0 — LOCKED
+- 🔒 Prompt Execution Engine v7.1 — LOCKED
 
-> **Project Rule**: No further architectural or functional changes to completed foundation tiers should be made without an official Architecture Decision Record (ADR).
+> **Automated Test Suite Status**: **146 Tests Passing** in strict asyncio mode.
 
 ---
 
 ## Future Roadmap & Runtime Evolution
 
-### Phase 7 — Enterprise Messaging Runtime (Current Active Phase)
-- **Phase 7.0**: LLM Runtime Engine
-- **Phase 7.1**: Prompt Execution Engine
-- **Phase 7.2**: Memory Runtime
+### Phase 7 — Enterprise Messaging Runtime (Active Milestone Target)
+- ✅ **Phase 7.0**: LLM Runtime Engine *(v7.0.0 Completed)*
+- ✅ **Phase 7.1**: Prompt Execution Engine *(v7.1.0 Completed)*
+- ⏳ **Phase 7.2**: Memory Runtime *(Next Sub-Phase)*
 - **Phase 7.3**: Tool Runtime
 - **Phase 7.4**: Graph Runtime Integration
 - **Phase 7.5**: Multi-Agent Runtime
@@ -175,4 +195,3 @@ Provider-independent human-in-the-loop approval and governance framework (`app/h
 - **Phase 8.3**: Voice Session Management
 - **Phase 8.4**: Telephony & SIP Integrations
 - **Phase 8.5**: Multimodal Voice & Text Conversations
-
