@@ -342,7 +342,8 @@
 
     <div class="header-nav">
       <button class="tab-btn active" id="tabNavRuntime">Runtime Console</button>
-      <button class="tab-btn" id="tabNavPrompt">Prompt Studio Mini-IDE</button>
+      <button class="tab-btn" id="tabNavPrompt">Prompt Studio</button>
+      <button class="tab-btn" id="tabNavMemory">Memory Studio</button>
     </div>
 
     <div class="header-actions">
@@ -569,9 +570,91 @@
 
   </main>
 
+
+  <!-- TAB 3: MEMORY STUDIO -->
+  <main class="main-container view-tab" id="viewMemory">
+
+    <!-- Memory Studio Creator & Search -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Memory Orchestration</span>
+      </div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label class="form-label" for="memTypeSelect">Memory Type</label>
+          <select id="memTypeSelect" class="form-control">
+            <option value="short_term" selected>SHORT_TERM</option>
+            <option value="long_term">LONG_TERM</option>
+
+            <option value="user">USER</option>
+            <option value="working">WORKING</option>
+            <option value="system">SYSTEM</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="memContentInput">Memory Content</label>
+          <textarea id="memContentInput" class="form-control" rows="4" placeholder="User prefers Sedan vehicles for airport trips to SFO..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="memImportanceRange">Importance: <span id="memImpVal">0.8</span></label>
+          <div class="range-wrap">
+            <input type="range" id="memImportanceRange" min="0" max="1" step="0.1" value="0.8">
+          </div>
+        </div>
+
+        <div class="form-group" style="display: flex; gap: 8px;">
+          <button class="btn btn-primary" id="btnCreateMemory" style="flex:1; justify-content:center;">Add Memory</button>
+          <button class="btn" id="btnAssembleContext" style="flex:1; justify-content:center;">Build Context</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Memory Inspector & Timeline -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Active Memories & Lifecycle Timeline</span>
+        <button class="btn" id="btnRefreshMemories" style="padding:2px 6px; font-size:0.7rem;">Refresh</button>
+      </div>
+      <div class="panel-body">
+        <div class="pipeline-flow" style="margin-bottom: 12px;">
+          <span class="step-chip" style="color:#10b981;">CREATED</span> ➔
+          <span class="step-chip" style="color:#6366f1;">ACTIVE</span> ➔
+          <span class="step-chip" style="color:#f59e0b;">PINNED</span> ➔
+          <span class="step-chip" style="color:#94a3b8;">ARCHIVED</span> ➔
+          <span class="step-chip" style="color:#ef4444;">DELETED</span>
+        </div>
+        <pre class="diff-box" id="memoriesListInspector" style="height: 380px;">[Click 'Refresh' or 'Add Memory' to inspect active memory entries]</pre>
+      </div>
+    </section>
+
+    <!-- Memory Context Preview & Token Budget -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Context Window & Token Budget</span>
+      </div>
+      <div class="panel-body">
+        <div class="diag-metric">
+          <div class="diag-title">Memory Token Budget</div>
+          <div class="diag-val" id="memTokenBudgetVal">0 / 4000</div>
+        </div>
+
+        <div class="diag-metric">
+          <div class="diag-title">Repository Total Entries</div>
+          <div class="diag-val" id="memTotalCountVal">0</div>
+        </div>
+
+        <div class="diag-title" style="margin-top: 12px; margin-bottom: 6px;">Assembled MemoryContext Preview</div>
+        <pre class="raw-inspector" id="memContextPreview" style="max-height: 260px;">[Click 'Build Context' to inspect assembled memory payload ready for Prompt Engine injection]</pre>
+      </div>
+    </section>
+
+  </main>
+
   <script>
     const RUNTIME_BASE = '/api/v1/runtime';
-    const PROMPT_BASE = '/api/v1/prompts';
+    const MEMORY_BASE = '/api/v1/memory';
 
     // State
     const conversationHistory = [];
@@ -580,21 +663,41 @@
     // Nav Tabs
     const tabNavRuntime = document.getElementById('tabNavRuntime');
     const tabNavPrompt = document.getElementById('tabNavPrompt');
+    const tabNavMemory = document.getElementById('tabNavMemory');
+
     const viewRuntime = document.getElementById('viewRuntime');
     const viewPrompt = document.getElementById('viewPrompt');
+    const viewMemory = document.getElementById('viewMemory');
 
     tabNavRuntime.addEventListener('click', () => {
       tabNavRuntime.classList.add('active');
       tabNavPrompt.classList.remove('active');
+      tabNavMemory.classList.remove('active');
+
       viewRuntime.classList.add('active');
       viewPrompt.classList.remove('active');
+      viewMemory.classList.remove('active');
     });
 
     tabNavPrompt.addEventListener('click', () => {
       tabNavPrompt.classList.add('active');
       tabNavRuntime.classList.remove('active');
+      tabNavMemory.classList.remove('active');
+
       viewPrompt.classList.add('active');
       viewRuntime.classList.remove('active');
+      viewMemory.classList.remove('active');
+    });
+
+    tabNavMemory.addEventListener('click', () => {
+      tabNavMemory.classList.add('active');
+      tabNavRuntime.classList.remove('active');
+      tabNavPrompt.classList.remove('active');
+
+      viewMemory.classList.add('active');
+      viewRuntime.classList.remove('active');
+      viewPrompt.classList.remove('active');
+      refreshMemories();
     });
 
     // Elements - Runtime
@@ -859,6 +962,87 @@
         alert(`Comparison Error: ${err.message}`);
       }
     }
+
+    // MEMORY STUDIO HANDLERS
+    const memTypeSelect = document.getElementById('memTypeSelect');
+    const memContentInput = document.getElementById('memContentInput');
+    const memImportanceRange = document.getElementById('memImportanceRange');
+    const memImpVal = document.getElementById('memImpVal');
+    const btnCreateMemory = document.getElementById('btnCreateMemory');
+    const btnAssembleContext = document.getElementById('btnAssembleContext');
+    const btnRefreshMemories = document.getElementById('btnRefreshMemories');
+    const memoriesListInspector = document.getElementById('memoriesListInspector');
+    const memTokenBudgetVal = document.getElementById('memTokenBudgetVal');
+    const memTotalCountVal = document.getElementById('memTotalCountVal');
+    const memContextPreview = document.getElementById('memContextPreview');
+
+    if (memImportanceRange) {
+      memImportanceRange.addEventListener('input', (e) => { memImpVal.textContent = e.target.value; });
+    }
+
+    async function refreshMemories() {
+      try {
+        const res = await fetch(`${MEMORY_BASE}`);
+        const json = await res.json();
+        if (json.success && json.data) {
+          const list = json.data;
+          memTotalCountVal.textContent = list.length;
+          memoriesListInspector.textContent = JSON.stringify(list, null, 2);
+        }
+      } catch (err) {
+        memoriesListInspector.textContent = `[Error loading memories: ${err.message}]`;
+      }
+    }
+
+    async function createMemory() {
+      const content = memContentInput.value.trim();
+      if (!content) { alert('Please enter memory content'); return; }
+
+      const payload = {
+        content: content,
+        memory_type: memTypeSelect.value,
+        importance: parseFloat(memImportanceRange.value)
+      };
+
+      try {
+        const res = await fetch(`${MEMORY_BASE}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.success) {
+          memContentInput.value = '';
+          refreshMemories();
+        } else {
+          alert(`Creation error: ${json.message}`);
+        }
+      } catch (err) {
+        alert(`Network error: ${err.message}`);
+      }
+    }
+
+    async function assembleContext() {
+      try {
+        const res = await fetch(`${MEMORY_BASE}/context`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ strategy: "hybrid", token_budget: 4000 })
+        });
+        const json = await res.json();
+        if (json.success && json.data) {
+          const ctx = json.data;
+          memTokenBudgetVal.textContent = `${ctx.total_token_estimate || 0} / 4000`;
+          memContextPreview.textContent = JSON.stringify(ctx, null, 2);
+        }
+      } catch (err) {
+        memContextPreview.textContent = `[Context build error: ${err.message}]`;
+      }
+    }
+
+    if (btnCreateMemory) btnCreateMemory.addEventListener('click', createMemory);
+    if (btnAssembleContext) btnAssembleContext.addEventListener('click', assembleContext);
+    if (btnRefreshMemories) btnRefreshMemories.addEventListener('click', refreshMemories);
 
     btnRenderPrompt.addEventListener('click', renderPrompt);
     btnExecutePrompt.addEventListener('click', executePrompt);

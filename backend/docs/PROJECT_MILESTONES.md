@@ -112,7 +112,14 @@ To maintain clear project tracking:
 - **Version**: `v7.1.0`
 - **Completion Date**: 2026-08-07
 - **Includes Sub-Phases**:
-  - **Phase 7.1**: Enterprise Prompt Execution Engine (`backend/app/prompt/`). Provider-independent prompt composition, `PromptManager` (decoupled `render()` vs `execute()`), `PromptProfile` separation, `PromptCompiler`, `PromptRepository` ABC, `PromptLinter`, `PromptOptimizer`, `PromptValidator`, `PromptSecurityPolicy`, `PromptChain` contracts, `PromptCostEstimator`, `PromptQualityAnalyzer`, `PromptBenchmarkRunner`, `PromptAnalyticsManager`, `VariableProvider` ABC, and Prompt Studio Mini-IDE (`testing-ui/index.html`). 146 tests passing.
+  - **Phase 7.1**: Enterprise Prompt Execution Engine (`backend/app/prompt/`). Provider-independent prompt composition, `PromptManager` (decoupled `render()` vs `execute()`), `PromptProfile` separation, `PromptCompiler`, `PromptRepository` ABC, `PromptLinter`, `PromptOptimizer`, `PromptValidator`, `PromptSecurityPolicy`, `PromptChain` contracts, `PromptCostEstimator`, `PromptQualityAnalyzer`, `PromptBenchmarkRunner`, `PromptAnalyticsManager`, `VariableProvider` ABC, and Prompt Studio Mini-IDE (`testing-ui/index.html`).
+
+### Release v7.2 — Enterprise Memory Runtime
+- **Status**: **COMPLETED, VERIFIED, LOCKED**
+- **Version**: `v7.2.0`
+- **Completion Date**: 2026-08-07
+- **Includes Sub-Phases**:
+  - **Phase 7.2**: Enterprise Memory Runtime (`backend/app/memory/`). Provider-independent memory orchestration, `MemoryManager`, `MemoryLifecycleManager` (`CREATED` ➔ `ACTIVE` ➔ `PINNED` ➔ `ARCHIVED` ➔ `EXPIRED` ➔ `DELETED`), `ContextAssemblyStrategy` ABC (`RecentStrategy`, `ImportanceStrategy`, `HybridStrategy`, `SlidingWindowStrategy`), `MemoryContextBuilder`, `MemoryVariableProvider`, `MemoryScorer`, `MemoryCompactor`, `ContextWindowBudget`, `MemoryRepository` ABC, `MemoryFactory`, `MemoryRegistry`, `MemoryHealthManager`, `MemoryStatistics`, `WorkflowEventBus` integration (v6.5), and Memory Studio UI (`testing-ui/index.html`). 156 tests passing.
 
 ---
 
@@ -123,8 +130,8 @@ To maintain clear project tracking:
 - **Target Sub-Phases**:
   - **Phase 7.0**: LLM Runtime Engine ✅ **COMPLETED (`v7.0.0`)**
   - **Phase 7.1**: Prompt Execution Engine ✅ **COMPLETED (`v7.1.0`)**
-  - **Phase 7.2**: Memory Runtime ⏳ **NEXT SUB-PHASE**
-  - **Phase 7.3**: Tool Runtime
+  - **Phase 7.2**: Memory Runtime ✅ **COMPLETED (`v7.2.0`)**
+  - **Phase 7.3**: Tool Runtime ⏳ **NEXT SUB-PHASE**
   - **Phase 7.4**: Graph Runtime Integration
   - **Phase 7.5**: Multi-Agent Runtime
   - **Phase 7.6**: RAG Engine

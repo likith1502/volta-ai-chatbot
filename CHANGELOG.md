@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v7.2.0] - 2026-08-07
+
+### Added
+- **Enterprise Memory Runtime** (`backend/app/memory/`): Provider-independent, framework-independent conversation memory orchestration, lifecycle management, retrieval scoring, context assembly, and token window budget management layer.
+- **`MemoryManager` Orchestrator**: Central memory management orchestrator with CRUD, search scoring, pinning/unpinning, archiving, policy cleanup, and `WorkflowEventBus` integration (v6.5).
+- **`MemoryLifecycleManager`**: Formal state transition rules (`CREATED` ➔ `ACTIVE` ➔ `PINNED` ➔ `ARCHIVED` ➔ `EXPIRED` ➔ `DELETED`).
+- **`ContextAssemblyStrategy` Abstraction**: Flexible strategy assembly (`RecentStrategy`, `ImportanceStrategy`, `HybridStrategy`, `SlidingWindowStrategy`).
+- **Prompt Engine Integration**: Implemented `MemoryVariableProvider` extending Prompt Engine's `VariableProvider` ABC, dynamically resolving `{conversation_memory}` variables for `PromptManager`.
+- **`MemoryTokenEstimator` & `ContextWindowBudget`**: Token budget calculation for single memory, list of memories, and full `MemoryContext`.
+- **Repository Abstractions**: `MemoryRepository` ABC, `InMemoryMemoryRepository`, `MemoryFactory`, `MemoryRegistry`, and `MemoryStorageCapabilities`.
+- **Telemetry & Health Reports**: `MemoryHealthManager`, `MemoryStatistics`, `MemoryMetrics`, `MemoryAnalyticsManager`, `MemoryQualityAnalyzer`, `MemoryCostEstimator`, `MemorySerializer`, and `MemoryVersion`.
+- **REST API Presentation Layer**: Router `/api/v1/memory` with endpoints `POST /`, `GET /`, `GET /{id}`, `DELETE /{id}`, `POST /search`, `POST /context`, `POST /cleanup`, `GET /metrics`, `GET /statistics`, `GET /health`.
+- **Developer Console — Memory Studio**: Interactive UI panel (`testing-ui/index.html`) mounted at `/console` featuring active memory inspector, lifecycle timeline, token budget visualizer, search scoring tester, and context preview.
+- **Architecture Decision Records**: `ADR 040` (Enterprise Memory Runtime Architecture with Future Compatibility Matrix) and `ADR 041` (Memory Engineering Guidelines).
+
+---
+
 ## [v7.1.0] - 2026-08-07
 
 ### Added

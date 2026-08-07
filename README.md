@@ -2,8 +2,8 @@
 
 A production-grade, asynchronous AI-powered messaging chatbot backend designed for the VOLTA urban mobility platform.
 
-[![Release](https://img.shields.io/badge/Release-v7.1-blue.svg)](https://github.com/likith1502/volta-ai-chatbot/releases/tag/v7.1)
-[![Tests](https://img.shields.io/badge/Tests-146%20Passing-success.svg)](backend/tests/)
+[![Release](https://img.shields.io/badge/Release-v7.2-blue.svg)](https://github.com/likith1502/volta-ai-chatbot/releases/tag/v7.2)
+[![Tests](https://img.shields.io/badge/Tests-156%20Passing-success.svg)](backend/tests/)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-v1.0-green.svg)](https://fastapi.tiangolo.com/)
 
@@ -12,7 +12,7 @@ A production-grade, asynchronous AI-powered messaging chatbot backend designed f
 ## Project Goals
 
 - **Conversational Mobility**: Provide real-time, context-aware ride discovery, booking, and travel assistance over enterprise messaging channels.
-- **Enterprise AI Messaging Runtime**: Maintain persistent multi-turn conversational state, graph workflows, prompt engineering, and tool integration across messaging interactions.
+- **Enterprise AI Messaging Runtime**: Maintain persistent multi-turn conversational state, graph workflows, prompt engineering, memory orchestration, and tool integration across messaging interactions.
 - **Enterprise Performance**: Deliver sub-second response times using asynchronous non-blocking Python architecture (FastAPI, Async PostgreSQL, SQLAlchemy 2.0).
 
 ---
@@ -37,6 +37,7 @@ Volta-AI-Chatbot/
 │   │   ├── execution/    # Graph Execution Engine (v6.4)
 │   │   ├── graph/        # Graph Orchestration Foundation (v6.2)
 │   │   ├── hitl/         # Human-in-the-Loop & Governance Foundation (v6.8)
+│   │   ├── memory/       # Enterprise Memory Runtime (v7.2)
 │   │   ├── models/       # SQLAlchemy ORM domain models
 │   │   ├── prompt/       # Prompt Execution Engine (v7.1)
 │   │   ├── repositories/ # Generic & specialized data access repositories
@@ -46,24 +47,24 @@ Volta-AI-Chatbot/
 │   │   ├── streaming/    # Streaming & Real-Time Foundation (v6.7)
 │   │   ├── utils/        # Response helpers & utility functions
 │   │   └── workflow/     # Workflow Node Library (v6.3)
-│   ├── docs/             # Technical architecture & engineering docs (ADRs 001–039)
+│   ├── docs/             # Technical architecture & engineering docs (ADRs 001–041)
 │   ├── logs/             # Runtime execution log directory
 │   ├── migrations/       # Alembic versioned schema migrations
 │   ├── scripts/          # Operation & database seeding scripts
-│   ├── tests/            # Automated pytest test suites (146 passed)
+│   ├── tests/            # Automated pytest test suites (156 passed)
 │   ├── alembic.ini       # Alembic migration configuration
 │   ├── ARCHITECTURE.md   # Master backend architecture blueprint
 │   └── README.md         # Backend developer guide
 ├── docs/                 # General project documentation hub
 ├── infrastructure/       # Deployment manifests & container configs
-└── testing-ui/           # Developer Testing Console & Prompt Studio Mini-IDE
+└── testing-ui/           # Developer Testing Console, Prompt Studio & Memory Studio
 ```
 
 ---
 
 ## Master Architecture Overview
 
-The backend employs a **Modular Clean Architecture** enforcing clean boundary separation between HTTP Routers, Business Services, Prompt Engineering, LLM Runtime Execution, Repositories, and Persistent Infrastructure.
+The backend employs a **Modular Clean Architecture** enforcing clean boundary separation between HTTP Routers, Business Services, Memory Orchestration, Prompt Engineering, LLM Runtime Execution, Repositories, and Persistent Infrastructure.
 
 ```
 FastAPI Router (app/api/v1/)
@@ -82,6 +83,9 @@ Event & Stream Bus     HITL Governance & Replay Engine
 (app/events/, streaming/)  (app/hitl/, app/checkpoints/)
        │
        ▼
+Enterprise Memory Runtime (app/memory/ v7.2)
+       │
+       ▼
 Prompt Execution Engine (app/prompt/ v7.1)
        │
        ▼
@@ -95,18 +99,18 @@ Google Gemini SDK / Mock Provider
 
 ## Documentation Location
 
-All technical documentation, Architecture Decision Records (ADRs 001–039), database constitutions, and coding standards are maintained under:
+All technical documentation, Architecture Decision Records (ADRs 001–041), database constitutions, and coding standards are maintained under:
 
 👉 [backend/docs/](backend/docs/)
 
 Key Documents:
 - [Master Backend Architecture](backend/ARCHITECTURE.md)
-- [ADR Index (ADRs 001 – 039)](backend/docs/architecture/README.md)
+- [ADR Index (ADRs 001 – 041)](backend/docs/architecture/README.md)
 - [Foundation Status & Lock Record](backend/docs/FOUNDATION_STATUS.md)
 - [Project Milestones & Release History](backend/docs/PROJECT_MILESTONES.md)
 - [Foundation Graduation Certificate](backend/docs/FOUNDATION_CERTIFICATE_v6.8.1.md)
-- [ADR 038: Prompt Execution Engine Architecture](backend/docs/architecture/038-prompt-execution-engine.md)
-- [ADR 039: Prompt Engineering Guidelines](backend/docs/architecture/039-prompt-engineering-guidelines.md)
+- [ADR 040: Enterprise Memory Runtime Architecture](backend/docs/architecture/040-enterprise-memory-runtime.md)
+- [ADR 041: Memory Engineering Guidelines](backend/docs/architecture/041-memory-engineering-guidelines.md)
 
 ---
 
@@ -116,9 +120,10 @@ Key Documents:
 - **Database**: PostgreSQL 15+, Async SQLAlchemy 2.0 (`asyncpg` driver)
 - **Migrations**: Alembic
 - **Runtime Engine**: Official `google-genai` SDK (`gemini-2.5-flash`, `gemini-2.5-pro`) & Provider-Independent Runtime Layer
-- **Prompt Engine**: Decoupled Prompt Manager, PromptProfiles, PromptCompiler, PromptLinter, PromptPipeline
-- **Testing**: pytest (146 passed in strict asyncio mode), `httpx`
-- **Developer UI**: HTML5/CSS3/Vanilla JS Developer Testing Console & Prompt Studio Mini-IDE (`testing-ui/index.html`)
+- **Prompt Engine**: PromptManager, PromptProfiles, PromptCompiler, PromptLinter, PromptPipeline
+- **Memory Engine**: MemoryManager, MemoryLifecycleManager, ContextAssemblyStrategy, MemoryScorer, MemoryCompactor, ContextWindowBudget
+- **Testing**: pytest (156 passed in strict asyncio mode), `httpx`
+- **Developer UI**: Developer Testing Console, Prompt Studio & Memory Studio (`testing-ui/index.html`)
 
 ---
 
@@ -146,8 +151,8 @@ Key Documents:
 - 🚀 **Phase 7 — Enterprise Messaging Runtime** *(Active Phase)*
   - ✅ `7.0` LLM Runtime Engine *(v7.0.0 Completed)*
   - ✅ `7.1` Prompt Execution Engine *(v7.1.0 Completed)*
-  - ⏳ `7.2` Memory Runtime *(Next Sub-Phase)*
-  - `7.3` Tool Runtime
+  - ✅ `7.2` Memory Runtime *(v7.2.0 Completed)*
+  - ⏳ `7.3` Tool Runtime *(Next Sub-Phase)*
   - `7.4` Graph Runtime Integration
   - `7.5` Multi-Agent Runtime
   - `7.6` RAG Engine
