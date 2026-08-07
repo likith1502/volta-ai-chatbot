@@ -5,6 +5,7 @@ from app.api.v1.routers.bookings import router as bookings_router
 from app.api.v1.routers.chat import router as chat_router
 from app.api.v1.routers.conversations import router as conversations_router
 from app.api.v1.routers.notifications import router as notifications_router
+from app.api.v1.routers.prompts import router as prompts_router
 from app.api.v1.routers.recommendations import router as recommendations_router
 from app.api.v1.routers.runtime import router as runtime_router
 from app.api.v1.routers.users import router as users_router
@@ -20,3 +21,4 @@ api_v1_router.include_router(bookings_router)
 api_v1_router.include_router(notifications_router)
 api_v1_router.include_router(chat_router)
 api_v1_router.include_router(runtime_router)
+api_v1_router.include_router(prompts_router)

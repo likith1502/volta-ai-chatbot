@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VOLTA AI Chatbot — Developer Testing Console (v7.0)</title>
+  <title>VOLTA AI Chatbot — Developer Console & Prompt Studio (v7.1)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
@@ -91,6 +91,27 @@
     }
     .status-dot.unhealthy { background: var(--error); }
 
+    .header-nav {
+      display: flex;
+      gap: 8px;
+    }
+    .tab-btn {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid transparent;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: var(--accent-light);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
     .header-actions {
       display: flex;
       align-items: center;
@@ -127,6 +148,9 @@
       padding: 16px;
       height: calc(100vh - 65px);
     }
+
+    .view-tab { display: none; width: 100%; height: 100%; }
+    .view-tab.active { display: grid; }
 
     .panel {
       background: var(--panel-bg);
@@ -221,15 +245,6 @@
       border: 1px solid var(--panel-border);
       border-bottom-left-radius: 2px;
     }
-    .message-bubble pre {
-      background: rgba(0,0,0,0.3);
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      margin: 8px 0;
-      overflow-x: auto;
-    }
 
     .chat-input-wrap {
       padding: 16px;
@@ -286,6 +301,23 @@
       white-space: pre-wrap;
     }
 
+    .diff-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      height: 100%;
+    }
+    .diff-box {
+      background: var(--input-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 12px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      overflow: auto;
+      white-space: pre-wrap;
+    }
+
     .error-banner {
       background: rgba(239, 68, 68, 0.15);
       border: 1px solid var(--error);
@@ -303,18 +335,24 @@
   <header>
     <div class="brand">
       <span class="status-dot" id="healthDot" title="Health Indicator"></span>
-      <span class="brand-title">VOLTA AI Chatbot Console</span>
-      <span class="badge">Phase 7.0 Runtime</span>
-      <span class="badge" style="background:rgba(16,185,129,0.15); color:#10b981; border-color:#10b981;" id="demoBadge">DEMO_MODE</span>
+      <span class="brand-title">VOLTA AI Chatbot Studio</span>
+      <span class="badge">v7.1 Prompt Engine</span>
+      <span class="badge" style="background:rgba(16,185,129,0.15); color:#10b981; border-color:#10b981;">DEMO_MODE</span>
     </div>
+
+    <div class="header-nav">
+      <button class="tab-btn active" id="tabNavRuntime">Runtime Console</button>
+      <button class="tab-btn" id="tabNavPrompt">Prompt Studio Mini-IDE</button>
+    </div>
+
     <div class="header-actions">
       <button class="btn" id="btnThemeToggle">🌙 Theme</button>
-      <button class="btn" id="btnExportJson">📥 Export JSON</button>
       <button class="btn" id="btnClearChat">🧹 Clear</button>
     </div>
   </header>
 
-  <main class="main-container">
+  <!-- TAB 1: RUNTIME CONSOLE -->
+  <main class="main-container view-tab active" id="viewRuntime">
 
     <!-- Controls Panel -->
     <section class="panel">
@@ -374,7 +412,7 @@
       <div class="chat-container">
         <div class="messages-list" id="messagesList">
           <div class="message-bubble assistant">
-            Hello! I am the VOLTA AI Chatbot Enterprise Runtime Engine (Phase 7.0). How can I assist with your ride booking or route discovery today?
+            Hello! I am the VOLTA AI Chatbot Enterprise Runtime Engine (v7.1). How can I assist with your ride booking or route discovery today?
           </div>
         </div>
 
@@ -389,7 +427,6 @@
     <section class="panel">
       <div class="panel-header">
         <span>Developer Diagnostics</span>
-        <button class="btn" id="btnCopyResponse" style="padding: 2px 6px; font-size:0.7rem;">Copy</button>
       </div>
       <div class="panel-body">
         <div class="error-banner" id="errorBanner"></div>
@@ -430,14 +467,136 @@
 
   </main>
 
+
+  <!-- TAB 2: PROMPT STUDIO MINI-IDE -->
+  <main class="main-container view-tab" id="viewPrompt">
+
+    <!-- Prompt Studio Sidebar -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Template & Profile Editor</span>
+      </div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label class="form-label" for="promptTemplateSelect">Prompt Template</label>
+          <select id="promptTemplateSelect" class="form-control">
+            <option value="mobility_assistant_v1" selected>mobility_assistant_v1 (System)</option>
+            <option value="ride_booking_v1">ride_booking_v1 (Chat)</option>
+            <option value="system_chat_v1">system_chat_v1 (Generic)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="promptRevisionSelect">Revision</label>
+          <select id="promptRevisionSelect" class="form-control">
+            <option value="v1" selected>v1 (Initial Revision)</option>
+            <option value="v2">v2 (Updated Revision)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="promptProfileSelect">Generation Profile</label>
+          <select id="promptProfileSelect" class="form-control">
+            <option value="default_chat" selected>default_chat (Temp 0.7)</option>
+            <option value="strict_json">strict_json (Temp 0.1, JSON)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="promptVariablesJson">Variables Payload (JSON)</label>
+          <textarea id="promptVariablesJson" class="form-control" rows="8" style="font-family: var(--font-mono); font-size:0.8rem;">{
+  "city_name": "San Francisco",
+  "user_name": "Likith",
+  "pickup_location": "Market St",
+  "dropoff_location": "SFO Airport",
+  "vehicle_type": "Sedan"
+}</textarea>
+        </div>
+
+        <div class="form-group" style="display: flex; gap: 8px;">
+          <button class="btn btn-primary" id="btnRenderPrompt" style="flex:1; justify-content:center;">Render Prompt</button>
+          <button class="btn btn-primary" id="btnExecutePrompt" style="flex:1; justify-content:center; background:#10b981;">Execute ➔</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Prompt Studio Diff View -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Side-by-Side Diff Inspector</span>
+        <button class="btn" id="btnCopyPrompt" style="padding: 2px 6px; font-size:0.7rem;">Copy Rendered</button>
+      </div>
+      <div class="panel-body">
+        <div class="diff-grid">
+          <div>
+            <div class="diag-title" style="margin-bottom: 4px;">Rendered Chat Messages</div>
+            <pre class="diff-box" id="promptRenderedBox" style="height: 380px;">[Click 'Render Prompt' to preview rendered output]</pre>
+          </div>
+          <div>
+            <div class="diag-title" style="margin-bottom: 4px;">Optimized & Compiled Output</div>
+            <pre class="diff-box" id="promptOptimizedBox" style="height: 380px;">[Click 'Render Prompt' to preview optimization]</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Prompt Quality Scorecard -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Quality Scorecard & Trace</span>
+      </div>
+      <div class="panel-body">
+        <div class="diag-metric">
+          <div class="diag-title">Token Estimate</div>
+          <div class="diag-val" id="promptMetricTokens">0</div>
+        </div>
+
+        <div class="diag-metric">
+          <div class="diag-title">Compression Ratio</div>
+          <div class="diag-val" id="promptMetricCompression">1.00x</div>
+        </div>
+
+        <div class="diag-metric">
+          <div class="diag-title">Validation Score</div>
+          <div class="diag-val" id="promptMetricScore">100%</div>
+        </div>
+
+        <div class="diag-title" style="margin-top: 12px; margin-bottom: 6px;">Pipeline Execution Trace</div>
+        <pre class="raw-inspector" id="promptTraceBox" style="max-height: 220px;">[Idle]</pre>
+      </div>
+    </section>
+
+  </main>
+
   <script>
-    const API_BASE = '/api/v1/runtime';
+    const RUNTIME_BASE = '/api/v1/runtime';
+    const PROMPT_BASE = '/api/v1/prompts';
 
     // State
     const conversationHistory = [];
     let lastResult = null;
 
-    // Elements
+    // Nav Tabs
+    const tabNavRuntime = document.getElementById('tabNavRuntime');
+    const tabNavPrompt = document.getElementById('tabNavPrompt');
+    const viewRuntime = document.getElementById('viewRuntime');
+    const viewPrompt = document.getElementById('viewPrompt');
+
+    tabNavRuntime.addEventListener('click', () => {
+      tabNavRuntime.classList.add('active');
+      tabNavPrompt.classList.remove('active');
+      viewRuntime.classList.add('active');
+      viewPrompt.classList.remove('active');
+    });
+
+    tabNavPrompt.addEventListener('click', () => {
+      tabNavPrompt.classList.add('active');
+      tabNavRuntime.classList.remove('active');
+      viewPrompt.classList.add('active');
+      viewRuntime.classList.remove('active');
+    });
+
+    // Elements - Runtime
     const providerSelect = document.getElementById('providerSelect');
     const modelSelect = document.getElementById('modelSelect');
     const tempRange = document.getElementById('tempRange');
@@ -449,9 +608,7 @@
     const btnSendMessage = document.getElementById('btnSendMessage');
     const btnHealthCheck = document.getElementById('btnHealthCheck');
     const btnClearChat = document.getElementById('btnClearChat');
-    const btnExportJson = document.getElementById('btnExportJson');
     const btnThemeToggle = document.getElementById('btnThemeToggle');
-    const btnCopyResponse = document.getElementById('btnCopyResponse');
 
     const metricLatency = document.getElementById('metricLatency');
     const metricTokens = document.getElementById('metricTokens');
@@ -464,15 +621,28 @@
     const chatStatusText = document.getElementById('chatStatusText');
     const errorBanner = document.getElementById('errorBanner');
 
-    // Temperature slider sync
-    tempRange.addEventListener('input', (e) => {
-      tempVal.textContent = e.target.value;
-    });
+    // Elements - Prompt Studio
+    const promptTemplateSelect = document.getElementById('promptTemplateSelect');
+    const promptRevisionSelect = document.getElementById('promptRevisionSelect');
+    const promptProfileSelect = document.getElementById('promptProfileSelect');
+    const promptVariablesJson = document.getElementById('promptVariablesJson');
+    const btnRenderPrompt = document.getElementById('btnRenderPrompt');
+    const btnExecutePrompt = document.getElementById('btnExecutePrompt');
+    const btnCopyPrompt = document.getElementById('btnCopyPrompt');
+
+    const promptRenderedBox = document.getElementById('promptRenderedBox');
+    const promptOptimizedBox = document.getElementById('promptOptimizedBox');
+    const promptMetricTokens = document.getElementById('promptMetricTokens');
+    const promptMetricCompression = document.getElementById('promptMetricCompression');
+    const promptMetricScore = document.getElementById('promptMetricScore');
+    const promptTraceBox = document.getElementById('promptTraceBox');
+
+    // Temperature sync
+    tempRange.addEventListener('input', (e) => { tempVal.textContent = e.target.value; });
 
     // Theme toggle
     btnThemeToggle.addEventListener('click', () => {
-      const currentTheme = document.body.getAttribute('data-theme');
-      if (currentTheme === 'light') {
+      if (document.body.getAttribute('data-theme') === 'light') {
         document.body.removeAttribute('data-theme');
         btnThemeToggle.textContent = '🌙 Theme';
       } else {
@@ -484,43 +654,18 @@
     // Clear chat
     btnClearChat.addEventListener('click', () => {
       conversationHistory.length = 0;
-      messagesList.innerHTML = `
-        <div class="message-bubble assistant">
-          Conversation cleared. Send a message to start a new runtime execution turn.
-        </div>`;
+      messagesList.innerHTML = `<div class="message-bubble assistant">Conversation cleared. Send a message to start a new turn.</div>`;
       rawEnvelopeInspector.textContent = '{ "status": "cleared" }';
       eventStreamInspector.textContent = '[Cleared]';
       errorBanner.style.display = 'none';
     });
 
-    // Export JSON
-    btnExportJson.addEventListener('click', () => {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
-        history: conversationHistory,
-        lastResult: lastResult
-      }, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `runtime_session_${Date.now()}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-    });
-
-    // Copy response
-    btnCopyResponse.addEventListener('click', () => {
-      if (lastResult && lastResult.response) {
-        navigator.clipboard.writeText(lastResult.response.content);
-        alert('Assistant response copied to clipboard!');
-      }
-    });
-
-    // Health Check
+    // Provider Health Check
     async function checkHealth() {
       const provider = providerSelect.value;
       providerHealthText.textContent = `Checking ${provider}...`;
       try {
-        const res = await fetch(`${API_BASE}/providers/${provider}/health`);
+        const res = await fetch(`${RUNTIME_BASE}/providers/${provider}/health`);
         const json = await res.json();
         if (json.success && json.data && json.data.is_healthy) {
           healthDot.className = 'status-dot';
@@ -534,18 +679,9 @@
         providerHealthText.textContent = 'Offline';
       }
     }
-
     btnHealthCheck.addEventListener('click', checkHealth);
-    providerSelect.addEventListener('change', () => {
-      if (providerSelect.value === 'gemini') {
-        modelSelect.value = 'gemini-2.5-flash';
-      } else {
-        modelSelect.value = 'mock-model-v1';
-      }
-      checkHealth();
-    });
 
-    // Send Message
+    // Send Message in Runtime Console
     async function sendMessage() {
       const text = messageInput.value.trim();
       if (!text) return;
@@ -554,17 +690,13 @@
       chatStatusText.textContent = 'Executing...';
       messageInput.value = '';
 
-      // Append user bubble
       const userBubble = document.createElement('div');
       userBubble.className = 'message-bubble user';
       userBubble.textContent = text;
       messagesList.appendChild(userBubble);
-      messagesList.scrollTop = messagesList.scrollHeight;
 
-      // Update history
       conversationHistory.push({ role: 'user', content: text });
 
-      // Append pending assistant bubble
       const assistantBubble = document.createElement('div');
       assistantBubble.className = 'message-bubble assistant';
       assistantBubble.textContent = 'Thinking...';
@@ -582,12 +714,11 @@
       };
 
       try {
-        const res = await fetch(`${API_BASE}/chat`, {
+        const res = await fetch(`${RUNTIME_BASE}/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-
         const json = await res.json();
         rawEnvelopeInspector.textContent = JSON.stringify(json, null, 2);
 
@@ -597,49 +728,114 @@
           assistantBubble.textContent = respContent;
           conversationHistory.push({ role: 'assistant', content: respContent });
 
-          // Metrics update
           const metrics = json.data.metrics || {};
           const tokens = metrics.tokens || {};
           metricLatency.textContent = `${(metrics.latency_ms || 0).toFixed(2)} ms`;
           metricTokens.textContent = `${tokens.total_tokens || 0} (${tokens.prompt_tokens || 0} / ${tokens.completion_tokens || 0})`;
           metricCost.textContent = `$${(metrics.estimated_cost_usd || 0).toFixed(6)}`;
           pipeProvider.textContent = json.data.context ? json.data.context.provider : providerSelect.value;
-
-          eventStreamInspector.textContent = [
-            `[1] runtime.started (${json.data.context ? json.data.context.provider : providerSelect.value})`,
-            `[2] runtime.prompt_prepared (${conversationHistory.length} msgs)`,
-            `[3] runtime.provider_selected`,
-            `[4] runtime.response_received`,
-            `[5] runtime.tokens_calculated (${tokens.total_tokens || 0})`,
-            `[6] runtime.completed (${(metrics.latency_ms || 0).toFixed(2)}ms)`
-          ].join('\n');
-
           chatStatusText.textContent = 'Done';
         } else {
           assistantBubble.textContent = `[Error] ${json.message || 'Execution failed'}`;
-          errorBanner.textContent = json.message || 'Runtime execution returned an error.';
-          errorBanner.style.display = 'block';
           chatStatusText.textContent = 'Failed';
         }
       } catch (err) {
         assistantBubble.textContent = `[System Error] ${err.message}`;
-        errorBanner.textContent = `Network / System error: ${err.message}`;
-        errorBanner.style.display = 'block';
         chatStatusText.textContent = 'Error';
       }
+    }
+    btnSendMessage.addEventListener('click', sendMessage);
 
-      messagesList.scrollTop = messagesList.scrollHeight;
+    // PROMPT STUDIO ACTIONS
+    async function renderPrompt() {
+      let vars = {};
+      try {
+        vars = JSON.parse(promptVariablesJson.value);
+      } catch (err) {
+        alert('Invalid JSON in Variables Payload');
+        return;
+      }
+
+      const payload = {
+        template_id: promptTemplateSelect.value,
+        revision_id: promptRevisionSelect.value,
+        profile_id: promptProfileSelect.value,
+        variables: vars
+      };
+
+      try {
+        const res = await fetch(`${PROMPT_BASE}/render`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+
+        if (json.success && json.data) {
+          const resData = json.data;
+          const rendered = resData.rendered_prompt || {};
+
+          let renderedText = "";
+          if (rendered.system_prompt) renderedText += `[SYSTEM]\n${rendered.system_prompt}\n\n`;
+          (rendered.messages || []).forEach(m => {
+            renderedText += `[${m.role.toUpperCase()}]\n${m.content}\n\n`;
+          });
+          promptRenderedBox.textContent = renderedText || "No rendered content.";
+
+          promptOptimizedBox.textContent = JSON.stringify(rendered, null, 2);
+
+          const metrics = resData.metrics || {};
+          promptMetricTokens.textContent = metrics.token_estimate || 0;
+          promptMetricCompression.textContent = `${(metrics.compression_ratio || 1.0).toFixed(2)}x`;
+          promptMetricScore.textContent = `${((metrics.validation_score || 1.0) * 100).toFixed(0)}%`;
+
+          const trace = resData.trace || {};
+          promptTraceBox.textContent = (trace.steps || []).map(s => `[${s.stage_name}] ${s.status} (${s.duration_ms.toFixed(2)}ms)`).join('\n') || "[Completed]";
+        } else {
+          promptRenderedBox.textContent = `[Error] ${json.message}`;
+        }
+      } catch (err) {
+        promptRenderedBox.textContent = `[Network Error] ${err.message}`;
+      }
     }
 
-    btnSendMessage.addEventListener('click', sendMessage);
-    messageInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
+    async function executePrompt() {
+      let vars = {};
+      try { vars = JSON.parse(promptVariablesJson.value); } catch (err) { alert('Invalid Variables JSON'); return; }
+
+      const payload = {
+        template_id: promptTemplateSelect.value,
+        revision_id: promptRevisionSelect.value,
+        profile_id: promptProfileSelect.value,
+        variables: vars
+      };
+
+      try {
+        const res = await fetch(`${PROMPT_BASE}/execute`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.success && json.data) {
+          renderPrompt();
+          const runtimeRes = json.data.runtime_result;
+          if (runtimeRes && runtimeRes.response) {
+            promptOptimizedBox.textContent = `[LLM RESPONSE - ${runtimeRes.response.provider}]\n${runtimeRes.response.content}`;
+          }
+        }
+      } catch (err) {
+        alert(`Execution Error: ${err.message}`);
       }
+    }
+
+    btnRenderPrompt.addEventListener('click', renderPrompt);
+    btnExecutePrompt.addEventListener('click', executePrompt);
+    btnCopyPrompt.addEventListener('click', () => {
+      navigator.clipboard.writeText(promptRenderedBox.textContent);
+      alert('Rendered prompt copied to clipboard!');
     });
 
-    // Initial Health Check
     checkHealth();
   </script>
 </body>
