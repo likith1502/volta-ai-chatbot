@@ -4,14 +4,14 @@ This index lists all official Architecture Decision Records (ADRs) and technical
 
 ---
 
-## Architecture Decision Records & Guidelines (ADRs 001 – 047)
+## Architecture Decision Records & Guidelines (ADRs 001 – 049)
 
 | ADR ID | Title | Status | Date |
 | :--- | :--- | :---: | :---: |
-| **[ADR 044](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/044-enterprise-graph-runtime.md)** | Enterprise Graph Runtime Architecture (v7.4) | Accepted | 2026-08-07 |
-| **[ADR 045](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/045-graph-runtime-guidelines.md)** | Graph Runtime Engineering Guidelines & Extension Standards | Accepted | 2026-08-07 |
 | **[ADR 046](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/046-enterprise-multi-agent-runtime.md)** | Enterprise Multi-Agent Orchestration Runtime Architecture (v7.5) | Accepted | 2026-08-07 |
 | **[ADR 047](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/047-agent-engineering-guidelines.md)** | Agent Engineering Guidelines & Extension Standards | Accepted | 2026-08-07 |
+| **[ADR 048](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/048-enterprise-rag-engine.md)** | Enterprise RAG Engine Architecture (v7.6) | Accepted | 2026-08-07 |
+| **[ADR 049](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/049-enterprise-retrieval-guidelines.md)** | Enterprise Retrieval Guidelines & Extension Standards | Accepted | 2026-08-07 |
 | **[ADR 001](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/001-fastapi-framework.md)** | FastAPI Core Framework & Pydantic Configuration | Accepted | 2026-08-03 |
 | **[ADR 002](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/002-project-structure.md)** | Backend Project Directory Structure Standardization | Accepted | 2026-08-03 |
 | **[ADR 003](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/003-api-versioning.md)** | API Versioning Strategy & Routing Standards | Accepted | 2026-08-03 |

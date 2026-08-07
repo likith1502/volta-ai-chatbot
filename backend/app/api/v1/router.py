@@ -9,6 +9,7 @@ from app.api.v1.routers.graph_runtime import router as graph_runtime_router
 from app.api.v1.routers.memory import router as memory_router
 from app.api.v1.routers.notifications import router as notifications_router
 from app.api.v1.routers.prompts import router as prompts_router
+from app.api.v1.routers.rag import router as rag_router
 from app.api.v1.routers.recommendations import router as recommendations_router
 from app.api.v1.routers.runtime import router as runtime_router
 from app.api.v1.routers.tools import router as tools_router
@@ -30,3 +31,4 @@ api_v1_router.include_router(memory_router)
 api_v1_router.include_router(tools_router)
 api_v1_router.include_router(graph_runtime_router)
 api_v1_router.include_router(agents_router)
+api_v1_router.include_router(rag_router)

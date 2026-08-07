@@ -347,6 +347,7 @@
       <button class="tab-btn" id="tabNavTool">Tool Studio</button>
       <button class="tab-btn" id="tabNavGraph">Graph Studio</button>
       <button class="tab-btn" id="tabNavAgent">Agent Studio</button>
+      <button class="tab-btn" id="tabNavRag">Knowledge Studio</button>
     </div>
 
     <div class="header-actions">
@@ -885,10 +886,88 @@
 
   </main>
 
+  <!-- TAB 7: KNOWLEDGE STUDIO -->
+  <main class="main-container view-tab" id="viewRag">
+
+    <!-- Panel A: Document Library & Ingestion -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Panel A: Document Library & Ingestion</span>
+        <button class="btn" id="btnRefreshRagHealth" style="padding:2px 6px; font-size:0.7rem;">Health Check</button>
+      </div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label class="form-label" for="ragDocTitleInput">Document Title</label>
+          <input type="text" id="ragDocTitleInput" class="form-control" value="Volta EV Scooter Charging & Battery Policy" placeholder="Enter document title">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="ragDocTextInput">Document Raw Text</label>
+          <textarea id="ragDocTextInput" class="form-control" rows="4" placeholder="Enter raw document content...">VOLTA EV Scooter Charging & Battery Safety Guidelines.
+Batteries are 100% swappable at all 50 Volta Hub stations in the city center.
+Standard charging time is 45 minutes for full 100% capacity.
+Minimum battery level permitted for unlocked rides is 15%.
+In case of battery failure, contact emergency support immediately via the app.</textarea>
+        </div>
+
+        <div class="form-group" style="display: flex; gap: 8px;">
+          <button class="btn btn-primary" id="btnAddRagDoc" style="flex:1; justify-content:center;">Add Document ➔</button>
+          <button class="btn" id="btnIngestRagDoc" style="flex:1; justify-content:center;">Ingest Pipeline</button>
+        </div>
+
+        <div class="diag-title" style="margin-top: 12px; margin-bottom: 6px;">Document Repository List</div>
+        <pre class="raw-inspector" id="ragDocsListInspector" style="max-height: 180px;">[Click 'Health Check' or 'Add Document' to view knowledge repository status]</pre>
+      </div>
+    </section>
+
+    <!-- Panel B: Chunk & Embedding Inspector -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Panel B: Chunk Viewer & Vector Embeddings</span>
+      </div>
+      <div class="panel-body">
+        <pre class="diff-box" id="ragChunkInspector" style="height: 380px;">[Ingest a document to view generated text chunks, token counts, and embedding status]</pre>
+      </div>
+    </section>
+
+    <!-- Panel C: Retrieval & Reranking Inspector -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Panel C: Retrieval & Reranking Inspector</span>
+      </div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label class="form-label" for="ragQueryInput">Search Query</label>
+          <input type="text" id="ragQueryInput" class="form-control" value="battery issue charging time" placeholder="Enter search query">
+        </div>
+
+        <div class="form-group" style="display: flex; gap: 8px;">
+          <button class="btn btn-primary" id="btnRetrieveRagContext" style="flex:1; justify-content:center;">Retrieve Context 🔍</button>
+          <button class="btn" id="btnAnswerRagQuery" style="flex:1; justify-content:center;">Answer Query 🤖</button>
+        </div>
+
+        <div class="diag-metric">
+          <div class="diag-title">Vectors Count</div>
+          <div class="diag-val" id="ragVectorsCountVal">5</div>
+        </div>
+
+        <div class="diag-metric">
+          <div class="diag-title">Indexed Documents</div>
+          <div class="diag-val" id="ragDocsCountVal">2</div>
+        </div>
+
+        <div class="diag-title" style="margin-top: 12px; margin-bottom: 6px;">RAG Context & Citations</div>
+        <pre class="raw-inspector" id="ragRetrievalInspector" style="max-height: 220px;">[Click 'Retrieve Context' to view reranked chunks, scores, and formatted context]</pre>
+      </div>
+    </section>
+
+  </main>
+
   <script>
     const TOOL_BASE = '/api/v1/tools';
     const GRAPH_BASE = '/api/v1/graph-runtime';
     const AGENTS_BASE = '/api/v1/agents';
+    const RAG_BASE = '/api/v1/rag';
 
     // State
     const conversationHistory = [];
@@ -901,6 +980,7 @@
     const tabNavTool = document.getElementById('tabNavTool');
     const tabNavGraph = document.getElementById('tabNavGraph');
     const tabNavAgent = document.getElementById('tabNavAgent');
+    const tabNavRag = document.getElementById('tabNavRag');
 
     const viewRuntime = document.getElementById('viewRuntime');
     const viewPrompt = document.getElementById('viewPrompt');
@@ -908,6 +988,7 @@
     const viewTool = document.getElementById('viewTool');
     const viewGraph = document.getElementById('viewGraph');
     const viewAgent = document.getElementById('viewAgent');
+    const viewRag = document.getElementById('viewRag');
 
     tabNavRuntime.addEventListener('click', () => {
       tabNavRuntime.classList.add('active');
@@ -916,6 +997,7 @@
       tabNavTool.classList.remove('active');
       tabNavGraph.classList.remove('active');
       tabNavAgent.classList.remove('active');
+      tabNavRag.classList.remove('active');
 
       viewRuntime.classList.add('active');
       viewPrompt.classList.remove('active');
@@ -923,6 +1005,7 @@
       viewTool.classList.remove('active');
       viewGraph.classList.remove('active');
       viewAgent.classList.remove('active');
+      viewRag.classList.remove('active');
     });
 
     tabNavPrompt.addEventListener('click', () => {
@@ -993,6 +1076,7 @@
       tabNavMemory.classList.remove('active');
       tabNavTool.classList.remove('active');
       tabNavGraph.classList.remove('active');
+      tabNavRag.classList.remove('active');
 
       viewAgent.classList.add('active');
       viewRuntime.classList.remove('active');
@@ -1000,7 +1084,27 @@
       viewMemory.classList.remove('active');
       viewTool.classList.remove('active');
       viewGraph.classList.remove('active');
+      viewRag.classList.remove('active');
       refreshAgentsList();
+    });
+
+    tabNavRag.addEventListener('click', () => {
+      tabNavRag.classList.add('active');
+      tabNavRuntime.classList.remove('active');
+      tabNavPrompt.classList.remove('active');
+      tabNavMemory.classList.remove('active');
+      tabNavTool.classList.remove('active');
+      tabNavGraph.classList.remove('active');
+      tabNavAgent.classList.remove('active');
+
+      viewRag.classList.add('active');
+      viewRuntime.classList.remove('active');
+      viewPrompt.classList.remove('active');
+      viewMemory.classList.remove('active');
+      viewTool.classList.remove('active');
+      viewGraph.classList.remove('active');
+      viewAgent.classList.remove('active');
+      refreshRagDocsList();
     });
 
     // Elements - Runtime
@@ -1563,6 +1667,138 @@
     if (btnExecuteAgentTask) btnExecuteAgentTask.addEventListener('click', executeAgentTeamTask);
     if (btnRefreshAgentHealth) btnRefreshAgentHealth.addEventListener('click', refreshAgentsList);
     if (btnRefreshAgentsList) btnRefreshAgentsList.addEventListener('click', refreshAgentsList);
+
+    // KNOWLEDGE STUDIO (RAG) HANDLERS
+    const ragDocTitleInput = document.getElementById('ragDocTitleInput');
+    const ragDocTextInput = document.getElementById('ragDocTextInput');
+    const btnAddRagDoc = document.getElementById('btnAddRagDoc');
+    const btnIngestRagDoc = document.getElementById('btnIngestRagDoc');
+    const btnRefreshRagHealth = document.getElementById('btnRefreshRagHealth');
+    const ragQueryInput = document.getElementById('ragQueryInput');
+    const btnRetrieveRagContext = document.getElementById('btnRetrieveRagContext');
+    const btnAnswerRagQuery = document.getElementById('btnAnswerRagQuery');
+    const ragDocsListInspector = document.getElementById('ragDocsListInspector');
+    const ragChunkInspector = document.getElementById('ragChunkInspector');
+    const ragRetrievalInspector = document.getElementById('ragRetrievalInspector');
+    const ragVectorsCountVal = document.getElementById('ragVectorsCountVal');
+    const ragDocsCountVal = document.getElementById('ragDocsCountVal');
+
+    let currentRagDocId = null;
+
+    async function addRagDocument() {
+      const title = ragDocTitleInput.value.trim() || 'Untitled Document';
+      const text = ragDocTextInput.value.trim() || 'Empty document text';
+      ragDocsListInspector.textContent = `Adding document '${title}'...`;
+
+      try {
+        const res = await fetch(`${RAG_BASE}/documents`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: title, raw_text: text, mime_type: "text/plain" })
+        });
+        const json = await res.json();
+        if (json.success && json.data) {
+          currentRagDocId = json.data.document_id;
+          ragDocsListInspector.textContent = JSON.stringify(json.data, null, 2);
+          refreshRagDocsList();
+        } else {
+          ragDocsListInspector.textContent = `[Error adding document: ${JSON.stringify(json, null, 2)}]`;
+        }
+      } catch (err) {
+        ragDocsListInspector.textContent = `[Network Error: ${err.message}]`;
+      }
+    }
+
+    async function ingestRagDocument() {
+      if (!currentRagDocId) {
+        alert('Please add a document first!');
+        return;
+      }
+      ragChunkInspector.textContent = `Ingesting document '${currentRagDocId}'...`;
+
+      try {
+        const res = await fetch(`${RAG_BASE}/ingest`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ document_id: currentRagDocId, chunk_size: 512, chunk_overlap: 64 })
+        });
+        const json = await res.json();
+        if (json.success && json.data) {
+          ragChunkInspector.textContent = JSON.stringify(json.data, null, 2);
+          refreshRagDocsList();
+        } else {
+          ragChunkInspector.textContent = `[Ingestion Error: ${JSON.stringify(json, null, 2)}]`;
+        }
+      } catch (err) {
+        ragChunkInspector.textContent = `[Network Error: ${err.message}]`;
+      }
+    }
+
+    async function retrieveRagContext() {
+      const q = ragQueryInput.value.trim() || 'battery issue charging time';
+      ragRetrievalInspector.textContent = `Retrieving RAG context for query '${q}'...`;
+
+      try {
+        const res = await fetch(`${RAG_BASE}/retrieve`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: q, top_k: 5, strategy: "vector", reranker: "cosine" })
+        });
+        const json = await res.json();
+        if (json.success && json.data) {
+          ragRetrievalInspector.textContent = JSON.stringify(json.data, null, 2);
+        } else {
+          ragRetrievalInspector.textContent = `[Retrieval Error: ${JSON.stringify(json, null, 2)}]`;
+        }
+      } catch (err) {
+        ragRetrievalInspector.textContent = `[Network Error: ${err.message}]`;
+      }
+    }
+
+    async function answerRagQuery() {
+      const q = ragQueryInput.value.trim() || 'battery issue charging time';
+      ragRetrievalInspector.textContent = `Answering query via RAG + LLM Runtime...`;
+
+      try {
+        const res = await fetch(`${RAG_BASE}/query`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: q, top_k: 5 })
+        });
+        const json = await res.json();
+        if (json.success && json.data) {
+          ragRetrievalInspector.textContent = JSON.stringify(json.data, null, 2);
+        } else {
+          ragRetrievalInspector.textContent = `[Query Error: ${JSON.stringify(json, null, 2)}]`;
+        }
+      } catch (err) {
+        ragRetrievalInspector.textContent = `[Network Error: ${err.message}]`;
+      }
+    }
+
+    async function refreshRagDocsList() {
+      try {
+        const res = await fetch(`${RAG_BASE}/documents`);
+        const json = await res.json();
+        if (json.success && json.data) {
+          ragDocsListInspector.textContent = JSON.stringify(json.data, null, 2);
+          ragDocsCountVal.textContent = json.data.length || 1;
+        }
+        const hRes = await fetch(`${RAG_BASE}/health`);
+        const hJson = await hRes.json();
+        if (hJson.success && hJson.data) {
+          ragVectorsCountVal.textContent = hJson.data.vectors_count || 5;
+        }
+      } catch (err) {
+        ragDocsListInspector.textContent = `[Error listing docs: ${err.message}]`;
+      }
+    }
+
+    if (btnAddRagDoc) btnAddRagDoc.addEventListener('click', addRagDocument);
+    if (btnIngestRagDoc) btnIngestRagDoc.addEventListener('click', ingestRagDocument);
+    if (btnRetrieveRagContext) btnRetrieveRagContext.addEventListener('click', retrieveRagContext);
+    if (btnAnswerRagQuery) btnAnswerRagQuery.addEventListener('click', answerRagQuery);
+    if (btnRefreshRagHealth) btnRefreshRagHealth.addEventListener('click', refreshRagDocsList);
 
     btnRenderPrompt.addEventListener('click', renderPrompt);
     btnExecutePrompt.addEventListener('click', executePrompt);
