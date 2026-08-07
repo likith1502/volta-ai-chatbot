@@ -2,8 +2,8 @@
 
 A production-grade, asynchronous AI-powered messaging chatbot backend designed for the VOLTA urban mobility platform.
 
-[![Release](https://img.shields.io/badge/Release-v7.4-blue.svg)](https://github.com/likith1502/volta-ai-chatbot/releases/tag/v7.4)
-[![Tests](https://img.shields.io/badge/Tests-167%20Passing-success.svg)](backend/tests/)
+[![Release](https://img.shields.io/badge/Release-v7.5-blue.svg)](https://github.com/likith1502/volta-ai-chatbot/releases/tag/v7.5)
+[![Tests](https://img.shields.io/badge/Tests-175%20Passing-success.svg)](backend/tests/)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-v1.0-green.svg)](https://fastapi.tiangolo.com/)
 
@@ -12,7 +12,7 @@ A production-grade, asynchronous AI-powered messaging chatbot backend designed f
 ## Project Goals
 
 - **Conversational Mobility**: Provide real-time, context-aware ride discovery, booking, and travel assistance over enterprise messaging channels.
-- **Enterprise AI Messaging Runtime**: Maintain persistent multi-turn conversational state, graph workflows, prompt engineering, memory orchestration, tool integration, and graph runtime execution across messaging interactions.
+- **Enterprise AI Messaging Runtime**: Maintain persistent multi-turn conversational state, graph workflows, prompt engineering, memory orchestration, tool integration, graph runtime execution, and multi-agent team orchestration across messaging interactions.
 - **Enterprise Performance**: Deliver sub-second response times using asynchronous non-blocking Python architecture (FastAPI, Async PostgreSQL, SQLAlchemy 2.0).
 
 ---
@@ -24,6 +24,7 @@ Volta-AI-Chatbot/
 ├── .github/              # GitHub templates, workflows, & community standards
 ├── backend/              # Core FastAPI application & AI services
 │   ├── app/              # Application modules
+│   │   ├── agents/       # Enterprise Multi-Agent Orchestration Runtime (v7.5)
 │   │   ├── ai/           # Multi-provider AI engine (OpenAI, Claude, Gemini, Ollama)
 │   │   ├── api/          # REST API presentation routers & dependencies (v1)
 │   │   ├── checkpoints/  # Checkpoint & Replay Foundation (v6.6)
@@ -49,24 +50,24 @@ Volta-AI-Chatbot/
 │   │   ├── tools/        # Enterprise Tool Runtime (v7.3)
 │   │   ├── utils/        # Response helpers & utility functions
 │   │   └── workflow/     # Workflow Node Library (v6.3)
-│   ├── docs/             # Technical architecture & engineering docs (ADRs 001–045)
+│   ├── docs/             # Technical architecture & engineering docs (ADRs 001–047)
 │   ├── logs/             # Runtime execution log directory
 │   ├── migrations/       # Alembic versioned schema migrations
 │   ├── scripts/          # Operation & database seeding scripts
-│   ├── tests/            # Automated pytest test suites (167 passed)
+│   ├── tests/            # Automated pytest test suites (175 passed)
 │   ├── alembic.ini       # Alembic migration configuration
 │   ├── ARCHITECTURE.md   # Master backend architecture blueprint
 │   └── README.md         # Backend developer guide
 ├── docs/                 # General project documentation hub
 ├── infrastructure/       # Deployment manifests & container configs
-└── testing-ui/           # Developer Testing Console, Prompt Studio, Memory Studio, Tool Studio & Graph Studio
+└── testing-ui/           # Developer Testing Console, Prompt Studio, Memory Studio, Tool Studio, Graph Studio & Agent Studio
 ```
 
 ---
 
 ## Master Architecture Overview
 
-The backend employs a **Modular Clean Architecture** enforcing clean boundary separation between HTTP Routers, Business Services, Graph Runtime Orchestration, Tool Orchestration, Memory Orchestration, Prompt Engineering, LLM Runtime Execution, Repositories, and Persistent Infrastructure.
+The backend employs a **Modular Clean Architecture** enforcing clean boundary separation between HTTP Routers, Business Services, Multi-Agent Orchestration, Graph Runtime Orchestration, Tool Orchestration, Memory Orchestration, Prompt Engineering, LLM Runtime Execution, Repositories, and Persistent Infrastructure.
 
 ```
 FastAPI Router (app/api/v1/)
@@ -76,10 +77,13 @@ Chat Service & AI Orchestration (app/services/, app/ai/)
        │
        ├─────────────────────────────────────────┐
        ▼                                         ▼
-Enterprise Graph Runtime (app/graph_runtime/ v7.4) Domain Repositories (app/repositories/)
+Enterprise Multi-Agent Runtime (app/agents/ v7.5) Domain Repositories (app/repositories/)
        │                                         │
-       ├─────────────────┐                       ▼
-       ▼                 ▼                 Async PostgreSQL (app/db/)
+       ▼                                         ▼
+Enterprise Graph Runtime (app/graph_runtime/ v7.4) Async PostgreSQL (app/db/)
+       │
+       ├─────────────────┐
+       ▼                 ▼
 Event & Stream Bus     HITL Governance & Replay Engine
 (app/events/, streaming/)  (app/hitl/, app/checkpoints/)
        │
@@ -103,18 +107,19 @@ Google Gemini SDK / Mock Provider
 
 ## Documentation Location
 
-All technical documentation, Architecture Decision Records (ADRs 001–045), database constitutions, and coding standards are maintained under:
+All technical documentation, Architecture Decision Records (ADRs 001–047), database constitutions, and coding standards are maintained under:
 
 👉 [backend/docs/](backend/docs/)
 
 Key Documents:
 - [Master Backend Architecture](backend/ARCHITECTURE.md)
 - [Master Runtime Architecture Blueprint](backend/docs/RUNTIME_ARCHITECTURE.md)
-- [ADR Index (ADRs 001 – 045)](backend/docs/architecture/README.md)
+- [ADR Index (ADRs 001 – 047)](backend/docs/architecture/README.md)
 - [Foundation Status & Lock Record](backend/docs/FOUNDATION_STATUS.md)
 - [Project Milestones & Release History](backend/docs/PROJECT_MILESTONES.md)
-- [ADR 044: Enterprise Graph Runtime Architecture](backend/docs/architecture/044-enterprise-graph-runtime.md)
-- [ADR 045: Graph Runtime Guidelines](backend/docs/architecture/045-graph-runtime-guidelines.md)
+- [Final Enterprise Runtime Graduation Certificate](backend/docs/ENTERPRISE_RUNTIME_GRADUATION.md)
+- [ADR 046: Enterprise Multi-Agent Orchestration Runtime Architecture](backend/docs/architecture/046-enterprise-multi-agent-runtime.md)
+- [ADR 047: Agent Engineering Guidelines](backend/docs/architecture/047-agent-engineering-guidelines.md)
 
 ---
 
@@ -128,8 +133,9 @@ Key Documents:
 - **Memory Engine**: MemoryManager, MemoryLifecycleManager, ContextAssemblyStrategy, MemoryScorer
 - **Tool Engine**: ToolManager, BaseTool ABC, ToolSchema, ToolManifest, ToolPipeline, ToolChain, ToolDiscoveryService
 - **Graph Engine**: GraphRuntimeManager, GraphPlanner, GraphScheduler, GraphExecutionPlan, GraphCursor, GraphRuntimePipeline
-- **Testing**: pytest (167 passed in strict asyncio mode), `httpx`
-- **Developer UI**: Developer Testing Console, Prompt Studio, Memory Studio, Tool Studio & Graph Studio (`testing-ui/index.html`)
+- **Multi-Agent Engine**: AgentRuntimeManager, AgentDefinition, AgentInstance, AgentPersona, SupervisorAgent, PlannerAgent, TeamManager
+- **Testing**: pytest (175 passed in strict asyncio mode), `httpx`
+- **Developer UI**: Developer Console (`testing-ui/index.html`) featuring Runtime Console, Prompt Studio, Memory Studio, Tool Studio, Graph Studio & Agent Studio
 
 ---
 
@@ -160,8 +166,8 @@ Key Documents:
   - ✅ `7.2` Memory Runtime *(v7.2.0 Completed)*
   - ✅ `7.3` Tool Runtime *(v7.3.0 Completed)*
   - ✅ `7.4` Graph Runtime Integration *(v7.4.0 Completed)*
-  - ⏳ `7.5` Enterprise Multi-Agent Orchestration Runtime *(Next Sub-Phase)*
-  - `7.6` RAG Engine
+  - ✅ `7.5` Enterprise Multi-Agent Orchestration Runtime *(v7.5.0 Completed)*
+  - ⏳ `7.6` RAG Engine *(Next Sub-Phase)*
   - `7.7` Production Integrations
   - `7.8` Deployment & Scaling
 - 📅 **Phase 8 — Voice Platform** *(Future Horizon)*

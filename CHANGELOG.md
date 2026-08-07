@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v7.5.0] - 2026-08-07
+
+### Added
+- **Enterprise Multi-Agent Orchestration Runtime** (`backend/app/agents/`): Provider-independent, framework-independent multi-agent platform orchestrating autonomous worker agents, supervisor agents, planner agents, team composition, task queues, mailbox messaging, and delegation depth without modifying lower runtime layers.
+- **`AgentDefinition` & `AgentInstance`**: Blueprint vs worker pod separation enabling scalable worker instance replication.
+- **`AgentPersona` & `AgentCapabilities`**: Behavioral personas (`communication_style`, `expertise`, `tone`, `constraints`, `reasoning_style`) separated from permissions and capabilities.
+- **`AgentPermissionSet` & `AgentExecutionBudget`**: Fine-grained permissions (`CAN_DELEGATE`, `CAN_APPROVE`, `CAN_EXECUTE_TOOLS`, `CAN_ACCESS_MEMORY`) and execution safety budgets (max runtime, retries, tool calls, delegation depth, tokens, cost).
+- **`AgentLifecycleManager`**: State machine transitions (`CREATED` ➔ `REGISTERED` ➔ `READY` ➔ `RUNNING` ➔ `WAITING` ➔ `DELEGATING` ➔ `PAUSED` ➔ `COMPLETED` ➔ `FAILED` ➔ `TERMINATED`).
+- **`AgentTeam` & `TeamManager`**: Multi-agent team composition and lifecycle (`CREATED` ➔ `READY` ➔ `RUNNING` ➔ `WAITING` ➔ `COMPLETED` ➔ `FAILED`).
+- **Reference Team Templates** (`backend/app/agents/templates/`): Pre-built specs (`mobility_support`, `travel_booking`, `research_discovery`, `code_review`).
+- **`CommunicationManager` & `AgentMailbox`**: Inter-agent messaging and event-driven notifications via `WorkflowEventBus` (v6.5).
+- **`TaskQueue`, `TaskScheduler` & `DelegationManager`**: Task dispatching, priority scheduling, delegation depth tracking, and budget enforcement.
+- **Specialized Agents**: `SupervisorAgent`, `PlannerAgent`, `CoordinatorAgent`, and `AgentRouter`.
+- **Reserved Extensions Architecture**: Created `backend/app/agents/extensions/` directory for custom strategies and routers.
+- **REST API Presentation Layer**: Router `/api/v1/agents` with endpoints `POST /register`, `POST /execute`, `POST /delegate`, `POST /message`, `POST /task`, `GET /`, `GET /{agent_id}`, `GET /statistics`, `GET /analytics`, `GET /health`.
+- **Developer Console — Agent Studio**: 3-panel UI (`testing-ui/index.html`) mounted at `/console` featuring Panel A (Live Multi-Agent Team Graph), Panel B (Execution Tree & Mailbox Stream), and Panel C (Agent Registry & Capability Inspector).
+- **Architecture Decision Records & Graduation Suite**: `ADR 046` (Enterprise Multi-Agent Orchestration Runtime Architecture), `ADR 047` (Agent Engineering Guidelines), `RUNTIME_BASELINE_v7.5.md`, and `RUNTIME_CERTIFICATE_v7.5.md`.
+
+---
+
 ## [v7.4.0] - 2026-08-07
 
 ### Added

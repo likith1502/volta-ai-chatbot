@@ -135,6 +135,13 @@ To maintain clear project tracking:
 - **Includes Sub-Phases**:
   - **Phase 7.4**: Enterprise Graph Runtime Integration (`backend/app/graph_runtime/`). Decoupled runtime orchestration engine, `GraphRuntimeManager`, `GraphPlanner`, `GraphExecutionPlan`, `GraphScheduler`, `GraphCursor`, `GraphRuntimePipeline` middleware, `RetryPolicy`, `TimeoutPolicy`, `NodeExecutionContext`, `ExecutionTrace`, `GraphCheckpointIntegration`, `GraphInterruptIntegration`, reserved `extensions/` directory, REST router `/api/v1/graph-runtime`, and Graph Studio 3-panel UI (`testing-ui/index.html`). 167 tests passing. Architecture score: 10/10, Future compatibility: 10/10.
 
+### Release v7.5 — Enterprise Multi-Agent Orchestration Runtime
+- **Status**: **COMPLETED, VERIFIED, LOCKED**
+- **Version**: `v7.5.0`
+- **Completion Date**: 2026-08-07
+- **Includes Sub-Phases**:
+  - **Phase 7.5**: Enterprise Multi-Agent Orchestration Runtime (`backend/app/agents/`). Provider-independent, framework-independent multi-agent orchestration engine, `AgentRuntimeManager`, `AgentDefinition`, `AgentInstance`, `AgentPersona`, `AgentCapabilities`, `AgentPermissionSet`, `AgentExecutionBudget`, `AgentLifecycleManager`, `AgentTeam`, `TeamManager`, `CommunicationManager`, `AgentMailbox`, `TaskQueue`, `TaskScheduler`, `DelegationManager`, `SupervisorAgent`, `PlannerAgent`, `CoordinatorAgent`, `AgentRouter`, team templates (`mobility_support`, `travel_booking`, `research_discovery`, `code_review`), reserved `extensions/` directory, REST router `/api/v1/agents`, and Agent Studio 3-panel UI (`testing-ui/index.html`). 175 tests passing. Architecture score: 10/10, Future compatibility: 10/10.
+
 ---
 
 ## Future Release Roadmap
@@ -147,8 +154,8 @@ To maintain clear project tracking:
   - **Phase 7.2**: Memory Runtime ✅ **COMPLETED (`v7.2.0`)**
   - **Phase 7.3**: Tool Runtime ✅ **COMPLETED (`v7.3.0`)**
   - **Phase 7.4**: Graph Runtime Integration ✅ **COMPLETED (`v7.4.0`)**
-  - **Phase 7.5**: Enterprise Multi-Agent Orchestration Runtime ⏳ **NEXT SUB-PHASE**
-  - **Phase 7.6**: RAG Engine
+  - **Phase 7.5**: Enterprise Multi-Agent Orchestration Runtime ✅ **COMPLETED (`v7.5.0`)**
+  - **Phase 7.6**: RAG Engine ⏳ **NEXT SUB-PHASE**
   - **Phase 7.7**: Production Integrations
   - **Phase 7.8**: Deployment & Scaling
 
