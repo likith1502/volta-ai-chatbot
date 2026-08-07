@@ -3,9 +3,11 @@ from typing import Any, Optional
 from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
-from app.prompt.contracts import PromptRequest
+from app.prompt.contracts import ChatMessage, PromptMessage, PromptRequest
+from app.prompt.cost import PromptCostEstimator
 from app.prompt.manager import PromptManager
 from app.prompt.result import PromptResult
+from app.prompt.templates.chat_template import ChatPromptTemplate
 from app.utils.responses import success_response
 
 router = APIRouter(prefix="/prompts", tags=["Prompt Execution Engine"])
@@ -27,6 +29,24 @@ class PromptRenderPayload(BaseModel):
     temperature: Optional[float] = Field(default=None)
     max_tokens: Optional[int] = Field(default=None)
     conversation_id: Optional[uuid.UUID] = None
+
+
+class ScratchPromptPayload(BaseModel):
+    """Payload for unsaved scratch prompt sandbox execution."""
+
+    system_instruction: str = Field(default="You are a helpful AI assistant.")
+    user_prompt_template: str = Field(..., description="Raw text template string containing {placeholders}")
+    variables: dict[str, Any] = Field(default_factory=dict)
+    provider: Optional[str] = Field(default="mock")
+    model: Optional[str] = Field(default="mock-model-v1")
+
+
+class ProviderComparePayload(BaseModel):
+    """Payload for comparing prompt execution across multiple providers."""
+
+    template_id: str = "mobility_assistant_v1"
+    variables: dict[str, Any] = Field(default_factory=lambda: {"city_name": "San Francisco", "user_name": "Likith"})
+    providers: list[str] = Field(default_factory=lambda: ["mock", "gemini"])
 
 
 @router.post(
@@ -95,6 +115,69 @@ async def execute_prompt(payload: PromptRenderPayload) -> dict[str, Any]:
         )
 
 
+@router.post(
+    "/sandbox/execute",
+    status_code=status.HTTP_200_OK,
+    summary="Execute Unsaved Scratch Prompt (Sandbox Mode)",
+)
+async def execute_scratch_prompt(payload: ScratchPromptPayload) -> dict[str, Any]:
+    """Executes an unsaved scratch prompt template directly in sandbox mode."""
+    try:
+        scratch_id = f"scratch_{uuid.uuid4().hex[:8]}"
+        template = ChatPromptTemplate(
+            template_id=scratch_id,
+            system_instruction=payload.system_instruction,
+        )
+        template.add_message(role="user", content_template=payload.user_prompt_template)
+        _prompt_manager.registry.register_template(template)
+
+        req = PromptRequest(
+            template_id=scratch_id,
+            variables=payload.variables,
+            provider=payload.provider,
+            model=payload.model,
+        )
+
+        result: PromptResult = await _prompt_manager.execute(req)
+        _prompt_manager.registry.unregister_template(scratch_id)
+
+        return success_response(
+            data=result.model_dump(),
+            message="Scratch prompt sandbox executed successfully",
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=getattr(exc, "status_code", 500),
+            detail=f"Scratch prompt execution failed: {exc}",
+        )
+
+
+@router.post(
+    "/compare",
+    status_code=status.HTTP_200_OK,
+    summary="Compare Provider Execution Side-by-Side",
+)
+async def compare_providers(payload: ProviderComparePayload) -> dict[str, Any]:
+    """Executes the same prompt request across multiple providers side-by-side to compare latency, tokens, cost, and output."""
+    results: dict[str, Any] = {}
+    for prov in payload.providers:
+        try:
+            req = PromptRequest(
+                template_id=payload.template_id,
+                variables=payload.variables,
+                provider=prov,
+            )
+            res = await _prompt_manager.execute(req)
+            results[prov] = res.model_dump()
+        except Exception as exc:
+            results[prov] = {"error": str(exc)}
+
+    return success_response(
+        data=results,
+        message=f"Side-by-side provider comparison for '{payload.template_id}' completed",
+    )
+
+
 @router.get(
     "/templates",
     status_code=status.HTTP_200_OK,
@@ -131,31 +214,6 @@ async def list_profiles() -> dict[str, Any]:
     return success_response(
         data=profiles,
         message="Registered prompt profiles retrieved",
-    )
-
-
-@router.get(
-    "/templates/{template_id}",
-    status_code=status.HTTP_200_OK,
-    summary="Get Prompt Template Details",
-)
-async def get_template_details(template_id: str) -> dict[str, Any]:
-    """Returns details for specified prompt template."""
-    t = _prompt_manager.registry.get_template(template_id)
-    if not t:
-        raise HTTPException(status_code=404, detail=f"Template '{template_id}' not found.")
-
-    return success_response(
-        data={
-            "template_id": t.template_id,
-            "template_type": t.template_type,
-            "system_instruction": t.system_instruction,
-            "variables": [v.model_dump() for v in t.variables],
-            "messages": [m.model_dump() for m in t.messages],
-            "parent_template_id": t.parent_template_id,
-            "revisions": {k: v.model_dump() for k, v in t.revisions.items()},
-        },
-        message=f"Details for template '{template_id}' retrieved",
     )
 
 

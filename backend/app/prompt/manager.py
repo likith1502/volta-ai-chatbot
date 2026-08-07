@@ -117,12 +117,12 @@ class PromptManager:
         await self._emit_event("created", {"prompt_id": str(prompt_id), "template_id": request.template_id})
 
         # 1. Lookup Template
-        template = self.registry.lookup_template(request.template_id)
+        template = await self.registry.lookup_template_async(request.template_id)
 
         # Handle template inheritance
         effective_system_instruction = template.system_instruction
         if template.parent_template_id and self.registry.exists_template(template.parent_template_id):
-            parent = self.registry.lookup_template(template.parent_template_id)
+            parent = await self.registry.lookup_template_async(template.parent_template_id)
             if parent.system_instruction and not effective_system_instruction:
                 effective_system_instruction = parent.system_instruction
 
