@@ -2,8 +2,8 @@
 
 A production-grade, asynchronous AI-powered messaging chatbot backend designed for the VOLTA urban mobility platform.
 
-[![Release](https://img.shields.io/badge/Release-v7.5-blue.svg)](https://github.com/likith1502/volta-ai-chatbot/releases/tag/v7.5)
-[![Tests](https://img.shields.io/badge/Tests-176%20Passing-success.svg)](backend/tests/)
+[![Release](https://img.shields.io/badge/Release-v7.6-blue.svg)](https://github.com/likith1502/volta-ai-chatbot/releases/tag/v7.6)
+[![Tests](https://img.shields.io/badge/Tests-185%20Passing-success.svg)](backend/tests/)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-v1.0-green.svg)](https://fastapi.tiangolo.com/)
 
@@ -12,7 +12,7 @@ A production-grade, asynchronous AI-powered messaging chatbot backend designed f
 ## Project Goals
 
 - **Conversational Mobility**: Provide real-time, context-aware ride discovery, booking, and travel assistance over enterprise messaging channels.
-- **Enterprise AI Messaging Runtime**: Maintain persistent multi-turn conversational state, graph workflows, prompt engineering, memory orchestration, tool integration, graph runtime execution, and multi-agent team orchestration across messaging interactions.
+- **Enterprise AI Messaging Runtime**: Maintain persistent multi-turn conversational state, graph workflows, prompt engineering, memory orchestration, tool integration, graph runtime execution, multi-agent team orchestration, and RAG knowledge retrieval across messaging interactions.
 - **Enterprise Performance**: Deliver sub-second response times using asynchronous non-blocking Python architecture (FastAPI, Async PostgreSQL, SQLAlchemy 2.0).
 
 ---
@@ -23,38 +23,39 @@ A production-grade, asynchronous AI-powered messaging chatbot backend designed f
 Volta-AI-Chatbot/
 ├── .github/              # GitHub templates, workflows, & community standards
 ├── backend/              # Core FastAPI application & AI services
-│   ├── app/              # Application modules
-│   │   ├── agents/       # Enterprise Multi-Agent Orchestration Runtime (v7.5)
-│   │   ├── ai/           # Multi-provider AI engine (OpenAI, Claude, Gemini, Ollama)
-│   │   ├── api/          # REST API presentation routers & dependencies (v1)
-│   │   ├── checkpoints/  # Checkpoint & Replay Foundation (v6.6)
-│   │   ├── config/       # Settings configuration & constants
-│   │   ├── context/      # Conversation State Foundation (v6.1)
-│   │   ├── core/         # Exception handlers & logging setup
-│   │   ├── db/           # AsyncEngine, AsyncSession, Base metadata, Mixins
-│   │   ├── dependencies/ # FastAPI dependency injection utilities
-│   │   ├── events/       # Workflow Event & Observability Foundation (v6.5)
-│   │   ├── exceptions/   # Domain & infrastructure exceptions
-│   │   ├── execution/    # Graph Execution Engine (v6.4)
-│   │   ├── graph/        # Graph Orchestration Foundation (v6.2)
-│   │   ├── graph_runtime/# Enterprise Graph Runtime Integration (v7.4)
-│   │   ├── hitl/         # Human-in-the-Loop & Governance Foundation (v6.8)
-│   │   ├── memory/       # Enterprise Memory Runtime (v7.2)
-│   │   ├── models/       # SQLAlchemy ORM domain models
-│   │   ├── prompt/       # Prompt Execution Engine (v7.1)
-│   │   ├── repositories/ # Generic & specialized data access repositories
-│   │   ├── runtime/      # Enterprise LLM Runtime Engine (v7.0)
-│   │   ├── schemas/      # Pydantic DTO validation schemas
-│   │   ├── services/     # Domain business services & ChatService
-│   │   ├── streaming/    # Streaming & Real-Time Foundation (v6.7)
-│   │   ├── tools/        # Enterprise Tool Runtime (v7.3)
-│   │   ├── utils/        # Response helpers & utility functions
-│   │   └── workflow/     # Workflow Node Library (v6.3)
-│   ├── docs/             # Technical architecture & engineering docs (ADRs 001–047)
-│   ├── logs/             # Runtime execution log directory
-│   ├── migrations/       # Alembic versioned schema migrations
-│   ├── scripts/          # Operation & database seeding scripts
-│   ├── tests/            # Automated pytest test suites (175 passed)
+├── app/              # Application modules
+│   ├── agents/       # Enterprise Multi-Agent Orchestration Runtime (v7.5)
+│   ├── ai/           # Multi-provider AI engine (OpenAI, Claude, Gemini, Ollama)
+│   ├── api/          # REST API presentation routers & dependencies (v1)
+│   ├── checkpoints/  # Checkpoint & Replay Foundation (v6.6)
+│   ├── config/       # Settings configuration & constants
+│   ├── context/      # Conversation State Foundation (v6.1)
+│   ├── core/         # Exception handlers & logging setup
+│   ├── db/           # AsyncEngine, AsyncSession, Base metadata, Mixins
+│   ├── dependencies/ # FastAPI dependency injection utilities
+│   ├── events/       # Workflow Event & Observability Foundation (v6.5)
+│   ├── exceptions/   # Domain & infrastructure exceptions
+│   ├── execution/    # Graph Execution Engine (v6.4)
+│   ├── graph/        # Graph Orchestration Foundation (v6.2)
+│   ├── graph_runtime/# Enterprise Graph Runtime Integration (v7.4)
+│   ├── hitl/         # Human-in-the-Loop & Governance Foundation (v6.8)
+│   ├── memory/       # Enterprise Memory Runtime (v7.2)
+│   ├── models/       # SQLAlchemy ORM domain models
+│   ├── prompt/       # Prompt Execution Engine (v7.1)
+│   ├── rag/          # Enterprise RAG Engine (v7.6)
+│   ├── repositories/ # Generic & specialized data access repositories
+│   ├── runtime/      # Enterprise LLM Runtime Engine (v7.0)
+│   ├── schemas/      # Pydantic DTO validation schemas
+│   ├── services/     # Domain business services & ChatService
+│   ├── streaming/    # Streaming & Real-Time Foundation (v6.7)
+│   ├── tools/        # Enterprise Tool Runtime (v7.3)
+│   ├── utils/        # Response helpers & utility functions
+│   └── workflow/     # Workflow Node Library (v6.3)
+├── docs/             # Technical architecture & engineering docs (ADRs 001–049)
+├── logs/             # Runtime execution log directory
+├── migrations/       # Alembic versioned schema migrations
+├── scripts/          # Operation & database seeding scripts
+├── tests/            # Automated pytest test suites (185 passed)
 │   ├── alembic.ini       # Alembic migration configuration
 │   ├── ARCHITECTURE.md   # Master backend architecture blueprint
 │   └── README.md         # Backend developer guide

@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v7.6.0] - 2026-08-07
+
+### Added
+- **Enterprise RAG Engine** (`backend/app/rag/`): Provider-independent, storage-independent Retrieval-Augmented Generation platform coordinating document ingestion, parsing, chunking, embedding, vector indexing, retrieval planning, pluggable reranking, citation generation, context assembly, caching, ingestion jobs, and retrieval explanations without modifying frozen runtime layers (v7.0–v7.5).
+- **`IngestionRuntime` & `QueryRuntime` Separation**: Dedicated Ingestion Runtime (Parse ➔ Chunk ➔ Embed ➔ Index) with `IngestionJob` background tracking vs Query Runtime (Rewrite ➔ Plan ➔ Retrieve ➔ Rerank ➔ Context ➔ Citations).
+- **`RetrievalPlanner` & `RetrievalPlan`**: Structured retrieval planning for Vector, Keyword, Hybrid, Metadata Filter, Recent Documents, and Multi-Document strategies.
+- **`Chunk` vs `EmbeddedChunk` Separation**: Un-embedded text blocks decoupled from vector embedding bindings.
+- **Pluggable Rerankers**: `BaseReranker` ABC with `CosineReranker`, `HybridReranker`, `MetadataReranker`, `WeightedReranker`, and `CrossEncoderReranker` (placeholder).
+- **`RetrievalCache` Abstraction**: `CacheProvider` ABC & `InMemoryCacheProvider` caching embeddings, retrieval results, reranking, and context.
+- **`DocumentLifecycleManager`**: Lifecycle state machine (`UPLOADED` ➔ `PARSING` ➔ `CHUNKED` ➔ `INDEXED` ➔ `READY` ➔ `ARCHIVED` ➔ `DELETED`).
+- **REST API Presentation Layer**: Router `/api/v1/rag` with endpoints `POST /documents`, `GET /documents`, `GET /documents/{id}`, `DELETE /documents/{id}`, `POST /ingest`, `POST /retrieve`, `POST /query`, `GET /statistics`, `GET /analytics`, `GET /health`.
+- **Developer Console — Knowledge Studio**: 3-panel UI (`testing-ui/index.html`) mounted at `/console` featuring Panel A (Document Library & Ingestion), Panel B (Chunk & Embedding Viewer), and Panel C (Retrieval & Reranking Inspector).
+- **Architecture Decision Records & Graduation Suite**: `ADR 048` (Enterprise RAG Engine Architecture), `ADR 049` (Enterprise Retrieval Guidelines), `RUNTIME_BASELINE_v7.6.md`, `RUNTIME_CERTIFICATE_v7.6.md`, and `test_rag_full_stack_smoke.py`.
+
+---
+
 ## [v7.5.0] - 2026-08-07
 
 ### Added
