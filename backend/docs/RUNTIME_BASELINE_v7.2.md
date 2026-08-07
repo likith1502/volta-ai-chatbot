@@ -8,9 +8,31 @@
 
 ## 1. Freeze Declaration
 
-As of version `v7.2.0` (Git Tag `v7.2`, Commit `ac7327d`), all components under the **Enterprise LLM Runtime Engine (v7.0)**, **Prompt Execution Engine (v7.1)**, and **Enterprise Memory Runtime (v7.2)** are hereby declared **FROZEN AND IMMUTABLE**.
+As of version `v7.2.0` (Git Tag `v7.2`, Commit `6d08e0c`), all components under the **Enterprise LLM Runtime Engine (v7.0)**, **Prompt Execution Engine (v7.1)**, and **Enterprise Memory Runtime (v7.2)** are hereby declared **FROZEN AND IMMUTABLE**.
 
 Subsequent sub-phases (Phase 7.3 Tool Runtime through Phase 7.8 Deployment) will strictly integrate with these interfaces without modifying core contract implementations.
+
+---
+
+## 1.1 Runtime Stability Rules (Phase 7 Engineering Constitution)
+
+All remaining runtime sub-phases (Phase 7.3 – Phase 7.8) MUST obey the following 10 architectural stability rules:
+
+1. **Runtime Engine is immutable**: `backend/app/runtime/` interfaces and contracts remain locked.
+2. **Prompt Engine is immutable**: `backend/app/prompt/` interfaces and contracts remain locked.
+3. **Memory Runtime is immutable**: `backend/app/memory/` interfaces and contracts remain locked.
+4. **Future phases may extend, never modify**: New features add new modules/providers without mutating existing implementations.
+5. **Public interface communication only**: Inter-layer communication MUST occur through public interface contracts.
+6. **No internal implementation leakage**: No runtime layer may bypass public abstractions to access internal implementations.
+7. **Strict provider independence**: Every new runtime phase MUST remain 100% independent of vendor-specific SDKs, databases, vector stores, or APIs.
+8. **100% backward compatibility**: Every release MUST preserve existing API contracts and public schemas.
+9. **Coverage preservation**: Every release MUST maintain or increase total automated test coverage (never decreasing pass counts).
+10. **Disciplined Release Definition of Done**: Every sub-phase MUST conclude with:
+    - Architecture Decision Record (ADR)
+    - Baseline snapshot
+    - Git release tag
+    - Full documentation synchronization
+    - Clean working tree & git commit history
 
 ---
 
