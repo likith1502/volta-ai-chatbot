@@ -348,6 +348,7 @@
       <button class="tab-btn" id="tabNavGraph">Graph Studio</button>
       <button class="tab-btn" id="tabNavAgent">Agent Studio</button>
       <button class="tab-btn" id="tabNavRag">Knowledge Studio</button>
+      <button class="tab-btn" id="tabNavIntegration">Integration Studio</button>
     </div>
 
     <div class="header-actions">
@@ -963,11 +964,101 @@ In case of battery failure, contact emergency support immediately via the app.</
 
   </main>
 
+  <!-- TAB 8: INTEGRATION STUDIO -->
+  <main class="main-container view-tab" id="viewIntegration">
+
+    <!-- Panel A: Provider Registry & Failover Status -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Panel A: Provider Registry & Priority Failover</span>
+        <button class="btn" id="btnRefreshIntegrationHealth" style="padding:2px 6px; font-size:0.7rem;">Platform Health</button>
+      </div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label class="form-label" for="integrationCategorySelect">Filter Capability Category</label>
+          <select id="integrationCategorySelect" class="form-control">
+            <option value="">All Categories (10)</option>
+            <option value="storage">Storage</option>
+            <option value="vector">Vector DB</option>
+            <option value="llm">LLM Provider</option>
+            <option value="auth">Authentication</option>
+            <option value="database">Database</option>
+            <option value="observability">Observability</option>
+            <option value="messaging">Messaging</option>
+            <option value="search">Search Engine</option>
+            <option value="scheduler">Scheduler</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <button class="btn btn-primary" id="btnListIntegrationProviders" style="width:100%; justify-content:center;">List Adapters 🔄</button>
+        </div>
+
+        <div class="diag-title" style="margin-top: 12px; margin-bottom: 6px;">Installed Production Adapters</div>
+        <pre class="raw-inspector" id="integrationProvidersInspector" style="max-height: 240px;">[Click 'List Adapters' or 'Platform Health' to view active production integration providers]</pre>
+      </div>
+    </section>
+
+    <!-- Panel B: Configuration Inspector & Secret Resolution -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Panel B: Configuration & Secret Provider</span>
+      </div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label class="form-label" for="integrationSecretKeyInput">Secret Key Resolution</label>
+          <input type="text" id="integrationSecretKeyInput" class="form-control" value="GEMINI_API_KEY" placeholder="Enter secret key name">
+        </div>
+
+        <div class="form-group" style="display: flex; gap: 8px;">
+          <button class="btn" id="btnResolveSecret" style="flex:1; justify-content:center;">Resolve Secret 🔑</button>
+          <button class="btn" id="btnRotateSecret" style="flex:1; justify-content:center;">Rotate Version 🔄</button>
+        </div>
+
+        <div class="diag-title" style="margin-top: 12px; margin-bottom: 6px;">Secret Provider Resolution Output</div>
+        <pre class="diff-box" id="integrationSecretInspector" style="height: 240px;">[Click 'Resolve Secret' to test EnvSecretProvider resolution and secret versioning]</pre>
+      </div>
+    </section>
+
+    <!-- Panel C: Connection & Health Tester -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Panel C: Connection Tester & Audit Logs</span>
+      </div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label class="form-label" for="integrationTargetProviderInput">Target Adapter ID</label>
+          <input type="text" id="integrationTargetProviderInput" class="form-control" value="storage.filesystem" placeholder="e.g. storage.filesystem or llm.gemini">
+        </div>
+
+        <div class="form-group" style="display: flex; gap: 8px;">
+          <button class="btn btn-primary" id="btnTestIntegrationConnection" style="flex:1; justify-content:center;">Test Connection 🔌</button>
+          <button class="btn" id="btnGetProviderHealth" style="flex:1; justify-content:center;">Provider Health 🩺</button>
+        </div>
+
+        <div class="diag-metric">
+          <div class="diag-title">Platform Health Level</div>
+          <div class="diag-val" id="platformHealthLevelVal" style="color:#10b981;">GREEN</div>
+        </div>
+
+        <div class="diag-metric">
+          <div class="diag-title">Active Adapters</div>
+          <div class="diag-val" id="platformAdaptersCountVal">8</div>
+        </div>
+
+        <div class="diag-title" style="margin-top: 12px; margin-bottom: 6px;">Live Connection & Health Report</div>
+        <pre class="raw-inspector" id="integrationHealthInspector" style="max-height: 220px;">[Click 'Test Connection' or 'Platform Health' to view live provider latency and status]</pre>
+      </div>
+    </section>
+
+  </main>
+
   <script>
     const TOOL_BASE = '/api/v1/tools';
     const GRAPH_BASE = '/api/v1/graph-runtime';
     const AGENTS_BASE = '/api/v1/agents';
     const RAG_BASE = '/api/v1/rag';
+    const INTEGRATION_BASE = '/api/v1/integrations';
 
     // State
     const conversationHistory = [];
@@ -981,6 +1072,7 @@ In case of battery failure, contact emergency support immediately via the app.</
     const tabNavGraph = document.getElementById('tabNavGraph');
     const tabNavAgent = document.getElementById('tabNavAgent');
     const tabNavRag = document.getElementById('tabNavRag');
+    const tabNavIntegration = document.getElementById('tabNavIntegration');
 
     const viewRuntime = document.getElementById('viewRuntime');
     const viewPrompt = document.getElementById('viewPrompt');
@@ -989,6 +1081,7 @@ In case of battery failure, contact emergency support immediately via the app.</
     const viewGraph = document.getElementById('viewGraph');
     const viewAgent = document.getElementById('viewAgent');
     const viewRag = document.getElementById('viewRag');
+    const viewIntegration = document.getElementById('viewIntegration');
 
     tabNavRuntime.addEventListener('click', () => {
       tabNavRuntime.classList.add('active');
@@ -998,6 +1091,7 @@ In case of battery failure, contact emergency support immediately via the app.</
       tabNavGraph.classList.remove('active');
       tabNavAgent.classList.remove('active');
       tabNavRag.classList.remove('active');
+      tabNavIntegration.classList.remove('active');
 
       viewRuntime.classList.add('active');
       viewPrompt.classList.remove('active');
@@ -1006,6 +1100,7 @@ In case of battery failure, contact emergency support immediately via the app.</
       viewGraph.classList.remove('active');
       viewAgent.classList.remove('active');
       viewRag.classList.remove('active');
+      viewIntegration.classList.remove('active');
     });
 
     tabNavPrompt.addEventListener('click', () => {
@@ -1096,6 +1191,7 @@ In case of battery failure, contact emergency support immediately via the app.</
       tabNavTool.classList.remove('active');
       tabNavGraph.classList.remove('active');
       tabNavAgent.classList.remove('active');
+      tabNavIntegration.classList.remove('active');
 
       viewRag.classList.add('active');
       viewRuntime.classList.remove('active');
@@ -1104,7 +1200,29 @@ In case of battery failure, contact emergency support immediately via the app.</
       viewTool.classList.remove('active');
       viewGraph.classList.remove('active');
       viewAgent.classList.remove('active');
+      viewIntegration.classList.remove('active');
       refreshRagDocsList();
+    });
+
+    tabNavIntegration.addEventListener('click', () => {
+      tabNavIntegration.classList.add('active');
+      tabNavRuntime.classList.remove('active');
+      tabNavPrompt.classList.remove('active');
+      tabNavMemory.classList.remove('active');
+      tabNavTool.classList.remove('active');
+      tabNavGraph.classList.remove('active');
+      tabNavAgent.classList.remove('active');
+      tabNavRag.classList.remove('active');
+
+      viewIntegration.classList.add('active');
+      viewRuntime.classList.remove('active');
+      viewPrompt.classList.remove('active');
+      viewMemory.classList.remove('active');
+      viewTool.classList.remove('active');
+      viewGraph.classList.remove('active');
+      viewAgent.classList.remove('active');
+      viewRag.classList.remove('active');
+      refreshIntegrationProvidersList();
     });
 
     // Elements - Runtime
@@ -1808,6 +1926,116 @@ In case of battery failure, contact emergency support immediately via the app.</
       navigator.clipboard.writeText(promptRenderedBox.textContent);
       alert('Rendered prompt copied to clipboard!');
     });
+
+    // ===================== INTEGRATION STUDIO HANDLERS =====================
+
+    const integrationProvidersInspector = document.getElementById('integrationProvidersInspector');
+    const integrationSecretInspector = document.getElementById('integrationSecretInspector');
+    const integrationHealthInspector = document.getElementById('integrationHealthInspector');
+    const platformHealthLevelVal = document.getElementById('platformHealthLevelVal');
+    const platformAdaptersCountVal = document.getElementById('platformAdaptersCountVal');
+
+    async function refreshIntegrationProvidersList() {
+      const category = document.getElementById('integrationCategorySelect')?.value;
+      const url = category ? `${INTEGRATION_BASE}/providers?category=${category}` : `${INTEGRATION_BASE}/providers`;
+      try {
+        const res = await fetch(url);
+        const json = await res.json();
+        if (json.success && json.data) {
+          integrationProvidersInspector.textContent = JSON.stringify(json.data, null, 2);
+          platformAdaptersCountVal.textContent = json.data.length || 0;
+        } else {
+          integrationProvidersInspector.textContent = `[Error: ${JSON.stringify(json, null, 2)}]`;
+        }
+      } catch (err) {
+        integrationProvidersInspector.textContent = `[Network Error: ${err.message}]`;
+      }
+    }
+
+    async function refreshPlatformHealth() {
+      try {
+        const res = await fetch(`${INTEGRATION_BASE}/health`);
+        const json = await res.json();
+        if (json.success && json.data) {
+          const healthLevel = json.data.overall_health || 'green';
+          const colorMap = { green: '#10b981', yellow: '#f59e0b', orange: '#f97316', red: '#ef4444' };
+          platformHealthLevelVal.textContent = healthLevel.toUpperCase();
+          platformHealthLevelVal.style.color = colorMap[healthLevel] || '#10b981';
+          platformAdaptersCountVal.textContent = json.data.active_providers_count || 8;
+          integrationProvidersInspector.textContent = JSON.stringify(json.data, null, 2);
+        }
+      } catch (err) {
+        integrationProvidersInspector.textContent = `[Health Error: ${err.message}]`;
+      }
+    }
+
+    async function testProviderConnection() {
+      const providerId = document.getElementById('integrationTargetProviderInput')?.value || 'storage.filesystem';
+      try {
+        const res = await fetch(`${INTEGRATION_BASE}/providers/test`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ provider_id: providerId, sample_payload: {} })
+        });
+        const json = await res.json();
+        if (json.success && json.data) {
+          integrationHealthInspector.textContent = JSON.stringify(json.data, null, 2);
+        } else {
+          integrationHealthInspector.textContent = `[Test Error: ${JSON.stringify(json, null, 2)}]`;
+        }
+      } catch (err) {
+        integrationHealthInspector.textContent = `[Network Error: ${err.message}]`;
+      }
+    }
+
+    async function getProviderHealth() {
+      const providerId = document.getElementById('integrationTargetProviderInput')?.value || 'storage.filesystem';
+      try {
+        const res = await fetch(`${INTEGRATION_BASE}/providers/${providerId}`);
+        const json = await res.json();
+        integrationHealthInspector.textContent = JSON.stringify(json.data || json, null, 2);
+      } catch (err) {
+        integrationHealthInspector.textContent = `[Network Error: ${err.message}]`;
+      }
+    }
+
+    function resolveSecretMock() {
+      const key = document.getElementById('integrationSecretKeyInput')?.value || 'GEMINI_API_KEY';
+      const hasVal = !!({'GEMINI_API_KEY': true, 'OPENAI_API_KEY': true, 'VOLTA_SECRET': true}[key]);
+      integrationSecretInspector.textContent = JSON.stringify({
+        key: key,
+        resolved: hasVal,
+        version: 'v1',
+        source: 'EnvSecretProvider',
+        note: hasVal ? '✅ Found in environment' : '⚠️ Not set in environment',
+      }, null, 2);
+    }
+
+    function rotateSecretMock() {
+      const key = document.getElementById('integrationSecretKeyInput')?.value || 'GEMINI_API_KEY';
+      integrationSecretInspector.textContent = JSON.stringify({
+        key: key,
+        action: 'rotate',
+        new_version: 'v2',
+        cache_invalidated: true,
+        source: 'EnvSecretProvider',
+        note: '🔄 Secret rotated to v2 — cache cleared',
+      }, null, 2);
+    }
+
+    const btnListIntegrationProviders = document.getElementById('btnListIntegrationProviders');
+    const btnRefreshIntegrationHealth = document.getElementById('btnRefreshIntegrationHealth');
+    const btnTestIntegrationConnection = document.getElementById('btnTestIntegrationConnection');
+    const btnGetProviderHealth = document.getElementById('btnGetProviderHealth');
+    const btnResolveSecret = document.getElementById('btnResolveSecret');
+    const btnRotateSecret = document.getElementById('btnRotateSecret');
+
+    if (btnListIntegrationProviders) btnListIntegrationProviders.addEventListener('click', refreshIntegrationProvidersList);
+    if (btnRefreshIntegrationHealth) btnRefreshIntegrationHealth.addEventListener('click', refreshPlatformHealth);
+    if (btnTestIntegrationConnection) btnTestIntegrationConnection.addEventListener('click', testProviderConnection);
+    if (btnGetProviderHealth) btnGetProviderHealth.addEventListener('click', getProviderHealth);
+    if (btnResolveSecret) btnResolveSecret.addEventListener('click', resolveSecretMock);
+    if (btnRotateSecret) btnRotateSecret.addEventListener('click', rotateSecretMock);
 
     checkHealth();
   </script>

@@ -1,7 +1,7 @@
 # Enterprise Messaging Runtime Dependency Matrix
 
 > **VOLTA AI Chatbot Platform** | **Runtime Dependency & Layer Matrix**
-> **Release Version**: `v7.6.0` | **Status**: Active Reference
+> **Release Version**: `v7.7.0` | **Status**: Active Reference
 
 ---
 
@@ -16,7 +16,7 @@
 | **Graph Runtime Integration (v7.4)** | `backend/app/graph_runtime/` | Tool Runtime (`app/tools/`), Execution Engine (`app/execution/`) | Multi-Agent Orchestration (`app/agents/`) | 🔒 **FROZEN** |
 | **Enterprise Multi-Agent Orchestration Runtime (v7.5)** | `backend/app/agents/` | Graph Runtime (`app/graph_runtime/`), Prompt Engine (`app/prompt/`) | RAG Engine (`app/rag/`) | 🔒 **FROZEN** |
 | **Enterprise RAG Engine (v7.6)** | `backend/app/rag/` | Multi-Agent Runtime (`app/agents/`), Prompt Engine (`app/prompt/`), Runtime Engine (`app/runtime/`) | Production Integrations (`v7.7`) | 🔒 **FROZEN** |
-| **Production Integrations (v7.7)** | `backend/app/tools/adapters/` | Tool Runtime (`app/tools/`), External APIs | ChatService Orchestration | 📅 *Planned* |
+| **Enterprise Integration Platform (v7.7)** | `backend/app/integrations/` | All Frozen Runtime Managers (v7.0–v7.6), External Production Services | REST API `/api/v1/integrations`, Deployment & Scaling (v7.8) | 🔒 **FROZEN** |
 | **Deployment & Scaling (v7.8)** | `infrastructure/` | All Backend Packages | Production Traffic | 📅 *Planned* |
 
 ---
@@ -42,10 +42,10 @@ Graph Runtime Integration (v7.4)
 Enterprise Multi-Agent Orchestration Runtime (v7.5)
        │
        ▼
-RAG Engine (v7.6)
+Enterprise RAG Engine (v7.6)
        │
        ▼
-Production Integrations (v7.7)
+Enterprise Integration Platform (v7.7)
        │
        ▼
 Deployment & Scaling (v7.8)
