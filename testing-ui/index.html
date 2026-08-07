@@ -349,6 +349,7 @@
       <button class="tab-btn" id="tabNavAgent">Agent Studio</button>
       <button class="tab-btn" id="tabNavRag">Knowledge Studio</button>
       <button class="tab-btn" id="tabNavIntegration">Integration Studio</button>
+      <button class="tab-btn" id="tabNavOps">⚙️ Operations Studio</button>
     </div>
 
     <div class="header-actions">
@@ -1053,12 +1054,106 @@ In case of battery failure, contact emergency support immediately via the app.</
 
   </main>
 
+  <!-- TAB 9: OPERATIONS STUDIO -->
+  <main class="main-container view-tab" id="viewOps">
+
+    <!-- Panel A: Deployment Overview & Runtime Health -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Panel A: Deployment Overview</span>
+        <button class="btn" id="btnRefreshOpsHealth" style="padding:2px 6px; font-size:0.7rem;">Refresh Health 🟢</button>
+      </div>
+      <div class="panel-body">
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:12px;">
+          <div class="diag-metric">
+            <div class="diag-title">Platform Health</div>
+            <div class="diag-val" id="opsHealthLevelVal" style="color:#10b981;">GREEN</div>
+          </div>
+          <div class="diag-metric">
+            <div class="diag-title">Active Deployments</div>
+            <div class="diag-val" id="opsDeploymentsCountVal">1</div>
+          </div>
+          <div class="diag-metric">
+            <div class="diag-title">Platform Version</div>
+            <div class="diag-val" id="opsPlatformVersionVal">7.8.0</div>
+          </div>
+        </div>
+        <div class="form-group" style="display:flex; gap:8px;">
+          <input type="text" id="opsDeploymentIdInput" class="form-control" value="volta-platform-v7.8" placeholder="Deployment ID">
+          <button class="btn" id="btnGetDeploymentStatus" style="flex:0; white-space:nowrap;">Status 📊</button>
+        </div>
+        <pre class="raw-inspector" id="opsStatusInspector" style="max-height:220px;">[Click 'Refresh Health' or 'Status' to inspect deployment status]</pre>
+      </div>
+    </section>
+
+    <!-- Panel B: Deploy / Validate / Rollback / Scale -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Panel B: Release Lifecycle</span>
+      </div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label class="form-label">Strategy</label>
+          <select id="opsStrategySelect" class="form-control">
+            <option value="rolling">Rolling</option>
+            <option value="blue_green">Blue/Green</option>
+            <option value="canary">Canary</option>
+            <option value="recreate">Recreate</option>
+          </select>
+        </div>
+        <div class="form-group" style="display:flex; gap:8px;">
+          <input type="text" id="opsImageTagInput" class="form-control" value="7.8.0" placeholder="Image tag">
+          <input type="number" id="opsReplicasInput" class="form-control" value="2" min="1" max="20" style="width:80px;">
+        </div>
+        <div class="form-group" style="display:flex; gap:8px;">
+          <button class="btn" id="btnOpsValidate" style="flex:1; justify-content:center;">Validate ✅</button>
+          <button class="btn btn-primary" id="btnOpsDeploy" style="flex:1; justify-content:center;">Deploy 🚀</button>
+        </div>
+        <div class="form-group" style="display:flex; gap:8px;">
+          <button class="btn" id="btnOpsRollback" style="flex:1; justify-content:center;">Rollback ⏪</button>
+          <button class="btn" id="btnOpsScale" style="flex:1; justify-content:center;">Scale ↔️</button>
+        </div>
+        <pre class="diff-box" id="opsLifecycleInspector" style="height:200px;">[Deploy, rollback, and scale output appears here]</pre>
+      </div>
+    </section>
+
+    <!-- Panel C: Environment & Analytics -->
+    <section class="panel">
+      <div class="panel-header">
+        <span>Panel C: Environment & Analytics</span>
+      </div>
+      <div class="panel-body">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+          <div class="diag-metric">
+            <div class="diag-title">Total Deployments</div>
+            <div class="diag-val" id="opsTotalDeploymentsVal">0</div>
+          </div>
+          <div class="diag-metric">
+            <div class="diag-title">Rollbacks Triggered</div>
+            <div class="diag-val" id="opsRollbacksVal">0</div>
+          </div>
+        </div>
+        <div class="form-group" style="display:flex; gap:8px;">
+          <button class="btn" id="btnOpsGetEnv" style="flex:1; justify-content:center;">Active Environment 🌍</button>
+          <button class="btn" id="btnOpsGetAnalytics" style="flex:1; justify-content:center;">Analytics 📊</button>
+        </div>
+        <div class="form-group">
+          <button class="btn" id="btnOpsGetStatistics" style="width:100%; justify-content:center;">Platform Statistics 📈</button>
+        </div>
+        <pre class="raw-inspector" id="opsAnalyticsInspector" style="max-height:260px;">[Analytics and environment data appears here]</pre>
+      </div>
+    </section>
+
+  </main>
+
   <script>
     const TOOL_BASE = '/api/v1/tools';
     const GRAPH_BASE = '/api/v1/graph-runtime';
+
     const AGENTS_BASE = '/api/v1/agents';
     const RAG_BASE = '/api/v1/rag';
     const INTEGRATION_BASE = '/api/v1/integrations';
+    const DEPLOYMENT_BASE = '/api/v1/deployment';
 
     // State
     const conversationHistory = [];
@@ -1073,6 +1168,7 @@ In case of battery failure, contact emergency support immediately via the app.</
     const tabNavAgent = document.getElementById('tabNavAgent');
     const tabNavRag = document.getElementById('tabNavRag');
     const tabNavIntegration = document.getElementById('tabNavIntegration');
+    const tabNavOps = document.getElementById('tabNavOps');
 
     const viewRuntime = document.getElementById('viewRuntime');
     const viewPrompt = document.getElementById('viewPrompt');
@@ -1082,25 +1178,19 @@ In case of battery failure, contact emergency support immediately via the app.</
     const viewAgent = document.getElementById('viewAgent');
     const viewRag = document.getElementById('viewRag');
     const viewIntegration = document.getElementById('viewIntegration');
+    const viewOps = document.getElementById('viewOps');
+
+    function deactivateAllTabs() {
+      [tabNavRuntime, tabNavPrompt, tabNavMemory, tabNavTool, tabNavGraph, tabNavAgent, tabNavRag, tabNavIntegration, tabNavOps]
+        .forEach(t => t && t.classList.remove('active'));
+      [viewRuntime, viewPrompt, viewMemory, viewTool, viewGraph, viewAgent, viewRag, viewIntegration, viewOps]
+        .forEach(v => v && v.classList.remove('active'));
+    }
 
     tabNavRuntime.addEventListener('click', () => {
+      deactivateAllTabs();
       tabNavRuntime.classList.add('active');
-      tabNavPrompt.classList.remove('active');
-      tabNavMemory.classList.remove('active');
-      tabNavTool.classList.remove('active');
-      tabNavGraph.classList.remove('active');
-      tabNavAgent.classList.remove('active');
-      tabNavRag.classList.remove('active');
-      tabNavIntegration.classList.remove('active');
-
       viewRuntime.classList.add('active');
-      viewPrompt.classList.remove('active');
-      viewMemory.classList.remove('active');
-      viewTool.classList.remove('active');
-      viewGraph.classList.remove('active');
-      viewAgent.classList.remove('active');
-      viewRag.classList.remove('active');
-      viewIntegration.classList.remove('active');
     });
 
     tabNavPrompt.addEventListener('click', () => {
@@ -1205,25 +1295,20 @@ In case of battery failure, contact emergency support immediately via the app.</
     });
 
     tabNavIntegration.addEventListener('click', () => {
+      deactivateAllTabs();
       tabNavIntegration.classList.add('active');
-      tabNavRuntime.classList.remove('active');
-      tabNavPrompt.classList.remove('active');
-      tabNavMemory.classList.remove('active');
-      tabNavTool.classList.remove('active');
-      tabNavGraph.classList.remove('active');
-      tabNavAgent.classList.remove('active');
-      tabNavRag.classList.remove('active');
-
       viewIntegration.classList.add('active');
-      viewRuntime.classList.remove('active');
-      viewPrompt.classList.remove('active');
-      viewMemory.classList.remove('active');
-      viewTool.classList.remove('active');
-      viewGraph.classList.remove('active');
-      viewAgent.classList.remove('active');
-      viewRag.classList.remove('active');
       refreshIntegrationProvidersList();
     });
+
+    if (tabNavOps) {
+      tabNavOps.addEventListener('click', () => {
+        deactivateAllTabs();
+        tabNavOps.classList.add('active');
+        viewOps.classList.add('active');
+        refreshOpsHealth();
+      });
+    }
 
     // Elements - Runtime
     const providerSelect = document.getElementById('providerSelect');
@@ -2037,7 +2122,178 @@ In case of battery failure, contact emergency support immediately via the app.</
     if (btnResolveSecret) btnResolveSecret.addEventListener('click', resolveSecretMock);
     if (btnRotateSecret) btnRotateSecret.addEventListener('click', rotateSecretMock);
 
+    // ===================== OPERATIONS STUDIO HANDLERS =====================
+
+    const opsStatusInspector = document.getElementById('opsStatusInspector');
+    const opsLifecycleInspector = document.getElementById('opsLifecycleInspector');
+    const opsAnalyticsInspector = document.getElementById('opsAnalyticsInspector');
+    const opsHealthLevelVal = document.getElementById('opsHealthLevelVal');
+    const opsDeploymentsCountVal = document.getElementById('opsDeploymentsCountVal');
+    const opsTotalDeploymentsVal = document.getElementById('opsTotalDeploymentsVal');
+    const opsRollbacksVal = document.getElementById('opsRollbacksVal');
+
+    async function refreshOpsHealth() {
+      try {
+        const res = await fetch(`${DEPLOYMENT_BASE}/health`);
+        const json = await res.json();
+        if (json.success && json.data) {
+          const d = json.data;
+          const levelColors = { green: '#10b981', yellow: '#f59e0b', orange: '#f97316', red: '#ef4444' };
+          if (opsHealthLevelVal) {
+            opsHealthLevelVal.textContent = d.overall_health?.toUpperCase() || 'GREEN';
+            opsHealthLevelVal.style.color = levelColors[d.overall_health] || '#10b981';
+          }
+          if (opsDeploymentsCountVal) opsDeploymentsCountVal.textContent = d.total_deployments || 1;
+          if (opsStatusInspector) opsStatusInspector.textContent = JSON.stringify(d, null, 2);
+        }
+      } catch (err) {
+        if (opsStatusInspector) opsStatusInspector.textContent = `[Health Check Error: ${err.message}]`;
+      }
+    }
+
+    async function getDeploymentStatus() {
+      const deploymentId = document.getElementById('opsDeploymentIdInput')?.value || 'volta-platform-v7.8';
+      if (opsStatusInspector) opsStatusInspector.textContent = `Fetching status for '${deploymentId}'...`;
+      try {
+        const res = await fetch(`${DEPLOYMENT_BASE}/status?deployment_id=${encodeURIComponent(deploymentId)}`);
+        const json = await res.json();
+        if (opsStatusInspector) opsStatusInspector.textContent = JSON.stringify(json.data || json, null, 2);
+      } catch (err) {
+        if (opsStatusInspector) opsStatusInspector.textContent = `[Status Error: ${err.message}]`;
+      }
+    }
+
+    async function validateDeployment() {
+      const deploymentId = document.getElementById('opsDeploymentIdInput')?.value || 'volta-platform-v7.8';
+      if (opsLifecycleInspector) opsLifecycleInspector.textContent = `Validating deployment '${deploymentId}'...`;
+      try {
+        const res = await fetch(`${DEPLOYMENT_BASE}/validate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ deployment_id: deploymentId, platform_version: '7.8.0', environment: 'production' })
+        });
+        const json = await res.json();
+        if (opsLifecycleInspector) opsLifecycleInspector.textContent = JSON.stringify(json.data || json, null, 2);
+      } catch (err) {
+        if (opsLifecycleInspector) opsLifecycleInspector.textContent = `[Validation Error: ${err.message}]`;
+      }
+    }
+
+    async function executeDeploy() {
+      const deploymentId = document.getElementById('opsDeploymentIdInput')?.value || 'volta-platform-v7.8';
+      const strategy = document.getElementById('opsStrategySelect')?.value || 'rolling';
+      const imageTag = document.getElementById('opsImageTagInput')?.value || '7.8.0';
+      const replicas = parseInt(document.getElementById('opsReplicasInput')?.value || '2');
+      if (opsLifecycleInspector) opsLifecycleInspector.textContent = `Deploying '${deploymentId}' with strategy '${strategy}'...`;
+      try {
+        const res = await fetch(`${DEPLOYMENT_BASE}/deploy`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ deployment_id: deploymentId, strategy, image_tag: imageTag, replica_count: replicas, environment: 'production' })
+        });
+        const json = await res.json();
+        if (opsLifecycleInspector) opsLifecycleInspector.textContent = JSON.stringify(json.data || json, null, 2);
+        if (opsTotalDeploymentsVal) {
+          opsTotalDeploymentsVal.textContent = parseInt(opsTotalDeploymentsVal.textContent || '0') + 1;
+        }
+      } catch (err) {
+        if (opsLifecycleInspector) opsLifecycleInspector.textContent = `[Deploy Error: ${err.message}]`;
+      }
+    }
+
+    async function executeRollback() {
+      const deploymentId = document.getElementById('opsDeploymentIdInput')?.value || 'volta-platform-v7.8';
+      if (opsLifecycleInspector) opsLifecycleInspector.textContent = `Initiating rollback for '${deploymentId}'...`;
+      try {
+        const res = await fetch(`${DEPLOYMENT_BASE}/rollback`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ deployment_id: deploymentId, snapshot_id: 'snap_default', strategy: 'rolling' })
+        });
+        const json = await res.json();
+        if (opsLifecycleInspector) opsLifecycleInspector.textContent = JSON.stringify(json.data || json, null, 2);
+        if (opsRollbacksVal) {
+          opsRollbacksVal.textContent = parseInt(opsRollbacksVal.textContent || '0') + 1;
+        }
+      } catch (err) {
+        if (opsLifecycleInspector) opsLifecycleInspector.textContent = `[Rollback Error: ${err.message}]`;
+      }
+    }
+
+    async function executeScale() {
+      const deploymentId = document.getElementById('opsDeploymentIdInput')?.value || 'volta-platform-v7.8';
+      const replicas = parseInt(document.getElementById('opsReplicasInput')?.value || '3');
+      if (opsLifecycleInspector) opsLifecycleInspector.textContent = `Scaling '${deploymentId}' to ${replicas} replicas...`;
+      try {
+        const res = await fetch(`${DEPLOYMENT_BASE}/scale`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ deployment_id: deploymentId, target_replicas: replicas, reason: 'manual_ops_studio' })
+        });
+        const json = await res.json();
+        if (opsLifecycleInspector) opsLifecycleInspector.textContent = JSON.stringify(json.data || json, null, 2);
+      } catch (err) {
+        if (opsLifecycleInspector) opsLifecycleInspector.textContent = `[Scale Error: ${err.message}]`;
+      }
+    }
+
+    async function getOpsEnvironment() {
+      if (opsAnalyticsInspector) opsAnalyticsInspector.textContent = 'Fetching active environment...';
+      try {
+        const res = await fetch(`${DEPLOYMENT_BASE}/environment`);
+        const json = await res.json();
+        if (opsAnalyticsInspector) opsAnalyticsInspector.textContent = JSON.stringify(json.data || json, null, 2);
+      } catch (err) {
+        if (opsAnalyticsInspector) opsAnalyticsInspector.textContent = `[Environment Error: ${err.message}]`;
+      }
+    }
+
+    async function getOpsAnalytics() {
+      if (opsAnalyticsInspector) opsAnalyticsInspector.textContent = 'Fetching analytics...';
+      try {
+        const res = await fetch(`${DEPLOYMENT_BASE}/analytics`);
+        const json = await res.json();
+        if (opsAnalyticsInspector) opsAnalyticsInspector.textContent = JSON.stringify(json.data || json, null, 2);
+      } catch (err) {
+        if (opsAnalyticsInspector) opsAnalyticsInspector.textContent = `[Analytics Error: ${err.message}]`;
+      }
+    }
+
+    async function getOpsStatistics() {
+      if (opsAnalyticsInspector) opsAnalyticsInspector.textContent = 'Fetching statistics...';
+      try {
+        const res = await fetch(`${DEPLOYMENT_BASE}/statistics`);
+        const json = await res.json();
+        if (opsAnalyticsInspector) opsAnalyticsInspector.textContent = JSON.stringify(json.data || json, null, 2);
+        if (opsTotalDeploymentsVal && json.data) opsTotalDeploymentsVal.textContent = json.data.total_deployments || 0;
+        if (opsRollbacksVal && json.data) opsRollbacksVal.textContent = json.data.rollbacks_triggered || 0;
+      } catch (err) {
+        if (opsAnalyticsInspector) opsAnalyticsInspector.textContent = `[Statistics Error: ${err.message}]`;
+      }
+    }
+
+    const btnRefreshOpsHealth = document.getElementById('btnRefreshOpsHealth');
+    const btnGetDeploymentStatus = document.getElementById('btnGetDeploymentStatus');
+    const btnOpsValidate = document.getElementById('btnOpsValidate');
+    const btnOpsDeploy = document.getElementById('btnOpsDeploy');
+    const btnOpsRollback = document.getElementById('btnOpsRollback');
+    const btnOpsScale = document.getElementById('btnOpsScale');
+    const btnOpsGetEnv = document.getElementById('btnOpsGetEnv');
+    const btnOpsGetAnalytics = document.getElementById('btnOpsGetAnalytics');
+    const btnOpsGetStatistics = document.getElementById('btnOpsGetStatistics');
+
+    if (btnRefreshOpsHealth) btnRefreshOpsHealth.addEventListener('click', refreshOpsHealth);
+    if (btnGetDeploymentStatus) btnGetDeploymentStatus.addEventListener('click', getDeploymentStatus);
+    if (btnOpsValidate) btnOpsValidate.addEventListener('click', validateDeployment);
+    if (btnOpsDeploy) btnOpsDeploy.addEventListener('click', executeDeploy);
+    if (btnOpsRollback) btnOpsRollback.addEventListener('click', executeRollback);
+    if (btnOpsScale) btnOpsScale.addEventListener('click', executeScale);
+    if (btnOpsGetEnv) btnOpsGetEnv.addEventListener('click', getOpsEnvironment);
+    if (btnOpsGetAnalytics) btnOpsGetAnalytics.addEventListener('click', getOpsAnalytics);
+    if (btnOpsGetStatistics) btnOpsGetStatistics.addEventListener('click', getOpsStatistics);
+
     checkHealth();
+
   </script>
 </body>
 </html>

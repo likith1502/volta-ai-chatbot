@@ -1,0 +1,32 @@
+name: CD — Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: "staging"
+        type: choice
+        options: ["staging", "production"]
+      image_tag:
+        description: "Docker image tag to deploy"
+        required: true
+        default: "latest"
+
+jobs:
+  deploy:
+    name: Deploy to ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy (stub — replace with actual kubectl/cloud deploy command)
+        run: |
+          echo "Deploying tag '${{ inputs.image_tag }}' to environment '${{ inputs.environment }}'..."
+          echo "Update this workflow with your actual cloud deployment commands."
+          echo "Examples:"
+          echo "  kubectl set image deployment/volta-platform volta-api=ghcr.io/${{ github.repository }}:${{ inputs.image_tag }} -n volta"
+          echo "  render deploy --service-id=<id> --image-tag=${{ inputs.image_tag }}"
+          echo "  flyctl deploy --image=ghcr.io/${{ github.repository }}:${{ inputs.image_tag }}"

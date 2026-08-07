@@ -1,0 +1,36 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: volta-platform-netpol
+  namespace: volta
+spec:
+  podSelector:
+    matchLabels:
+      app: volta-platform
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8000
+  egress:
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 5432   # PostgreSQL
+        - protocol: TCP
+          port: 6379   # Redis
+        - protocol: TCP
+          port: 443    # Gemini API / external HTTPS
+        - protocol: TCP
+          port: 53     # DNS
+      ports:
+        - protocol: UDP
+          port: 53     # DNS

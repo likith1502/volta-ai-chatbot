@@ -38,21 +38,30 @@
 
 ### 8. `backend/app/integrations/` — Enterprise Integration Platform (v7.7)
 - **Primary Responsibility**: Provides a provider-independent enterprise integration infrastructure connecting the frozen runtime stack to production services (storage, vector DBs, LLMs, authentication, databases, observability, messaging, search, schedulers, secret management) through capability-aware adapters with priority failover, lifecycle state machines, health aggregation, audit logging, retry policies, and plugin manifests.
+
+### 9. `backend/app/deployment/` — Enterprise Deployment, Scaling & Operationalization (v7.8)
+- **Primary Responsibility**: Provides cloud-native deployment orchestration, release management, automated rollbacks, horizontal/vertical scaling, multi-environment management, runtime validation, aggregated platform health, automated backup, and disaster recovery.
 - **Key Modules**:
-  - `manager.py`: `IntegrationManager` central orchestration entry point.
-  - `registry.py`: `IntegrationRegistry` with `find_by_capability()` and `resolve_active_provider()`.
-  - `secrets.py`: `SecretProvider` ABC & `EnvSecretProvider` (with secret rotation).
-  - `health.py`: `IntegrationHealthManager` aggregating `HealthLevel` across all adapters.
-  - `lifecycle.py`: `IntegrationLifecycleManager` state machine (`REGISTERED` ➔ `HEALTHY`).
-  - `retry.py`: `NoRetry`, `LinearBackoff`, `ExponentialBackoff`, `CircuitBreaker`.
-  - `manifest.py`: `PluginManifest` with `api_version`, `runtime_version`, `depends_on`, `conflicts_with`.
-  - `adapters/storage/`: `FilesystemStorageAdapter`, `FilesystemSandboxAdapter` + S3, Azure, GCS.
-  - `adapters/vector/`: `InMemoryVectorAdapter` + Pinecone, Qdrant, FAISS.
-  - `adapters/llm/`: `GeminiLLMAdapter` + OpenAI, Anthropic, Ollama.
-  - `adapters/auth/`: `JWTAuthAdapter` + OAuth2, Auth0, Keycloak.
-  - `adapters/database/`: `PostgresDatabaseAdapter`, `RedisDatabaseAdapter`.
-  - `adapters/observability/`: `PrometheusObservabilityAdapter` + OpenTelemetry, Sentry.
-  - `adapters/messaging/`: `WebhookMessagingAdapter` + Kafka, RabbitMQ.
-  - `adapters/search/`: `ElasticsearchSearchAdapter` + Typesense.
-  - `adapters/scheduler/`: `CronSchedulerAdapter` + APScheduler.
+  - `manager.py`: `DeploymentManager` central orchestrator.
+  - `lifecycle.py`: `DeploymentLifecycleManager` state machine.
+  - `strategy.py`: `BlueGreenDeployment`, `RollingDeployment`, `CanaryDeployment`, `RecreateDeployment`.
+  - `release.py`: `ReleaseManager` (`SemVer`, `ReleaseManifest`, compatibility check).
+  - `rollback.py`: `RollbackManager` (`RollbackSnapshot`, `RollbackPlan`).
+  - `scaling.py`: `HorizontalScaling` (HPA), `VerticalScaling` (VPA), `AutoScalingPolicy`.
+  - `environment.py`: `EnvironmentManager` (Dev, Test, Staging, Prod, DR).
+  - `validator.py`: `DeploymentValidator` (16 layer checks).
+  - `health.py`: `DeploymentHealthManager` (4-level health aggregation).
+  - `backup.py`: `BackupManager` (`BackupPlan`, `BackupSnapshot`).
+  - `recovery.py`: `RecoveryManager` (`RecoveryPlan`, `RecoveryReport`, RPO/RTO tracking).
+
+### 10. `backend/app/observability/` — Platform Observability & Monitoring (v7.8)
+- **Primary Responsibility**: Provides unified metrics, structured logging, distributed tracing, alerting, and dashboard aggregation.
+- **Key Modules**:
+  - `manager.py`: `ObservabilityManager` central orchestrator.
+  - `metrics.py`: `MetricsProvider` & `PrometheusMetricsProvider`.
+  - `logging.py`: `LoggingProvider` & `StructuredLoggingProvider`.
+  - `tracing.py`: `TracingProvider` & `OpenTelemetryTracingProvider`.
+  - `alerts.py`: `AlertProvider` & `EmailAlertProvider`.
+  - `dashboard.py`: `DashboardProvider` & `GrafanaDashboardProvider`.
+
 

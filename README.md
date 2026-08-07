@@ -2,8 +2,8 @@
 
 A production-grade, asynchronous AI-powered messaging chatbot backend designed for the VOLTA urban mobility platform.
 
-[![Release](https://img.shields.io/badge/Release-v7.7-blue.svg)](https://github.com/likith1502/volta-ai-chatbot/releases/tag/v7.7)
-[![Tests](https://img.shields.io/badge/Tests-242%20Passing-success.svg)](backend/tests/)
+[![Release](https://img.shields.io/badge/Release-v7.8-blue.svg)](https://github.com/likith1502/volta-ai-chatbot/releases/tag/v7.8)
+[![Tests](https://img.shields.io/badge/Tests-421%20Passing-success.svg)](backend/tests/)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-v1.0-green.svg)](https://fastapi.tiangolo.com/)
 
@@ -33,6 +33,7 @@ Volta-AI-Chatbot/
 │   ├── core/         # Exception handlers & logging setup
 │   ├── db/           # AsyncEngine, AsyncSession, Base metadata, Mixins
 │   ├── dependencies/ # FastAPI dependency injection utilities
+│   ├── deployment/   # Enterprise Deployment, Scaling & Operationalization (v7.8)
 │   ├── events/       # Workflow Event & Observability Foundation (v6.5)
 │   ├── exceptions/   # Domain & infrastructure exceptions
 │   ├── execution/    # Graph Execution Engine (v6.4)
@@ -42,6 +43,7 @@ Volta-AI-Chatbot/
 │   ├── integrations/ # Enterprise Integration Platform (v7.7)
 │   ├── memory/       # Enterprise Memory Runtime (v7.2)
 │   ├── models/       # SQLAlchemy ORM domain models
+│   ├── observability/# Platform Metrics, Logging, Tracing & Alerting (v7.8)
 │   ├── prompt/       # Prompt Execution Engine (v7.1)
 │   ├── rag/          # Enterprise RAG Engine (v7.6)
 │   ├── repositories/ # Generic & specialized data access repositories
@@ -52,11 +54,11 @@ Volta-AI-Chatbot/
 │   ├── tools/        # Enterprise Tool Runtime (v7.3)
 │   ├── utils/        # Response helpers & utility functions
 │   └── workflow/     # Workflow Node Library (v6.3)
-├── docs/             # Technical architecture & engineering docs (ADRs 001–051)
+├── docs/             # Technical architecture & engineering docs (ADRs 001–053)
 ├── logs/             # Runtime execution log directory
 ├── migrations/       # Alembic versioned schema migrations
 ├── scripts/          # Operation & database seeding scripts
-├── tests/            # Automated pytest test suites (242 passed)
+├── tests/            # Automated pytest test suites (421 passed)
 │   ├── alembic.ini       # Alembic migration configuration
 │   ├── ARCHITECTURE.md   # Master backend architecture blueprint
 │   └── README.md         # Backend developer guide

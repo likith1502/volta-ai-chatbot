@@ -2,8 +2,8 @@
 
 A production-grade, asynchronous AI-powered messaging chatbot backend for the VOLTA urban mobility platform. Built with Python 3.11+, FastAPI, Async PostgreSQL, SQLAlchemy 2.0, Alembic, Google Gemini SDK, and Provider-Agnostic Conversational AI.
 
-[![Release](https://img.shields.io/badge/Release-v7.7-blue.svg)](https://github.com/likith1502/volta-ai-chatbot/releases/tag/v7.7)
-[![Tests](https://img.shields.io/badge/Tests-242%20Passing-success.svg)](tests/)
+[![Release](https://img.shields.io/badge/Release-v7.8-blue.svg)](https://github.com/likith1502/volta-ai-chatbot/releases/tag/v7.8)
+[![Tests](https://img.shields.io/badge/Tests-421%20Passing-success.svg)](tests/)
 
 ---
 

@@ -15,6 +15,7 @@ from app.api.v1.routers.recommendations import router as recommendations_router
 from app.api.v1.routers.runtime import router as runtime_router
 from app.api.v1.routers.tools import router as tools_router
 from app.api.v1.routers.users import router as users_router
+from app.api.v1.routers.deployment import router as deployment_router
 
 api_v1_router = APIRouter()
 
@@ -34,3 +35,4 @@ api_v1_router.include_router(graph_runtime_router)
 api_v1_router.include_router(agents_router)
 api_v1_router.include_router(rag_router)
 api_v1_router.include_router(integrations_router)
+api_v1_router.include_router(deployment_router)

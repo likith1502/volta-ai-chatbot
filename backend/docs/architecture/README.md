@@ -4,10 +4,12 @@ This index lists all official Architecture Decision Records (ADRs) and technical
 
 ---
 
-## Architecture Decision Records & Guidelines (ADRs 001 – 051)
+## Architecture Decision Records & Guidelines (ADRs 001 – 053)
 
 | ADR ID | Title | Status | Date |
 | :--- | :--- | :---: | :---: |
+| **[ADR 052](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/052-enterprise-deployment.md)** | Enterprise Deployment Package Architecture (v7.8) | Accepted | 2026-08-07 |
+| **[ADR 053](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/053-operational-guidelines.md)** | Enterprise Operational Guidelines & Runbooks | Accepted | 2026-08-07 |
 | **[ADR 050](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/050-enterprise-production-integrations.md)** | Enterprise Integration Platform Architecture (v7.7) | Accepted | 2026-08-07 |
 | **[ADR 051](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/051-production-integration-guidelines.md)** | Production Integration Guidelines & Extension Standards | Accepted | 2026-08-07 |
 | **[ADR 048](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/048-enterprise-rag-engine.md)** | Enterprise RAG Engine Architecture (v7.6) | Accepted | 2026-08-07 |
