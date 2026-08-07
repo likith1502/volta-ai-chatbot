@@ -19,8 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Reserved Adapter Architecture**: Created `backend/app/tools/adapters/` directory for future production integrations (Phase 7.7).
 - **Formal Tool Events**: `ToolRegistered`, `ToolValidated`, `ToolStarted`, `ToolCompleted`, `ToolFailed`, `ToolTimedOut`, `ToolSkipped`, `ToolCancelled` published directly to `WorkflowEventBus` (v6.5).
 - **REST API Presentation Layer**: Router `/api/v1/tools` with endpoints `POST /execute`, `GET /`, `GET /{tool_name}`, `GET /health`, `GET /statistics`, `POST /validate`, `POST /pipeline`, `POST /chain`.
-- **Developer Console — Tool Studio**: Interactive UI panel (`testing-ui/index.html`) mounted at `/console` featuring available tool cards, JSON argument editor, pipeline trace visualizer, and schema viewer.
-- **Architecture Decision Records**: `ADR 042` (Enterprise Tool Runtime Architecture) and `ADR 043` (Tool Engineering Guidelines).
+- **Developer Console — Tool Studio & Overview**: Interactive UI panel (`testing-ui/index.html`) mounted at `/console` featuring Runtime Overview Dashboard (Runtime ✔, Prompt ✔, Memory ✔, Tools ✔, Provider ✔, Health ✔), available tool cards, JSON argument editor, pipeline trace visualizer, and schema viewer.
+- **Architecture Decision Records & Graduation Suite**: `ADR 042` (Enterprise Tool Runtime Architecture), `ADR 043` (Tool Engineering Guidelines), `RUNTIME_CERTIFICATE_v7.3.md` (Runtime Graduation Certificate), `RUNTIME_DEPENDENCY_MATRIX.md`, and `RUNTIME_PACKAGE_INDEX.md`.
 
 ---
 

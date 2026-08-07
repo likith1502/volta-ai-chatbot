@@ -1,13 +1,46 @@
 # Enterprise Messaging Runtime Architecture Blueprint (Phase 7)
 
 > **VOLTA AI Chatbot Platform** | **Runtime Engine Architecture Blueprint**
-> **Current Version**: `v7.2.0` | **Status**: Active Runtime Architecture Reference
+> **Current Version**: `v7.3.0` | **Status**: Active Runtime Architecture Reference
 
 ---
 
 ## Executive Overview
 
 The **Enterprise Messaging Runtime** is a modular, provider-independent, framework-independent conversational AI runtime engine built specifically for multi-turn mobility messaging interactions. It operates directly above the foundation infrastructure layers (v1.0 – v6.8.1) and enforces clean architectural separation between LLM execution, prompt engineering, memory orchestration, tool calling, graph state machines, multi-agent networks, and RAG retrieval.
+
+---
+
+## End-to-End Execution Sequence Diagram
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant API as REST Presentation Layer (/api/v1/tools)
+    participant Tool as Enterprise Tool Runtime (ToolManager)
+    participant Mem as Enterprise Memory Runtime (MemoryManager)
+    participant Prompt as Prompt Execution Engine (PromptManager)
+    participant Runtime as LLM Runtime Engine (RuntimeManager)
+    participant Provider as AI Provider (Gemini / Mock)
+
+    User->>API: POST /api/v1/tools/execute or /api/v1/chat
+    API->>Tool: execute_tool(payload) / execute_pipeline(payload)
+    Tool->>Tool: ToolValidator.validate() & Permission Check
+    Tool->>Mem: assemble_context(strategy="hybrid")
+    Mem->>Mem: Lifecycle check & Scorer calculation
+    Mem-->>Tool: MemoryContext payload
+    Tool->>Prompt: render(profile, variables={memory_context, tool_schema})
+    Prompt->>Prompt: PromptCompiler & Pipeline Middlewares
+    Prompt-->>Tool: CompiledPrompt payload
+    Tool->>Runtime: execute(request=CompiledPrompt)
+    Runtime->>Provider: generate_content() / mock_dispatch()
+    Provider-->>Runtime: Model Output & Token Telemetry
+    Runtime-->>Tool: ToolResult / Output Response
+    Tool->>Tool: Record Analytics & Publish WorkflowEvent (v6.5)
+    Tool-->>API: ToolResponse JSON payload
+    API-->>User: 200 OK Response
+```
 
 ---
 
@@ -113,9 +146,9 @@ graph LR
 ---
 
 ### 4. Tool Runtime Layer (Phase 7.3 — `backend/app/tools/`)
-- **Status**: ⏳ **NEXT TARGET (`v7.3.0`)**
-- **Responsibilities**: Function call registration, parameter validation, tool execution dispatch, security sandboxing, and execution result formatting for LLM feedback loops.
-- **Planned Components**: `ToolManager`, `ToolRegistry`, `BaseTool`, `ToolDefinition`, `ToolResult`, `ToolExecutionSandbox`.
+- **Status**: ✅ **COMPLETED (`v7.3.0`)**
+- **Responsibilities**: Tool registration, JSON Schema discovery, permission authorization, policy enforcement, 6-step pipeline execution, sequential chaining, built-in reference tools, and telemetry dispatch.
+- **Core Components**: `ToolManager`, `ToolRegistry`, `BaseTool`, `ToolSchema`, `ToolManifest`, `ToolPipeline`, `ToolChain`, `ToolDiscoveryService`.
 
 ---
 
