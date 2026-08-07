@@ -5,7 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.models import AIToolResult
 from app.ai.tools.base import AITool
-from app.services.recommendation import RecommendationService
 
 
 class RecommendationTool(AITool):
@@ -15,6 +14,8 @@ class RecommendationTool(AITool):
     description: str = "Generates and persists ride/route recommendations for active conversations."
 
     def __init__(self, session: AsyncSession) -> None:
+        from app.services.recommendation import RecommendationService
+
         self.session = session
         self.recommendation_service = RecommendationService(session)
 

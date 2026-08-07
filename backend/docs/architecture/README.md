@@ -1,10 +1,10 @@
 # VOLTA AI Backend — Master Architecture Decision Record (ADR) Index
 
-This index lists all official Architecture Decision Records (ADRs) and technical standards for the VOLTA AI Chatbot backend platform.
+This index lists all official Architecture Decision Records (ADRs) and technical engineering guidelines for the VOLTA AI Chatbot backend platform.
 
 ---
 
-## Architecture Decision Records (ADRs 001 – 020)
+## Architecture Decision Records & Guidelines (ADRs 001 – 035)
 
 | ADR ID | Title | Status | Date |
 | :--- | :--- | :---: | :---: |
@@ -28,3 +28,18 @@ This index lists all official Architecture Decision Records (ADRs) and technical
 | **[ADR 018](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/018-ai-foundation-architecture.md)** | Enterprise AI Provider Engine & Tool Execution Framework | Accepted | 2026-08-03 |
 | **[ADR 019](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/019-ai-engine-request-flow.md)** | AI Engine End-to-End Request Flow & Execution | Accepted | 2026-08-04 |
 | **[ADR 020](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/020-phase-6-readiness-review.md)** | Phase 6 Readiness Review & LangGraph Integration Strategy | Accepted | 2026-08-04 |
+| **[ADR 021](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/021-conversation-state-architecture.md)** | Conversation State Foundation Architecture (v6.1) | Accepted | 2026-08-04 |
+| **[ADR 022](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/022-graph-orchestration-foundation.md)** | Graph Orchestration Foundation Architecture (v6.2) | Accepted | 2026-08-04 |
+| **[ADR 023](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/023-graph-foundation-lock.md)** | Graph Orchestration Foundation Lock Record | Accepted | 2026-08-04 |
+| **[ADR 024](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/024-workflow-node-library.md)** | Workflow Node Library Architecture (v6.3) | Accepted | 2026-08-05 |
+| **[ADR 025](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/025-workflow-node-guidelines.md)** | Workflow Node Engineering Guidelines | Accepted | 2026-08-05 |
+| **[ADR 026](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/026-graph-execution-engine.md)** | Graph Execution Engine Architecture (v6.4) | Accepted | 2026-08-05 |
+| **[ADR 027](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/027-execution-engine-guidelines.md)** | Graph Execution Engine Guidelines | Accepted | 2026-08-05 |
+| **[ADR 028](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/028-workflow-event-foundation.md)** | Workflow Event & Observability Foundation Architecture (v6.5) | Accepted | 2026-08-05 |
+| **[ADR 029](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/029-workflow-event-guidelines.md)** | Workflow Event Engineering Guidelines | Accepted | 2026-08-05 |
+| **[ADR 030](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/030-checkpoint-replay-foundation.md)** | Checkpoint & Replay Foundation Architecture (v6.6) | Accepted | 2026-08-05 |
+| **[ADR 031](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/031-checkpoint-guidelines.md)** | Checkpoint & Replay Engineering Guidelines | Accepted | 2026-08-05 |
+| **[ADR 032](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/032-streaming-foundation.md)** | Streaming & Real-Time Foundation Architecture (v6.7) | Accepted | 2026-08-05 |
+| **[ADR 033](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/033-streaming-guidelines.md)** | Streaming & Real-Time Engineering Guidelines | Accepted | 2026-08-05 |
+| **[ADR 034](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/034-human-in-the-loop-foundation.md)** | Human-in-the-Loop (HITL) Foundation Architecture (v6.8) | Accepted | 2026-08-05 |
+| **[ADR 035](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/035-human-loop-guidelines.md)** | Human-in-the-Loop (HITL) Engineering Guidelines | Accepted | 2026-08-05 |

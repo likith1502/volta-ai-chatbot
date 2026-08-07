@@ -56,10 +56,12 @@ backend/
 │   ├── exceptions/   # Application & AI exceptions
 │   ├── execution/    # Graph Execution Engine (v6.4)
 │   ├── graph/        # Graph Orchestration Foundation (v6.2)
+│   ├── hitl/         # Human-in-the-Loop & Governance Foundation (v6.8)
 │   ├── models/       # SQLAlchemy ORM models
 │   ├── repositories/ # Data access repository layer
 │   ├── schemas/      # Pydantic DTO validation schemas
 │   ├── services/     # Domain services & ChatService orchestrator
+│   ├── streaming/    # Streaming & Real-Time Foundation (v6.7)
 │   ├── utils/        # Response helpers & utility functions
 │   ├── workflow/     # Workflow Node Library (v6.3)
 │   └── main.py       # FastAPI application entry point
@@ -94,7 +96,7 @@ The application will be accessible at:
 
 ## Testing Commands
 
-Run the complete automated test suite (43 passed in ~2.6s):
+Run the complete automated test suite (124 passed in ~3.2s):
 ```bash
 pytest
 ```
@@ -110,4 +112,14 @@ pytest
 - **Release v2.6**: Project Structure Standardization *(Completed & Locked)*
 - **Release v3.0**: Service Layer *(Completed & Locked)*
 - **Release v4.0**: REST API Layer *(Completed & Locked)*
-- **Release v5.0**: AI Foundation & Conversation Intelligence *(Completed)*
+- **Release v5.0**: AI Foundation & Conversation Intelligence *(Completed & Locked)*
+- **Release v6.1**: Conversation State Foundation *(Completed & Locked)*
+- **Release v6.2**: Graph Orchestration Foundation *(Completed & Locked)*
+- **Release v6.3**: Workflow Node Library *(Completed & Locked)*
+- **Release v6.4**: Graph Execution Engine *(Completed & Locked)*
+- **Release v6.5**: Workflow Event & Observability Foundation *(Completed & Locked)*
+- **Release v6.6**: Checkpoint & Replay Foundation *(Completed & Locked)*
+- **Release v6.7**: Streaming & Real-Time Foundation *(Completed & Locked)*
+- **Release v6.8**: Human-in-the-Loop Foundation *(Completed & Locked)*
+- **Release v6.8.1**: Documentation & Repository Synchronization *(Completed & Locked)*
+

@@ -70,6 +70,15 @@ Strongly-typed, immutable-friendly, provider-agnostic conversation state archite
 
 ---
 
+## 9. Graph Orchestration Foundation (Chapter 6.2)
+- **Release Version**: `v6.2`
+- **Status**: 🔒 **LOCKED**
+- **Completion Date**: 2026-08-04
+
+Provider-independent graph orchestration engine (`app/graph/`), state graph builder (`StateGraph`), node contracts (`BaseNode`), conditional edge evaluation (`ConditionalEdge`), depth limit protection, cycle detection algorithm, and graph template registry (`GraphTemplateRegistry`).
+
+---
+
 ## 10. Workflow Node Library (Chapter 6.3)
 - **Release Version**: `v6.3`
 - **Status**: 🔒 **LOCKED**
@@ -115,6 +124,15 @@ Provider-independent real-time streaming framework (`app/streaming/`), immutable
 
 ---
 
+## 15. Human-in-the-Loop Foundation (Chapter 6.8)
+- **Release Version**: `v6.8`
+- **Status**: 🔒 **LOCKED**
+- **Completion Date**: 2026-08-05
+
+Provider-independent human-in-the-loop approval and governance framework (`app/hitl/`), approval request model (`HITLApprovalRequest`), lifecycle status tracking (`PENDING`, `APPROVED`, `REJECTED`, `TIMEOUT`, `CANCELLED`), resume contracts (`HITLResumePayload`, `HITLResumeResult`), governance engine (`HITLGovernanceEngine`), interrupt manager (`HITLInterruptManager`), and registry (`HITLInterruptRegistry`).
+
+---
+
 ## Master Foundation Lock Record
 
 - 🔒 Infrastructure Foundation v1.0 — LOCKED
@@ -131,5 +149,6 @@ Provider-independent real-time streaming framework (`app/streaming/`), immutable
 - 🔒 Workflow Event & Observability Foundation v6.5 — LOCKED
 - 🔒 Checkpoint & Replay Foundation v6.6 — LOCKED
 - 🔒 Streaming & Real-Time Foundation v6.7 — LOCKED
+- 🔒 Human-in-the-Loop Foundation v6.8 — LOCKED
 
 > **Project Rule**: No further architectural or functional changes to completed foundation tiers should be made without an official Architecture Decision Record (ADR).

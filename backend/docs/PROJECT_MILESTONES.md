@@ -93,17 +93,26 @@ To maintain clear project tracking:
 - **Includes Chapters**:
   - **Chapter 6.7**: Streaming & Real-Time Foundation (`backend/app/streaming/`). Provider-independent streaming framework (`StreamMessage`, `StreamEnvelope`, `StreamChannel`, `StreamSubscription`, `StreamDispatcher`, `StreamRegistry`, `StreamManager`, `StreamAdapter`, `StreamSerializer`, `StreamMetrics`, `StreamHistory`).
 
+### Release v6.8 — Human-in-the-Loop Foundation
+- **Status**: **COMPLETED, VERIFIED, LOCKED**
+- **Version**: `v6.8`
+- **Completion Date**: 2026-08-05
+- **Includes Chapters**:
+  - **Chapter 6.8**: Human-in-the-Loop & Approval Interrupts (`backend/app/hitl/`). Provider-independent approval lifecycle (`HITLApprovalRequest`), resume contracts (`HITLResumePayload`), governance engine (`HITLGovernanceEngine`), interrupt manager (`HITLInterruptManager`), and registry (`HITLInterruptRegistry`).
+
+### Release v6.8.1 — Documentation & Repository Synchronization
+- **Status**: **COMPLETED, VERIFIED, LOCKED**
+- **Version**: `v6.8.1`
+- **Completion Date**: 2026-08-07
+- **Includes Chapters**:
+  - **Pre-v7 Audit Cleanup**: Updated Root & Backend READMEs, synchronized ADR Index (001–035), fixed Foundation Status numbering, resolved circular import in AI tools package, purged stray workspace artifacts, and verified 124 passing automated tests.
+
 ---
 
 ## Future Release Roadmap
 
-### Release v6.8 — Human-in-the-Loop & Approval Interrupts
-- **Status**: **NEXT PLANNED MILESTONE**
-- **Target Chapters**:
-  - **Chapter 6.8**: Human Approval Interrupts, Pause/Resume Operations, & Governance Operations
-
 ### Release v7.0 — Voice Agent & Real-Time Audio Engine
-- **Status**: Planned
+- **Status**: Planned (Approved for Execution)
 - **Target Chapters**:
   - **Chapter 7.1**: Low-Latency WebSocket Audio Streaming & Voice Agent Core
 
