@@ -158,9 +158,9 @@ graph LR
 
 ---
 
-### 6. Multi-Agent Runtime Layer (Phase 7.5 — `backend/app/agents/`)
+### 6. Enterprise Multi-Agent Orchestration Runtime Layer (Phase 7.5 — `backend/app/agents/`)
 - **Status**: 📅 **PLANNED (`v7.5.0`)**
-- **Responsibilities**: Multi-agent interaction networks, agent supervisors, critic/reflection feedback loops, domain delegation (Planner, Booking Agent, Support Agent).
+- **Responsibilities**: Agent registry, agent runtime execution, agent scheduler, agent communication, agent memory, agent planning, agent delegation, coordinator & supervisor agents.
 
 ---
 

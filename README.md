@@ -160,7 +160,7 @@ Key Documents:
   - ✅ `7.2` Memory Runtime *(v7.2.0 Completed)*
   - ✅ `7.3` Tool Runtime *(v7.3.0 Completed)*
   - ✅ `7.4` Graph Runtime Integration *(v7.4.0 Completed)*
-  - ⏳ `7.5` Multi-Agent Runtime *(Next Sub-Phase)*
+  - ⏳ `7.5` Enterprise Multi-Agent Orchestration Runtime *(Next Sub-Phase)*
   - `7.6` RAG Engine
   - `7.7` Production Integrations
   - `7.8` Deployment & Scaling

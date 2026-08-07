@@ -53,6 +53,7 @@ All application configuration is centrally managed via Pydantic `Settings` (`app
 - **Memory Engine**: MemoryManager, MemoryLifecycleManager, ContextAssemblyStrategy, MemoryScorer
 - **Tool Engine**: ToolManager, BaseTool ABC, ToolSchema, ToolManifest, ToolPipeline, ToolChain, ToolDiscoveryService
 - **Graph Engine**: GraphRuntimeManager, GraphPlanner, GraphScheduler, GraphExecutionPlan, GraphCursor, GraphRuntimePipeline
+- **Multi-Agent Engine**: Multi-Agent Orchestration (Phase 7.5 Target)
 - **Settings**: Pydantic BaseSettings (`pydantic-settings`)
 - **Testing**: pytest & `httpx` (`TestClient`) — **167 Tests Passing**
 
