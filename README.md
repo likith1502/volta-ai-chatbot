@@ -3,7 +3,7 @@
 A production-grade, asynchronous AI-powered messaging chatbot backend designed for the VOLTA urban mobility platform.
 
 [![Release](https://img.shields.io/badge/Release-v7.5-blue.svg)](https://github.com/likith1502/volta-ai-chatbot/releases/tag/v7.5)
-[![Tests](https://img.shields.io/badge/Tests-175%20Passing-success.svg)](backend/tests/)
+[![Tests](https://img.shields.io/badge/Tests-176%20Passing-success.svg)](backend/tests/)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-v1.0-green.svg)](https://fastapi.tiangolo.com/)
 

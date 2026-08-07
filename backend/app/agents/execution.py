@@ -13,6 +13,7 @@ from app.events.event_bus import WorkflowEventBus
 from app.memory.manager import MemoryManager
 from app.prompt.manager import PromptManager
 from app.runtime.manager import RuntimeManager
+from app.tools.contracts import ToolExecutePayload
 from app.tools.manager import ToolManager
 
 logger = logging.getLogger("app.agents.execution")
@@ -44,6 +45,9 @@ class AgentExecution:
             raise AgentBudgetExhaustedError(f"Agent '{agent.name}' budget exhausted.")
 
         # 2. Lifecycle transition
+        if agent.instance.lifecycle.current_state == AgentLifecycleState.CREATED:
+            agent.transition_lifecycle(AgentLifecycleState.REGISTERED)
+            agent.transition_lifecycle(AgentLifecycleState.READY)
         agent.transition_lifecycle(AgentLifecycleState.RUNNING)
         agent.set_status(AgentStatus.BUSY)
 
@@ -64,7 +68,7 @@ class AgentExecution:
             tool_name = task.inputs["tool_name"]
             tool_args = task.inputs.get("tool_args", {})
             try:
-                res = await self.tool_manager.execute_tool(tool_name, tool_args)
+                res = await self.tool_manager.execute_tool(ToolExecutePayload(tool_name=tool_name, arguments=tool_args))
                 tool_output = res.model_dump()
             except Exception as exc:
                 logger.warning(f"Tool execution failed: {exc}")

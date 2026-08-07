@@ -23,6 +23,7 @@ from app.agents.factory import AgentFactory
 from app.agents.health import AgentHealthManager, AgentHealthStatus
 from app.agents.identity import AgentIdentity
 from app.agents.message import AgentMessage
+from app.agents.permissions import AgentPermission, AgentPermissionSet
 from app.agents.persona import AgentPersona
 from app.agents.registry import AgentRegistry
 from app.agents.role import AgentRole
@@ -109,6 +110,13 @@ class AgentRuntimeManager:
         persona = AgentPersona(communication_style=payload.communication_style, tone=payload.tone)
         role = AgentRole(payload.role)
         definition = AgentDefinition(identity=identity, role=role, persona=persona)
+        if role == AgentRole.SUPERVISOR:
+            definition.policy.permissions.grant(AgentPermission.CAN_DELEGATE)
+            definition.policy.permissions.grant(AgentPermission.CAN_SUPERVISE)
+            definition.policy.permissions.grant(AgentPermission.CAN_APPROVE)
+        else:
+            definition.policy.permissions.grant(AgentPermission.CAN_EXECUTE_TOOLS)
+
         agent = Agent(definition=definition)
 
         self.registry.register_agent(agent)

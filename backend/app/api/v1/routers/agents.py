@@ -26,7 +26,7 @@ async def register_agent(payload: AgentRegisterPayload) -> dict[str, Any]:
     try:
         agent = await _agent_runtime_manager.register_agent(payload)
         return success_response(
-            data={"agent_id": agent.agent_id, "name": agent.name, "role": agent.role},
+            data={"agent_id": agent.agent_id, "name": agent.name, "role": str(agent.role)},
             message=f"Agent '{agent.name}' registered successfully.",
         )
     except Exception as exc:
@@ -113,7 +113,7 @@ async def list_agents() -> dict[str, Any]:
     """Returns list of all registered agents."""
     agents = await _agent_runtime_manager.list_agents()
     return success_response(
-        data=[{"agent_id": a.agent_id, "name": a.name, "role": a.role, "status": a.status} for a in agents],
+        data=[{"agent_id": a.agent_id, "name": a.name, "role": str(a.role), "status": str(a.status)} for a in agents],
         message="Registered agents retrieved.",
     )
 
@@ -174,8 +174,8 @@ async def get_agent_by_id(agent_id: str) -> dict[str, Any]:
         data={
             "agent_id": agent.agent_id,
             "name": agent.name,
-            "role": agent.role,
-            "status": agent.status,
+            "role": str(agent.role),
+            "status": str(agent.status),
             "definition": agent.definition.model_dump(),
         },
         message=f"Agent '{agent_id}' retrieved.",
