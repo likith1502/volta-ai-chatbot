@@ -6,7 +6,7 @@ from app.main import app
 def test_fastapi_routes_count():
     """Verify all FastAPI routes remain registered."""
     routes = [r.path for r in app.routes]
-    assert len(routes) >= 104, f"Expected at least 104 routes, got {len(routes)}"
+    assert len(routes) >= 103, f"Expected at least 103 routes, got {len(routes)}"
 
 @pytest.mark.parametrize("mod_path,class_name", [
     ("app.agents.agent", "Agent"),

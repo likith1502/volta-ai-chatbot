@@ -41,20 +41,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-import os
-from fastapi.staticfiles import StaticFiles
-
 # Register Exception Handlers
 register_exception_handlers(app)
 
 # Include API Routers
 app.include_router(api_v1_router, prefix=settings.API_V1_PREFIX)
-
-# Mount Developer Testing Console UI if testing-ui directory exists
-testing_ui_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "testing-ui"))
-if os.path.exists(testing_ui_dir):
-    app.mount("/console", StaticFiles(directory=testing_ui_dir, html=True), name="console")
-
 
 # Root Endpoint
 @app.get("/", summary="Root Endpoint", tags=["Root"])

@@ -75,19 +75,6 @@ services:
       - volta-network
     restart: unless-stopped
 
-  # -----------------------------------------------------------------------
-  # Testing UI Developer Console
-  # -----------------------------------------------------------------------
-  testing-ui:
-    image: nginx:alpine
-    container_name: volta-testing-ui
-    ports:
-      - "3000:80"
-    volumes:
-      - ./testing-ui:/usr/share/nginx/html:ro
-    networks:
-      - volta-network
-    restart: unless-stopped
 
 networks:
   volta-network:

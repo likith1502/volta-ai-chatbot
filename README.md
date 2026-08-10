@@ -63,8 +63,8 @@ Volta-AI-Chatbot/
 │   ├── ARCHITECTURE.md   # Master backend architecture blueprint
 │   └── README.md         # Backend developer guide
 ├── docs/                 # General project documentation hub
-├── infrastructure/       # Deployment manifests & container configs
-└── testing-ui/           # Developer Testing Console, Prompt Studio, Memory Studio, Tool Studio, Graph Studio & Agent Studio
+├── frontend/             # Enterprise Admin Console (React 18, Vite, TypeScript, Tailwind CSS)
+└── infrastructure/       # Deployment manifests & container configs
 ```
 
 ---
@@ -116,30 +116,18 @@ All technical documentation, Architecture Decision Records (ADRs 001–047), dat
 👉 [backend/docs/](backend/docs/)
 
 Key Documents:
-- [Master Backend Architecture](backend/ARCHITECTURE.md)
-- [Master Runtime Architecture Blueprint](backend/docs/RUNTIME_ARCHITECTURE.md)
-- [ADR Index (ADRs 001 – 047)](backend/docs/architecture/README.md)
-- [Foundation Status & Lock Record](backend/docs/FOUNDATION_STATUS.md)
-- [Project Milestones & Release History](backend/docs/PROJECT_MILESTONES.md)
-- [Final Enterprise Runtime Graduation Certificate](backend/docs/ENTERPRISE_RUNTIME_GRADUATION.md)
-- [ADR 046: Enterprise Multi-Agent Orchestration Runtime Architecture](backend/docs/architecture/046-enterprise-multi-agent-runtime.md)
-- [ADR 047: Agent Engineering Guidelines](backend/docs/architecture/047-agent-engineering-guidelines.md)
-
 ---
 
-## Technology Stack
+## Key Subsystems & Technology Stack
 
-- **Backend**: Python 3.11+, FastAPI (ASGI), Uvicorn
-- **Database**: PostgreSQL 15+, Async SQLAlchemy 2.0 (`asyncpg` driver)
-- **Migrations**: Alembic
 - **Runtime Engine**: Official `google-genai` SDK (`gemini-2.5-flash`, `gemini-2.5-pro`) & Provider-Independent Runtime Layer
 - **Prompt Engine**: PromptManager, PromptProfiles, PromptCompiler, PromptLinter, PromptPipeline
 - **Memory Engine**: MemoryManager, MemoryLifecycleManager, ContextAssemblyStrategy, MemoryScorer
 - **Tool Engine**: ToolManager, BaseTool ABC, ToolSchema, ToolManifest, ToolPipeline, ToolChain, ToolDiscoveryService
 - **Graph Engine**: GraphRuntimeManager, GraphPlanner, GraphScheduler, GraphExecutionPlan, GraphCursor, GraphRuntimePipeline
 - **Multi-Agent Engine**: AgentRuntimeManager, AgentDefinition, AgentInstance, AgentPersona, SupervisorAgent, PlannerAgent, TeamManager
-- **Testing**: pytest (175 passed in strict asyncio mode), `httpx`
-- **Developer UI**: Developer Console (`testing-ui/index.html`) featuring Runtime Console, Prompt Studio, Memory Studio, Tool Studio, Graph Studio & Agent Studio
+- **Testing**: pytest (1,648 passed in strict asyncio mode), Vitest (14 passed)
+- **Enterprise Admin Console**: Production Admin Console (`frontend/`) featuring 12 Studio pages (Prompt, Memory, Tool, Graph, Agent, Knowledge, Integration, Operations)
 
 ---
 

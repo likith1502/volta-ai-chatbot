@@ -120,7 +120,7 @@ python -m uvicorn app.main:app --reload
 
 The application will be accessible at:
 - **Root**: http://127.0.0.1:8000/
-- **Developer Console, Prompt Studio, Memory Studio, Tool Studio, Graph Studio & Agent Studio**: http://127.0.0.1:8000/console
+- **Enterprise Admin Console**: Run `npm run dev` in `frontend/` (accessible at http://127.0.0.1:5173/)
 - **V1 Health Check**: http://127.0.0.1:8000/api/v1/health
 - **V1 Chat Endpoint**: http://127.0.0.1:8000/api/v1/chat
 - **V1 Runtime Endpoint**: http://127.0.0.1:8000/api/v1/runtime/chat

@@ -22,7 +22,7 @@ Enterprise-grade, production-ready administration console for the VOLTA AI Platf
 4. **Recursive Secret Redaction Engine**: Automatic masking (`sk-***`) for sensitive fields (`password`, `secret`, `api_key`, `token`, `connection_string`, etc.) inside tables and the `JsonInspector` component.
 5. **API Failure Isolation**: Subsystems fail independently using React `ErrorBoundary` and TanStack Query error state without breaking the rest of the application.
 6. **Theme Switcher**: Dark mode, light mode, and system preference persistence.
-7. **Legacy Migration Safety**: The legacy developer testing console `testing-ui/` remains active and mounted at `/console`.
+7. **Single Administration Interface**: The legacy HTML testing UI (`testing-ui/`) is fully retired. The React Admin Console under `frontend/` is the sole platform administration console.
 
 ---
 
