@@ -1,13 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional
 from app.integrations.capabilities import IntegrationCapability
-from app.integrations.health_level import HealthLevel
-from app.integrations.provider import IntegrationHealthReport, IntegrationProvider
-from app.integrations.status import IntegrationStatus
+from app.integrations.provider import IntegrationProvider
 
 
 class MessagingAdapter(IntegrationProvider, ABC):
-    """Abstract interface for messaging queue and webhook event dispatchers."""
+    """Abstract interface for event streaming, message queue, and webhook brokers."""
 
     def __init__(self, provider_id: str, name: str, priority: int = 10) -> None:
         super().__init__(provider_id=provider_id, name=name, category=IntegrationCapability.MESSAGING, priority=priority)
@@ -17,53 +15,22 @@ class MessagingAdapter(IntegrationProvider, ABC):
         pass
 
 
-class WebhookMessagingAdapter(MessagingAdapter):
-    """Reference messaging adapter dispatching HTTP Webhooks."""
-
-    def __init__(self) -> None:
-        super().__init__(provider_id="messaging.webhook", name="HTTP Webhook Messaging Adapter", priority=10)
-        self._status = IntegrationStatus.CONFIGURED
-
-    async def initialize(self, context: Optional[Any] = None) -> None:
-        self._status = IntegrationStatus.READY
-        await self.connect()
-
-    async def connect(self) -> bool:
-        self._status = IntegrationStatus.CONNECTED
-        return True
-
-    async def disconnect(self) -> bool:
-        self._status = IntegrationStatus.DISCONNECTED
-        return True
-
-    async def publish_message(self, topic_or_url: str, payload: dict[str, Any]) -> bool:
-        return True
-
-    async def check_health(self) -> IntegrationHealthReport:
-        return IntegrationHealthReport(
-            provider_id=self.provider_id,
-            provider_name=self.name,
-            provider_type="Webhook",
-            is_healthy=True,
-            health_level=HealthLevel.GREEN,
-            status=self.status,
-            latency_ms=3.1,
-        )
+def __getattr__(name: str) -> Any:
+    if name == "WebhookMessagingAdapter":
+        from app.integrations.adapters.messaging.webhook_adapter import WebhookMessagingAdapter
+        return WebhookMessagingAdapter
+    if name == "KafkaMessagingAdapter":
+        from app.integrations.adapters.messaging.kafka_adapter import KafkaMessagingAdapter
+        return KafkaMessagingAdapter
+    if name == "RabbitMQMessagingAdapter":
+        from app.integrations.adapters.messaging.rabbitmq_adapter import RabbitMQMessagingAdapter
+        return RabbitMQMessagingAdapter
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
-class KafkaMessagingAdapter(WebhookMessagingAdapter):
-    """Extension placeholder for Apache Kafka Event Bus Adapter."""
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._provider_id = "messaging.kafka"
-        self._name = "Apache Kafka Event Bus Adapter"
-
-
-class RabbitMQMessagingAdapter(WebhookMessagingAdapter):
-    """Extension placeholder for RabbitMQ Message Queue Adapter."""
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._provider_id = "messaging.rabbitmq"
-        self._name = "RabbitMQ Message Queue Adapter"
+__all__ = [
+    "MessagingAdapter",
+    "WebhookMessagingAdapter",
+    "KafkaMessagingAdapter",
+    "RabbitMQMessagingAdapter",
+]

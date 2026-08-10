@@ -63,31 +63,27 @@ class InMemoryVectorAdapter(VectorDatabaseAdapter):
         )
 
 
-class PineconeVectorAdapter(InMemoryVectorAdapter):
-    """Extension placeholder for Pinecone Vector DB Adapter."""
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._provider_id = "vector.pinecone"
-        self._name = "Pinecone Vector DB Adapter"
-        self._priority = 100
-
-
-class QdrantVectorAdapter(InMemoryVectorAdapter):
-    """Extension placeholder for Qdrant Vector DB Adapter."""
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._provider_id = "vector.qdrant"
-        self._name = "Qdrant Vector DB Adapter"
-        self._priority = 90
+def __getattr__(name: str) -> Any:
+    if name == "QdrantVectorAdapter":
+        from app.integrations.adapters.vector.qdrant_adapter import QdrantVectorAdapter
+        return QdrantVectorAdapter
+    if name == "PineconeVectorAdapter":
+        from app.integrations.adapters.vector.pinecone_adapter import PineconeVectorAdapter
+        return PineconeVectorAdapter
+    if name == "FAISSVectorAdapter":
+        from app.integrations.adapters.vector.faiss_adapter import FAISSVectorAdapter
+        return FAISSVectorAdapter
+    if name == "ChromaVectorAdapter":
+        from app.integrations.adapters.vector.chroma_adapter import ChromaVectorAdapter
+        return ChromaVectorAdapter
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
-class FAISSVectorAdapter(InMemoryVectorAdapter):
-    """Extension placeholder for FAISS Vector DB Adapter."""
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._provider_id = "vector.faiss"
-        self._name = "FAISS Vector DB Adapter"
-        self._priority = 80
+__all__ = [
+    "VectorDatabaseAdapter",
+    "InMemoryVectorAdapter",
+    "QdrantVectorAdapter",
+    "PineconeVectorAdapter",
+    "FAISSVectorAdapter",
+    "ChromaVectorAdapter",
+]

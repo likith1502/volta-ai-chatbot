@@ -51,19 +51,23 @@ class JWTAuthAdapter(AuthAdapter):
         )
 
 
-class OAuth2AuthAdapter(JWTAuthAdapter):
-    """Extension placeholder for OAuth2 Authentication Adapter."""
+def __getattr__(name: str) -> Any:
+    if name == "OAuth2AuthAdapter":
+        from app.integrations.adapters.auth.oauth2_adapter import OAuth2AuthAdapter
+        return OAuth2AuthAdapter
+    if name == "Auth0Adapter":
+        from app.integrations.adapters.auth.auth0_adapter import Auth0Adapter
+        return Auth0Adapter
+    if name == "KeycloakAdapter":
+        from app.integrations.adapters.auth.keycloak_adapter import KeycloakAdapter
+        return KeycloakAdapter
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
-    def __init__(self) -> None:
-        super().__init__()
-        self._provider_id = "auth.oauth2"
-        self._name = "OAuth2 Authentication Adapter"
 
-
-class Auth0Adapter(JWTAuthAdapter):
-    """Extension placeholder for Auth0 Provider Adapter."""
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._provider_id = "auth.auth0"
-        self._name = "Auth0 Authentication Adapter"
+__all__ = [
+    "AuthAdapter",
+    "JWTAuthAdapter",
+    "OAuth2AuthAdapter",
+    "Auth0Adapter",
+    "KeycloakAdapter",
+]

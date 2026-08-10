@@ -1,9 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any
 from app.integrations.capabilities import IntegrationCapability
-from app.integrations.health_level import HealthLevel
-from app.integrations.provider import IntegrationHealthReport, IntegrationProvider
-from app.integrations.status import IntegrationStatus
+from app.integrations.provider import IntegrationProvider
 
 
 class DatabaseAdapter(IntegrationProvider, ABC):
@@ -17,45 +15,18 @@ class DatabaseAdapter(IntegrationProvider, ABC):
         pass
 
 
-class PostgresDatabaseAdapter(DatabaseAdapter):
-    """Reference database adapter wrapping Async PostgreSQL connection pool."""
-
-    def __init__(self) -> None:
-        super().__init__(provider_id="database.postgres", name="PostgreSQL Async Database Adapter", priority=10)
-        self._status = IntegrationStatus.CONFIGURED
-
-    async def initialize(self, context: Optional[Any] = None) -> None:
-        self._status = IntegrationStatus.READY
-        await self.connect()
-
-    async def connect(self) -> bool:
-        self._status = IntegrationStatus.CONNECTED
-        return True
-
-    async def disconnect(self) -> bool:
-        self._status = IntegrationStatus.DISCONNECTED
-        return True
-
-    async def execute_query(self, query: str) -> Any:
-        return [{"status": "success", "result": "mock_query_output"}]
-
-    async def check_health(self) -> IntegrationHealthReport:
-        return IntegrationHealthReport(
-            provider_id=self.provider_id,
-            provider_name=self.name,
-            provider_type="PostgreSQL",
-            is_healthy=True,
-            health_level=HealthLevel.GREEN,
-            status=self.status,
-            latency_ms=2.5,
-        )
+def __getattr__(name: str) -> Any:
+    if name == "PostgresDatabaseAdapter":
+        from app.integrations.adapters.database.postgres_adapter import PostgresDatabaseAdapter
+        return PostgresDatabaseAdapter
+    if name == "RedisDatabaseAdapter":
+        from app.integrations.adapters.database.redis_adapter import RedisDatabaseAdapter
+        return RedisDatabaseAdapter
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
-class RedisDatabaseAdapter(PostgresDatabaseAdapter):
-    """Reference database adapter wrapping Redis key-value cache."""
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._provider_id = "database.redis"
-        self._name = "Redis Cache & Key-Value Adapter"
-        self._priority = 15
+__all__ = [
+    "DatabaseAdapter",
+    "PostgresDatabaseAdapter",
+    "RedisDatabaseAdapter",
+]

@@ -51,31 +51,23 @@ class GeminiLLMAdapter(LLMAdapter):
         )
 
 
-class OpenAILLMAdapter(GeminiLLMAdapter):
-    """Extension placeholder for OpenAI LLM Adapter."""
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._provider_id = "llm.openai"
-        self._name = "OpenAI GPT-4 LLM Adapter"
-        self._priority = 90
-
-
-class AnthropicLLMAdapter(GeminiLLMAdapter):
-    """Extension placeholder for Anthropic Claude LLM Adapter."""
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._provider_id = "llm.anthropic"
-        self._name = "Anthropic Claude LLM Adapter"
-        self._priority = 85
+def __getattr__(name: str) -> Any:
+    if name == "OpenAILLMAdapter":
+        from app.integrations.adapters.llm.openai_adapter import OpenAILLMAdapter
+        return OpenAILLMAdapter
+    if name == "AnthropicLLMAdapter":
+        from app.integrations.adapters.llm.anthropic_adapter import AnthropicLLMAdapter
+        return AnthropicLLMAdapter
+    if name == "OllamaLLMAdapter":
+        from app.integrations.adapters.llm.ollama_adapter import OllamaLLMAdapter
+        return OllamaLLMAdapter
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
-class OllamaLLMAdapter(GeminiLLMAdapter):
-    """Extension placeholder for Ollama Local LLM Adapter."""
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._provider_id = "llm.ollama"
-        self._name = "Ollama Local LLM Adapter"
-        self._priority = 50
+__all__ = [
+    "LLMAdapter",
+    "GeminiLLMAdapter",
+    "OpenAILLMAdapter",
+    "AnthropicLLMAdapter",
+    "OllamaLLMAdapter",
+]
