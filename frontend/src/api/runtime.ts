@@ -5,11 +5,6 @@ export async function getRuntimeHealth() {
   return res.data
 }
 
-export async function getRuntimeMetrics() {
-  const res = await apiClient.get('/runtime/metrics')
-  return res.data
-}
-
 export async function getRuntimeProviders() {
   const res = await apiClient.get('/runtime/providers')
   return res.data
@@ -22,5 +17,10 @@ export async function getRuntimeModels() {
 
 export async function getExecutionHistory() {
   const res = await apiClient.get('/runtime/executions')
+  return res.data
+}
+
+export async function getRuntimeConfig() {
+  const res = await apiClient.get('/runtime/config')
   return res.data
 }

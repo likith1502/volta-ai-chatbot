@@ -5,7 +5,7 @@ import { Card } from '../components/common/Card'
 import { Badge } from '../components/common/Badge'
 import { Skeleton } from '../components/common/Skeleton'
 import { ErrorBoundary } from '../components/feedback/ErrorBoundary'
-import { getRuntimeHealth, getRuntimeMetrics } from '../api/runtime'
+import { getRuntimeHealth, getExecutionHistory } from '../api/runtime'
 import { getIntegrationProviders } from '../api/integrations'
 
 export const Dashboard: React.FC = () => {
@@ -21,13 +21,13 @@ export const Dashboard: React.FC = () => {
   })
 
   const {
-    data: metrics,
-    isLoading: loadingMetrics,
-    isError: errorMetrics,
-    refetch: refetchMetrics,
+    data: history,
+    isLoading: loadingHistory,
+    isError: errorHistory,
+    refetch: refetchHistory,
   } = useQuery({
-    queryKey: ['metrics'],
-    queryFn: getRuntimeMetrics,
+    queryKey: ['executionsHistory'],
+    queryFn: getExecutionHistory,
     refetchInterval: 15000,
   })
 
@@ -47,6 +47,8 @@ export const Dashboard: React.FC = () => {
   const providerList = Array.isArray(providers?.data) ? providers.data : Array.isArray(providers) ? providers : []
   const healthyCount = providerList.filter((p: any) => p.is_healthy || p.health === 'green' || p.status === 'ready').length
 
+  const historyList = Array.isArray(history?.data) ? history.data : Array.isArray(history) ? history : []
+
   return (
     <div className="space-y-6">
       {/* Title & Refresh */}
@@ -60,7 +62,7 @@ export const Dashboard: React.FC = () => {
         <button
           onClick={() => {
             refetchHealth()
-            refetchMetrics()
+            refetchHistory()
           }}
           className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-lg text-xs font-semibold hover:bg-slate-800 transition-colors shadow-xs"
         >
@@ -124,17 +126,17 @@ export const Dashboard: React.FC = () => {
         {/* Card 3: Execution Runtime Engine */}
         <ErrorBoundary fallbackTitle="Runtime Widget Error">
           <Card>
-            {loadingMetrics ? (
+            {loadingHistory ? (
               <Skeleton rows={2} />
-            ) : errorMetrics ? (
-              <div className="text-xs text-rose-500">Failed to fetch metrics</div>
+            ) : errorHistory ? (
+              <div className="text-xs text-rose-500">Failed to fetch history</div>
             ) : (
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Runtime Engine</span>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-                      {metrics?.total_executions !== undefined ? metrics.total_executions : 'Ready'}
+                      {historyList.length ? `${historyList.length} Runs` : 'Ready'}
                     </span>
                     <Badge variant="neutral">v7.8 Core</Badge>
                   </div>

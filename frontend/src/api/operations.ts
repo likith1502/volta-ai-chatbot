@@ -14,3 +14,13 @@ export async function getDeploymentAnalytics() {
   const res = await apiClient.get('/deployment/analytics')
   return res.data
 }
+
+export async function getDeploymentStatistics() {
+  const res = await apiClient.get('/deployment/statistics')
+  return res.data
+}
+
+export async function getDeploymentStatus() {
+  const res = await apiClient.get('/deployment/status')
+  return res.data
+}

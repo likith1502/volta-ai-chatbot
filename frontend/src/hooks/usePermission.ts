@@ -2,8 +2,8 @@ import { useState } from 'react'
 
 export type UserRole = 'admin' | 'operator' | 'viewer'
 
-export function usePermission() {
-  const [role] = useState<UserRole>('admin') // Default admin role for platform management
+export function usePermission(initialRole: UserRole = 'admin') {
+  const [role] = useState<UserRole>(initialRole)
 
   const canExecute = role === 'admin' || role === 'operator'
   const canDelete = role === 'admin'
@@ -14,6 +14,16 @@ export function usePermission() {
     canExecute,
     canDelete,
     isViewerOnly,
+    hasRole: (requiredRole: UserRole) => role === requiredRole,
+  }
+}
+
+export function checkPermissions(role: UserRole) {
+  return {
+    role,
+    canExecute: role === 'admin' || role === 'operator',
+    canDelete: role === 'admin',
+    isViewerOnly: role === 'viewer',
     hasRole: (requiredRole: UserRole) => role === requiredRole,
   }
 }

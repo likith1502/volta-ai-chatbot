@@ -1,8 +1,7 @@
 import { apiClient } from './client'
 
-export async function getMemoryRecords(user_id?: string) {
-  const params = user_id ? { user_id } : {}
-  const res = await apiClient.get('/memory/records', { params })
+export async function storeMemoryRecord(record: Record<string, any> = {}) {
+  const res = await apiClient.post('/memory', record)
   return res.data
 }
 
@@ -13,5 +12,10 @@ export async function searchMemory(query: string, user_id?: string) {
 
 export async function getMemoryStatistics() {
   const res = await apiClient.get('/memory/statistics')
+  return res.data
+}
+
+export async function getMemoryMetrics() {
+  const res = await apiClient.get('/memory/metrics')
   return res.data
 }

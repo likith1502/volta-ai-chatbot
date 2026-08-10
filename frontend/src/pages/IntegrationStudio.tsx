@@ -5,7 +5,7 @@ import { Card } from '../components/common/Card'
 import { Badge } from '../components/common/Badge'
 import { Skeleton } from '../components/common/Skeleton'
 import { JsonInspector } from '../components/inspector/JsonInspector'
-import { getIntegrationProviders, getCapabilityMatrix, getIntegrationAuditLog } from '../api/integrations'
+import { getIntegrationProviders, getIntegrationHealth, getIntegrationStatistics, getIntegrationAnalytics } from '../api/integrations'
 import type { ProviderInfo } from '../types/integrations'
 
 export const IntegrationStudio: React.FC = () => {
@@ -16,14 +16,19 @@ export const IntegrationStudio: React.FC = () => {
     queryFn: getIntegrationProviders,
   })
 
-  const { data: matrixData } = useQuery({
-    queryKey: ['capabilityMatrix'],
-    queryFn: getCapabilityMatrix,
+  const { data: healthData } = useQuery({
+    queryKey: ['integrationHealth'],
+    queryFn: getIntegrationHealth,
   })
 
-  const { data: auditData } = useQuery({
-    queryKey: ['integrationAudit'],
-    queryFn: getIntegrationAuditLog,
+  const { data: statsData } = useQuery({
+    queryKey: ['integrationStats'],
+    queryFn: getIntegrationStatistics,
+  })
+
+  const { data: analyticsData } = useQuery({
+    queryKey: ['integrationAnalytics'],
+    queryFn: getIntegrationAnalytics,
   })
 
   const providers: ProviderInfo[] = Array.isArray(providersData?.data)
@@ -118,19 +123,27 @@ export const IntegrationStudio: React.FC = () => {
 
       {/* Capability Matrix & Audit Inspection */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card title="Provider Capability Matrix">
-          {matrixData ? (
-            <JsonInspector data={matrixData} title="Machine-Readable Matrix" />
+        <Card title="Provider Integration Health & Statistics">
+          {statsData ? (
+            <JsonInspector data={statsData} title="Statistics Payload" />
+          ) : healthData ? (
+            <JsonInspector data={healthData} title="Health State Payload" />
           ) : (
-            <div className="text-xs text-slate-500 p-2">Capability matrix loading...</div>
+            <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/40 rounded-lg">
+              <span className="text-xs text-slate-500">Statistics State</span>
+              <Badge variant="unavailable">Unavailable</Badge>
+            </div>
           )}
         </Card>
 
-        <Card title="Integration Audit Log">
-          {auditData ? (
-            <JsonInspector data={auditData} title="Audit Trail Payload" />
+        <Card title="Integration Analytics">
+          {analyticsData ? (
+            <JsonInspector data={analyticsData} title="Analytics Payload" />
           ) : (
-            <div className="text-xs text-slate-500 p-2">Audit log loading...</div>
+            <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/40 rounded-lg">
+              <span className="text-xs text-slate-500">Analytics State</span>
+              <Badge variant="unavailable">Unavailable</Badge>
+            </div>
           )}
         </Card>
       </div>

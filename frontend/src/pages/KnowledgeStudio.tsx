@@ -1,28 +1,26 @@
 import React, { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { BookOpen, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { Card } from '../components/common/Card'
 import { Badge } from '../components/common/Badge'
 import { Skeleton } from '../components/common/Skeleton'
 import { JsonInspector } from '../components/inspector/JsonInspector'
-import { getRAGSources, queryRAG, getRAGStatistics } from '../api/knowledge'
+import { queryRAG, getRAGStatistics, getRAGAnalytics } from '../api/knowledge'
 
 export const KnowledgeStudio: React.FC = () => {
   const [queryText, setQueryText] = useState('')
   const [queryResults, setQueryResults] = useState<any>(null)
   const [isQuerying, setIsQuerying] = useState(false)
 
-  const { data: sources, isLoading } = useQuery({
-    queryKey: ['ragSources'],
-    queryFn: getRAGSources,
-  })
-
-  const { data: stats } = useQuery({
+  const { data: stats, isLoading } = useQuery({
     queryKey: ['ragStats'],
     queryFn: getRAGStatistics,
   })
 
-  const sourceList = Array.isArray(sources?.data) ? sources.data : Array.isArray(sources) ? sources : []
+  const { data: analytics } = useQuery({
+    queryKey: ['ragAnalytics'],
+    queryFn: getRAGAnalytics,
+  })
 
   const handleQuery = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -76,41 +74,30 @@ export const KnowledgeStudio: React.FC = () => {
         )}
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card title="Registered Knowledge Sources" className="lg:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card title="RAG Subsystem Telemetry & Statistics">
           {isLoading ? (
             <Skeleton rows={4} />
-          ) : sourceList.length === 0 ? (
-            <div className="text-xs text-slate-500 p-4">No active knowledge sources registered</div>
+          ) : stats ? (
+            <JsonInspector data={stats} title="RAG Statistics Payload" />
           ) : (
-            <div className="space-y-3">
-              {sourceList.map((src: any, i: number) => (
-                <div
-                  key={i}
-                  className="p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-lg flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-2">
-                    <BookOpen size={16} className="text-indigo-500" />
-                    <span className="text-xs font-medium text-slate-800 dark:text-slate-200">
-                      {src.name || src.id || `source_${i}`}
-                    </span>
-                  </div>
-                  <Badge variant="info">{src.chunks_count ? `${src.chunks_count} Chunks` : 'Indexed'}</Badge>
-                </div>
-              ))}
+            <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/40 rounded-lg">
+              <span className="text-xs text-slate-500">RAG Statistics</span>
+              <Badge variant="unavailable">Unavailable</Badge>
             </div>
           )}
         </Card>
 
-        <div>
-          <Card title="RAG Pipeline Statistics">
-            {stats ? (
-              <JsonInspector data={stats} title="Statistics Payload" />
-            ) : (
-              <div className="text-xs text-slate-500 p-2">Statistics unavailable</div>
-            )}
-          </Card>
-        </div>
+        <Card title="RAG Knowledge Pipeline Analytics">
+          {analytics ? (
+            <JsonInspector data={analytics} title="RAG Analytics Payload" />
+          ) : (
+            <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/40 rounded-lg">
+              <span className="text-xs text-slate-500">Analytics Data</span>
+              <Badge variant="unavailable">Unavailable</Badge>
+            </div>
+          )}
+        </Card>
       </div>
     </div>
   )

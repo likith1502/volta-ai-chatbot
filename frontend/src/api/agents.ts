@@ -14,3 +14,8 @@ export async function getAgentStatistics() {
   const res = await apiClient.get('/agents/statistics')
   return res.data
 }
+
+export async function getAgentAnalytics() {
+  const res = await apiClient.get('/agents/analytics')
+  return res.data
+}
