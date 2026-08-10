@@ -111,9 +111,8 @@ Google Gemini SDK / Mock Provider
 
 ## Documentation Location
 
-All technical documentation, Architecture Decision Records (ADRs 001–047), database constitutions, and coding standards are maintained under:
-
-👉 [backend/docs/](backend/docs/)
+👉 [docs/walkthroughs/](docs/walkthroughs/) — End-to-End Execution Walkthroughs  
+👉 [backend/docs/](backend/docs/) — Master Architecture Decision Records & System Certificates
 
 Key Documents:
 ---
