@@ -1,9 +1,5 @@
-from pydantic import BaseModel, Field
+"""Policy (Re-exported from consolidated models module)."""
 
+from app.integrations.models import IntegrationPolicy
 
-class IntegrationPolicy(BaseModel):
-    """Security and execution policy for integration adapters."""
-
-    allow_sandbox_override: bool = True
-    enforce_tls: bool = True
-    require_secret_resolution: bool = True
+__all__ = ["IntegrationPolicy"]

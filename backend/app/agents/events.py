@@ -1,25 +1,5 @@
-from pydantic import BaseModel, Field
+"""Events (Re-exported from consolidated telemetry module)."""
 
+from app.agents.telemetry import AgentRegisteredEvent, AgentStartedEvent, AgentDelegatedEvent, AgentTaskCompletedEvent
 
-class AgentRegisteredEvent(BaseModel):
-    agent_id: str
-    name: str
-    role: str
-
-
-class AgentStartedEvent(BaseModel):
-    agent_id: str
-    task_id: str
-
-
-class AgentDelegatedEvent(BaseModel):
-    delegator_id: str
-    delegatee_id: str
-    task_id: str
-    depth: int
-
-
-class AgentTaskCompletedEvent(BaseModel):
-    agent_id: str
-    task_id: str
-    latency_ms: float
+__all__ = ["AgentRegisteredEvent", "AgentStartedEvent", "AgentDelegatedEvent", "AgentTaskCompletedEvent"]

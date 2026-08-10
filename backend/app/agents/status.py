@@ -1,13 +1,5 @@
-from enum import Enum
+"""Status (Re-exported from consolidated models module)."""
 
+from app.agents.models import AgentStatus
 
-class AgentStatus(str, Enum):
-    """Operational status of an agent instance."""
-
-    IDLE = "idle"
-    BUSY = "busy"
-    WAITING = "waiting"
-    DELEGATING = "delegating"
-    PAUSED = "paused"
-    ERROR = "error"
-    TERMINATED = "terminated"
+__all__ = ["AgentStatus"]

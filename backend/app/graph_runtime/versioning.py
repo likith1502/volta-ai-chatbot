@@ -1,16 +1,5 @@
-from pydantic import BaseModel, Field
+"""Versioning (Re-exported from consolidated models module)."""
 
+from app.graph_runtime.models import GraphRuntimeVersion
 
-class GraphRuntimeVersion(BaseModel):
-    """Version metadata container."""
-
-    version: str = "7.4.0"
-    milestone: str = "Phase 7.4 Enterprise Graph Runtime Integration"
-    frozen_dependencies: list[str] = Field(
-        default_factory=lambda: [
-            "app.runtime (v7.0)",
-            "app.prompt (v7.1)",
-            "app.memory (v7.2)",
-            "app.tools (v7.3)",
-        ]
-    )
+__all__ = ["GraphRuntimeVersion"]

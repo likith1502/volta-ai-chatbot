@@ -1,13 +1,5 @@
-from enum import Enum
+"""Ranking_Strategy (Re-exported from consolidated models module)."""
 
+from app.rag.models import RankingStrategy
 
-class RankingStrategy(str, Enum):
-    """Supported reranking strategies."""
-
-    COSINE = "cosine"
-    HYBRID = "hybrid"
-    BM25 = "bm25"
-    WEIGHTED = "weighted"
-    RECENCY = "recency"
-    METADATA = "metadata"
-    CROSS_ENCODER = "cross_encoder"
+__all__ = ["RankingStrategy"]

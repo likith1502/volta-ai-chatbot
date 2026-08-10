@@ -1,9 +1,5 @@
-from pydantic import BaseModel, Field
-from app.rag.budget import RetrievalBudget
+"""Policy (Re-exported from consolidated models module)."""
 
+from app.rag.models import RAGPolicy
 
-class RAGPolicy(BaseModel):
-    """RAG execution policy binding retrieval budget and strict filters."""
-
-    budget: RetrievalBudget = Field(default_factory=RetrievalBudget)
-    strict_provenance: bool = True
+__all__ = ["RAGPolicy"]

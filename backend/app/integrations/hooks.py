@@ -1,14 +1,5 @@
-from abc import ABC, abstractmethod
-from app.integrations.provider import IntegrationProvider
+"""Hooks (Re-exported from consolidated telemetry module)."""
 
+from app.integrations.telemetry import BeforeProviderConnectHook, AfterProviderFailoverHook
 
-class BeforeProviderConnectHook(ABC):
-    @abstractmethod
-    async def before_connect(self, provider: IntegrationProvider) -> None:
-        pass
-
-
-class AfterProviderFailoverHook(ABC):
-    @abstractmethod
-    async def after_failover(self, category: str, active_provider: IntegrationProvider) -> None:
-        pass
+__all__ = ["BeforeProviderConnectHook", "AfterProviderFailoverHook"]

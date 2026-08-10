@@ -1,12 +1,5 @@
-from enum import Enum
+"""Event_Status (Re-exported from consolidated models module)."""
 
+from app.events.models import WorkflowEventStatus
 
-class WorkflowEventStatus(str, Enum):
-    """Lifecycle states of a workflow event during routing and processing."""
-
-    CREATED = "created"
-    QUEUED = "queued"
-    DISPATCHED = "dispatched"
-    PROCESSED = "processed"
-    FAILED = "failed"
-    IGNORED = "ignored"
+__all__ = ["WorkflowEventStatus"]

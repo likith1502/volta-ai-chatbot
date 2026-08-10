@@ -1,13 +1,5 @@
-import uuid
-from typing import Any
-from pydantic import BaseModel, Field
+"""Context (Re-exported from consolidated models module)."""
 
+from app.agents.models import AgentContext
 
-class AgentContext(BaseModel):
-    """Runtime context passed during agent execution turns."""
-
-    conversation_id: uuid.UUID = Field(default_factory=uuid.uuid4)
-    session_id: uuid.UUID = Field(default_factory=uuid.uuid4)
-    inputs: dict[str, Any] = Field(default_factory=dict)
-    memory_snapshot: list[dict[str, Any]] = Field(default_factory=list)
-    variables: dict[str, Any] = Field(default_factory=dict)
+__all__ = ["AgentContext"]

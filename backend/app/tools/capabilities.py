@@ -1,11 +1,5 @@
-from pydantic import BaseModel, Field
+"""Capabilities (Re-exported from consolidated models module)."""
 
+from app.tools.models import ToolCapabilities
 
-class ToolCapabilities(BaseModel):
-    """Capability flags defining supported execution features of a tool."""
-
-    supports_async: bool = True
-    supports_streaming: bool = False
-    supports_batch: bool = True
-    supports_pipeline: bool = True
-    supports_chain: bool = True
+__all__ = ["ToolCapabilities"]

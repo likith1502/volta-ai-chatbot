@@ -1,10 +1,5 @@
-from app.rag.embedding_registry import EmbeddingRegistry
-from app.rag.parser_registry import ParserRegistry
+"""Registry (Re-exported from consolidated models module)."""
 
+from app.rag.models import RAGRegistry
 
-class RAGRegistry:
-    """Registry maintaining active document parsers, embedding providers, and vector stores."""
-
-    def __init__(self) -> None:
-        self.parsers = ParserRegistry()
-        self.embeddings = EmbeddingRegistry()
+__all__ = ["RAGRegistry"]

@@ -1,10 +1,5 @@
-from enum import Enum
+"""Permission (Re-exported from consolidated models module)."""
 
+from app.tools.models import ToolPermission
 
-class ToolPermission(str, Enum):
-    """Authorization permission levels required to execute tools."""
-
-    ALLOW = "allow"
-    DENY = "deny"
-    READONLY = "readonly"
-    ADMIN = "admin"
+__all__ = ["ToolPermission"]

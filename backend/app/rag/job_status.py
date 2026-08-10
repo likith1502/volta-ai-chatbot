@@ -1,10 +1,5 @@
-from enum import Enum
+"""Job_Status (Re-exported from consolidated models module)."""
 
+from app.rag.models import JobStatus
 
-class JobStatus(str, Enum):
-    """Ingestion job status enum."""
-
-    QUEUED = "queued"
-    PROCESSING = "processing"
-    COMPLETED = "completed"
-    FAILED = "failed"
+__all__ = ["JobStatus"]

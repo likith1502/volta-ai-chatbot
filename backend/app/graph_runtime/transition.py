@@ -1,11 +1,5 @@
-from typing import Optional
-from pydantic import BaseModel, Field
+"""Transition (Re-exported from consolidated models module)."""
 
+from app.graph_runtime.models import GraphTransition
 
-class GraphTransition(BaseModel):
-    """Represents a state transition edge between two runtime graph nodes."""
-
-    from_node: str
-    to_node: str
-    condition_key: Optional[str] = None
-    is_executed: bool = False
+__all__ = ["GraphTransition"]

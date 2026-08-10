@@ -1,17 +1,5 @@
-from pydantic import BaseModel
+"""Events (Re-exported from consolidated telemetry module)."""
 
+from app.integrations.telemetry import ProviderRegisteredEvent, ProviderFailedEvent, FailoverTriggeredEvent
 
-class ProviderRegisteredEvent(BaseModel):
-    provider_id: str
-    category: str
-
-
-class ProviderFailedEvent(BaseModel):
-    provider_id: str
-    error_message: str
-
-
-class FailoverTriggeredEvent(BaseModel):
-    category: str
-    failed_provider_id: str
-    active_provider_id: str
+__all__ = ["ProviderRegisteredEvent", "ProviderFailedEvent", "FailoverTriggeredEvent"]

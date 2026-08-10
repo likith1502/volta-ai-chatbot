@@ -1,14 +1,5 @@
-"""Deployment context — runtime metadata passed to adapters."""
+"""Context (Re-exported from consolidated models module)."""
 
-from dataclasses import dataclass, field
-from typing import Any
+from app.deployment.models import DeploymentContext
 
-
-@dataclass
-class DeploymentContext:
-    deployment_id: str = ""
-    environment: str = "production"
-    platform_version: str = "7.8.0"
-    operator: str = "system"
-    dry_run: bool = False
-    metadata: dict[str, Any] = field(default_factory=dict)
+__all__ = ["DeploymentContext"]

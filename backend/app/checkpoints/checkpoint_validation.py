@@ -1,12 +1,5 @@
-from pydantic import BaseModel, Field
+"""Checkpoint_Validation (Re-exported from consolidated models module)."""
 
+from app.checkpoints.models import CheckpointValidationResult
 
-class CheckpointValidationResult(BaseModel):
-    """Rich container summarizing checkpoint validation diagnostic results."""
-
-    is_valid: bool = True
-    warnings: list[str] = Field(default_factory=list)
-    errors: list[str] = Field(default_factory=list)
-    version_match: bool = True
-    integrity_passed: bool = True
-    compatible: bool = True
+__all__ = ["CheckpointValidationResult"]

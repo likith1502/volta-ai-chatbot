@@ -1,13 +1,5 @@
-import uuid
-from datetime import datetime, timezone
+"""Heartbeat (Re-exported from consolidated telemetry module)."""
 
-from pydantic import BaseModel, Field
+from app.streaming.telemetry import StreamHeartbeat
 
-
-class StreamHeartbeat(BaseModel):
-    """Heartbeat signal monitoring stream health and round-trip transport latency."""
-
-    heartbeat_id: uuid.UUID = Field(default_factory=uuid.uuid4)
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    latency: float = 0.0
-    status: str = "healthy"
+__all__ = ["StreamHeartbeat"]

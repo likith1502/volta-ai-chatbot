@@ -1,15 +1,5 @@
-from abc import ABC, abstractmethod
-from app.rag.context import RAGContext
-from app.rag.document import Document
+"""Hooks (Re-exported from consolidated telemetry module)."""
 
+from app.rag.telemetry import BeforeDocumentIngestHook, AfterQueryRetrievalHook
 
-class BeforeDocumentIngestHook(ABC):
-    @abstractmethod
-    async def before_ingest(self, document: Document) -> None:
-        pass
-
-
-class AfterQueryRetrievalHook(ABC):
-    @abstractmethod
-    async def after_retrieval(self, query: str, context: RAGContext) -> None:
-        pass
+__all__ = ["BeforeDocumentIngestHook", "AfterQueryRetrievalHook"]

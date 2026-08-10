@@ -1,12 +1,5 @@
-from pydantic import BaseModel
+"""Backpressure (Re-exported from consolidated models module)."""
 
-from app.streaming.stream_types import OverflowStrategy
+from app.streaming.models import BackpressurePolicy
 
-
-class BackpressurePolicy(BaseModel):
-    """Configuration governing queue limits and overflow strategies under high load."""
-
-    max_queue_size: int = 1000
-    overflow_strategy: OverflowStrategy = OverflowStrategy.DROP_OLDEST
-    drop_policy: str = "oldest"
-    timeout: float = 5.0
+__all__ = ["BackpressurePolicy"]

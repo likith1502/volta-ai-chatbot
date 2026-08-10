@@ -1,11 +1,5 @@
-from enum import Enum
+"""Chunk_Strategy (Re-exported from consolidated models module)."""
 
+from app.rag.models import ChunkStrategy
 
-class ChunkStrategy(str, Enum):
-    """Strategies for splitting document text into chunks."""
-
-    FIXED = "fixed"
-    SLIDING_WINDOW = "sliding_window"
-    SENTENCE = "sentence"
-    PARAGRAPH = "paragraph"
-    SEMANTIC = "semantic"
+__all__ = ["ChunkStrategy"]

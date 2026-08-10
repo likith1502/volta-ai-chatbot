@@ -1,11 +1,5 @@
-from enum import Enum
+"""Status (Re-exported from consolidated models module)."""
 
+from app.memory.models import MemoryStatus
 
-class MemoryStatus(str, Enum):
-    """Lifecycle status states for memory entries."""
-
-    ACTIVE = "active"
-    ARCHIVED = "archived"
-    EXPIRED = "expired"
-    DELETED = "deleted"
-    PINNED = "pinned"
+__all__ = ["MemoryStatus"]

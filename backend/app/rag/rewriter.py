@@ -1,7 +1,5 @@
-class QueryRewriter:
-    """Query Rewriter hook transforming or expanding user queries prior to retrieval planning."""
+"""Rewriter (Re-exported from consolidated models module)."""
 
-    def rewrite_query(self, original_query: str) -> str:
-        """Standardizes query, performs spelling cleanup, and removes noise words."""
-        cleaned = original_query.strip()
-        return cleaned
+from app.rag.models import QueryRewriter
+
+__all__ = ["QueryRewriter"]

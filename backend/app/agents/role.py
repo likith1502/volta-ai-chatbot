@@ -1,16 +1,5 @@
-from enum import Enum
+"""Role (Re-exported from consolidated models module)."""
 
+from app.agents.models import AgentRole
 
-class AgentRole(str, Enum):
-    """Supported agent roles within the multi-agent orchestration runtime."""
-
-    SUPPORT = "support"
-    SUPERVISOR = "supervisor"
-    PLANNER = "planner"
-    RESEARCH = "research"
-    TOOL = "tool"
-    MEMORY = "memory"
-    REVIEWER = "reviewer"
-    CRITIC = "critic"
-    EXECUTOR = "executor"
-    CUSTOM = "custom"
+__all__ = ["AgentRole"]

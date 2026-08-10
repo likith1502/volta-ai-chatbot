@@ -1,10 +1,5 @@
-from enum import Enum
+"""Status (Re-exported from consolidated models module)."""
 
+from app.tools.models import ToolStatus
 
-class ToolStatus(str, Enum):
-    """Lifecycle status states for registered tools."""
-
-    ACTIVE = "active"
-    DEPRECATED = "deprecated"
-    DISABLED = "disabled"
-    ERROR = "error"
+__all__ = ["ToolStatus"]

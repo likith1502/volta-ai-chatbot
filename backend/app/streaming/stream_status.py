@@ -1,11 +1,5 @@
-from enum import Enum
+"""Stream_Status (Re-exported from consolidated models module)."""
 
+from app.streaming.models import StreamStatus
 
-class StreamStatus(str, Enum):
-    """Lifecycle states of a stream or streaming channel."""
-
-    CREATED = "created"
-    ACTIVE = "active"
-    PAUSED = "paused"
-    CLOSED = "closed"
-    FAILED = "failed"
+__all__ = ["StreamStatus"]

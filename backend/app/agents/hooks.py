@@ -1,15 +1,5 @@
-from abc import ABC, abstractmethod
-from app.agents.agent import Agent
-from app.agents.task import AgentTask, TaskResult
+"""Hooks (Re-exported from consolidated telemetry module)."""
 
+from app.agents.telemetry import BeforeAgentExecutionHook, AfterAgentExecutionHook
 
-class BeforeAgentExecutionHook(ABC):
-    @abstractmethod
-    async def before_execution(self, agent: Agent, task: AgentTask) -> None:
-        pass
-
-
-class AfterAgentExecutionHook(ABC):
-    @abstractmethod
-    async def after_execution(self, agent: Agent, result: TaskResult) -> None:
-        pass
+__all__ = ["BeforeAgentExecutionHook", "AfterAgentExecutionHook"]

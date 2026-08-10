@@ -1,14 +1,5 @@
-from enum import Enum
+"""Status (Re-exported from consolidated models module)."""
 
+from app.integrations.models import IntegrationStatus
 
-class IntegrationStatus(str, Enum):
-    """Runtime health status of an integration provider."""
-
-    UNKNOWN = "unknown"
-    CONFIGURED = "configured"
-    READY = "ready"
-    CONNECTED = "connected"
-    DEGRADED = "degraded"
-    DISCONNECTED = "disconnected"
-    FAILED = "failed"
-    DISABLED = "disabled"
+__all__ = ["IntegrationStatus"]

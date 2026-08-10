@@ -1,10 +1,5 @@
-from enum import Enum
+"""Health_Level (Re-exported from consolidated models module)."""
 
+from app.integrations.models import HealthLevel
 
-class HealthLevel(str, Enum):
-    """Operational health level classification."""
-
-    GREEN = "green"
-    YELLOW = "yellow"
-    ORANGE = "orange"
-    RED = "red"
+__all__ = ["HealthLevel"]

@@ -1,10 +1,5 @@
-from typing import Optional
-from app.rag.chunk import Chunk
+"""Selector (Re-exported from consolidated models module)."""
 
+from app.rag.models import ChunkSelector
 
-class ChunkSelector:
-    """Selects target chunks based on relevance scores and limits."""
-
-    @staticmethod
-    def select_top_chunks(chunks: list[tuple[Chunk, float]], limit: int = 5) -> list[Chunk]:
-        return [c for c, _ in chunks[:limit]]
+__all__ = ["ChunkSelector"]

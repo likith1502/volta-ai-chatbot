@@ -1,13 +1,5 @@
-from typing import Any
-from pydantic import BaseModel, Field
+"""Provider_Config (Re-exported from consolidated models module)."""
 
+from app.integrations.models import ProviderConfig
 
-class ProviderConfig(BaseModel):
-    """Adapter-specific configuration container."""
-
-    provider_id: str
-    enabled: bool = True
-    priority: int = Field(default=10, ge=1)
-    weight: float = Field(default=1.0, ge=0.0)
-    preferred: bool = False
-    options: dict[str, Any] = Field(default_factory=dict)
+__all__ = ["ProviderConfig"]

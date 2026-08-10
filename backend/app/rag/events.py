@@ -1,18 +1,5 @@
-from pydantic import BaseModel
+"""Events (Re-exported from consolidated telemetry module)."""
 
+from app.rag.telemetry import DocumentAddedEvent, DocumentIngestedEvent, QueryExecutedEvent
 
-class DocumentAddedEvent(BaseModel):
-    document_id: str
-    title: str
-
-
-class DocumentIngestedEvent(BaseModel):
-    document_id: str
-    job_id: str
-    chunks_count: int
-
-
-class QueryExecutedEvent(BaseModel):
-    query: str
-    citations_count: int
-    latency_ms: float
+__all__ = ["DocumentAddedEvent", "DocumentIngestedEvent", "QueryExecutedEvent"]
