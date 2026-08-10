@@ -40,10 +40,6 @@ export const Settings: React.FC = () => {
               <span className="font-medium text-slate-700 dark:text-slate-300">Secret Redaction Engine</span>
               <Badge variant="success">sk-*** Enabled</Badge>
             </div>
-            <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-lg">
-              <span className="font-medium text-slate-700 dark:text-slate-300">Legacy UI Status</span>
-              <Badge variant="neutral">Retired (Migrated to React Console)</Badge>
-            </div>
           </div>
         </Card>
       </div>
