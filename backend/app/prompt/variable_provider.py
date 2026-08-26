@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any
+
 from app.prompt.contracts import PromptRequest
 
 

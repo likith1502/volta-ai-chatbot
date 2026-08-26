@@ -1,4 +1,5 @@
 import logging
+
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger("app.tools.health")

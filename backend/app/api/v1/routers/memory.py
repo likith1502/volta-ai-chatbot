@@ -1,12 +1,12 @@
 import uuid
 from typing import Any, Optional
+
 from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
-from app.memory.contracts import MemoryRequest, MemoryResponse, MemorySearchResult
+from app.memory.contracts import MemoryRequest, MemorySearchResult
 from app.memory.manager import MemoryManager
 from app.memory.status import MemoryStatus
-from app.memory.types import MemoryType
 from app.utils.responses import success_response
 
 router = APIRouter(prefix="/memory", tags=["Enterprise Memory Runtime"])
@@ -20,7 +20,10 @@ class SearchMemoryPayload(BaseModel):
 
     query: str = Field(default="", description="Search query keyword filter")
     conversation_id: Optional[uuid.UUID] = Field(default=None)
-    strategy: str = Field(default="hybrid", description="'recent', 'importance', 'hybrid', 'sliding_window'")
+    strategy: str = Field(
+        default="hybrid",
+        description="'recent', 'importance', 'hybrid', 'sliding_window'",
+    )
     limit: int = Field(default=10, ge=1, le=100)
 
 
@@ -65,7 +68,9 @@ async def list_memories(
     """Lists stored memories with optional conversation or status filter."""
     repo = _memory_manager.registry.get_repository()
     if conversation_id:
-        mems = await repo.list_by_conversation(conversation_id, status=status_filter, limit=limit)
+        mems = await repo.list_by_conversation(
+            conversation_id, status=status_filter, limit=limit
+        )
     else:
         mems = await repo.list_all(limit=limit)
 
@@ -129,7 +134,7 @@ async def get_memory_details(memory_id: uuid.UUID) -> dict[str, Any]:
             data=mem.model_dump(),
             message=f"Memory '{memory_id}' retrieved",
         )
-    except Exception as exc:
+    except Exception:
         raise HTTPException(status_code=404, detail=f"Memory '{memory_id}' not found.")
 
 
@@ -143,13 +148,17 @@ async def delete_memory_entry(memory_id: uuid.UUID) -> dict[str, Any]:
     try:
         res = await _memory_manager.delete_memory(memory_id)
         if not res:
-            raise HTTPException(status_code=404, detail=f"Memory '{memory_id}' not found.")
+            raise HTTPException(
+                status_code=404, detail=f"Memory '{memory_id}' not found."
+            )
         return success_response(
             data={"deleted": True, "memory_id": str(memory_id)},
             message=f"Memory '{memory_id}' deleted successfully",
         )
     except Exception as exc:
-        raise HTTPException(status_code=getattr(exc, "status_code", 500), detail=f"Delete failed: {exc}")
+        raise HTTPException(
+            status_code=getattr(exc, "status_code", 500), detail=f"Delete failed: {exc}"
+        )
 
 
 @router.post(

@@ -1,4 +1,5 @@
 import asyncio
+
 from app.tools.executor import ToolExecutor
 from app.tools.request import ToolRequest
 from app.tools.result import ToolResult
@@ -11,9 +12,13 @@ class ToolDispatcher:
     def __init__(self, executor: ToolExecutor = None) -> None:
         self.executor = executor or ToolExecutor()
 
-    async def dispatch_single(self, tool_instance: BaseTool, request: ToolRequest) -> ToolResult:
+    async def dispatch_single(
+        self, tool_instance: BaseTool, request: ToolRequest
+    ) -> ToolResult:
         return await self.executor.execute(tool_instance, request)
 
-    async def dispatch_batch(self, pairs: list[tuple[BaseTool, ToolRequest]]) -> list[ToolResult]:
+    async def dispatch_batch(
+        self, pairs: list[tuple[BaseTool, ToolRequest]]
+    ) -> list[ToolResult]:
         tasks = [self.executor.execute(t, r) for t, r in pairs]
         return await asyncio.gather(*tasks)

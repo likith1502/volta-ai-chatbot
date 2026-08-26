@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from app.graph_runtime.context import GraphRuntimeContext
 from app.graph_runtime.execution_result import GraphExecutionResult
 

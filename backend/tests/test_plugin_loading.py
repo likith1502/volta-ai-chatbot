@@ -2,7 +2,7 @@ import pytest
 from app.integrations.manifest import PluginManifest
 from app.integrations.capabilities import IntegrationCapability
 from app.integrations.validator import IntegrationValidator
-from app.integrations.exceptions import IntegrationException
+from app.integrations.exceptions import IntegrationError
 
 
 def test_plugin_manifest_loads_correctly():

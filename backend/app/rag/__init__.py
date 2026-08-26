@@ -22,7 +22,12 @@ from app.rag.document_version import DocumentVersion
 from app.rag.embedding_provider import EmbeddingProvider, MockEmbeddingProvider
 from app.rag.embedding_registry import EmbeddingRegistry
 from app.rag.events import DocumentAddedEvent, DocumentIngestedEvent, QueryExecutedEvent
-from app.rag.exceptions import DocumentNotFoundError, IngestionError, RAGException, RetrievalError
+from app.rag.exceptions import (
+    DocumentNotFoundError,
+    IngestionError,
+    RAGError,
+    RetrievalError,
+)
 from app.rag.explanation import RetrievalExplanation
 from app.rag.factory import RAGFactory
 from app.rag.filter import MetadataFilter
@@ -145,7 +150,7 @@ __all__ = [
     "ChunkSelector",
     "MetadataFilter",
     "RAGVersion",
-    "RAGException",
+    "RAGError",
     "DocumentNotFoundError",
     "IngestionError",
     "RetrievalError",

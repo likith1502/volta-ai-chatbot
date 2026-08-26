@@ -1,6 +1,5 @@
 from app.agents.definition import AgentDefinition
 from app.agents.identity import AgentIdentity
-from app.agents.persona import AgentPersona
 from app.agents.role import AgentRole
 
 

@@ -1,5 +1,5 @@
 from app.agents.agent import Agent
-from app.agents.exceptions import AgentRuntimeException
+from app.agents.exceptions import AgentRuntimeError
 
 
 class AgentValidator:
@@ -8,5 +8,5 @@ class AgentValidator:
     @staticmethod
     def validate_agent(agent: Agent) -> bool:
         if not agent.name:
-            raise AgentRuntimeException("Agent name cannot be empty.")
+            raise AgentRuntimeError("Agent name cannot be empty.")
         return True

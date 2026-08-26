@@ -1,40 +1,40 @@
-class AgentRuntimeException(Exception):
+class AgentRuntimeError(Exception):
     """Base exception for all Agent Runtime errors."""
 
     pass
 
 
-class AgentNotFoundError(AgentRuntimeException):
+class AgentNotFoundError(AgentRuntimeError):
     """Raised when an agent ID or definition cannot be found."""
 
     pass
 
 
-class AgentDelegationError(AgentRuntimeException):
+class AgentDelegationError(AgentRuntimeError):
     """Raised when task delegation fails or exceeds depth limit."""
 
     pass
 
 
-class AgentTaskError(AgentRuntimeException):
+class AgentTaskError(AgentRuntimeError):
     """Raised when task execution fails."""
 
     pass
 
 
-class AgentCommunicationError(AgentRuntimeException):
+class AgentCommunicationError(AgentRuntimeError):
     """Raised when inter-agent message delivery fails."""
 
     pass
 
 
-class AgentBudgetExhaustedError(AgentRuntimeException):
+class AgentBudgetExhaustedError(AgentRuntimeError):
     """Raised when an agent exhausts its execution budget."""
 
     pass
 
 
-class AgentPermissionDeniedError(AgentRuntimeException):
+class AgentPermissionDeniedError(AgentRuntimeError):
     """Raised when an action is prohibited by agent permissions."""
 
     pass

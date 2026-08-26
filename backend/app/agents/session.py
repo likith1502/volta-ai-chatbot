@@ -1,6 +1,8 @@
 import uuid
-from typing import Any, Optional
+from typing import Optional
+
 from pydantic import BaseModel, Field
+
 from app.agents.status import AgentStatus
 
 

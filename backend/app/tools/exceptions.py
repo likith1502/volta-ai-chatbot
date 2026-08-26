@@ -1,8 +1,9 @@
 from typing import Optional
-from app.core.exceptions import AppException
+
+from app.core.exceptions import AppError
 
 
-class ToolException(AppException):
+class ToolError(AppError):
     """Base exception for all Tool Runtime failures."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -10,7 +11,7 @@ class ToolException(AppException):
         self.code = "TOOL_ERROR"
 
 
-class ToolNotFoundError(ToolException):
+class ToolNotFoundError(ToolError):
     """Raised when a requested tool name is not registered."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -19,7 +20,7 @@ class ToolNotFoundError(ToolException):
         self.status_code = 404
 
 
-class ToolValidationError(ToolException):
+class ToolValidationError(ToolError):
     """Raised when tool argument validation against JSON schema fails."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -28,7 +29,7 @@ class ToolValidationError(ToolException):
         self.status_code = 400
 
 
-class ToolExecutionError(ToolException):
+class ToolExecutionError(ToolError):
     """Raised when tool body execution fails."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -37,7 +38,7 @@ class ToolExecutionError(ToolException):
         self.status_code = 500
 
 
-class ToolPermissionDeniedError(ToolException):
+class ToolPermissionDeniedError(ToolError):
     """Raised when caller lacks permission to execute the tool."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -46,7 +47,7 @@ class ToolPermissionDeniedError(ToolException):
         self.status_code = 403
 
 
-class ToolPolicyViolationError(ToolException):
+class ToolPolicyViolationError(ToolError):
     """Raised when execution violates tool policy (timeout, rate limit, concurrency)."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:

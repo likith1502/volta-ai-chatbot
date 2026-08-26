@@ -10,4 +10,6 @@ class AgentCapabilities(BaseModel):
     supports_memory_access: bool = True
     supports_streaming: bool = True
     supports_hitl: bool = True
-    supported_tools: list[str] = Field(default_factory=lambda: ["echo", "calculator", "datetime", "uuid"])
+    supported_tools: list[str] = Field(
+        default_factory=lambda: ["echo", "calculator", "datetime", "uuid"]
+    )

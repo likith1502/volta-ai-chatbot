@@ -1,5 +1,6 @@
 import logging
 from typing import Callable, Optional
+
 from app.runtime.base import RuntimeProvider
 from app.runtime.exceptions import ProviderNotFoundError
 
@@ -19,7 +20,9 @@ class RuntimeRegistry:
         self._providers[name] = provider
         logger.info(f"Registered RuntimeProvider '{name}'")
 
-    def register_factory(self, provider_name: str, factory: Callable[[], RuntimeProvider]) -> None:
+    def register_factory(
+        self, provider_name: str, factory: Callable[[], RuntimeProvider]
+    ) -> None:
         """Registers a factory function for lazy provider construction."""
         name = provider_name.lower()
         self._factories[name] = factory
@@ -42,7 +45,9 @@ class RuntimeRegistry:
             self._providers[name] = provider
             return provider
 
-        raise ProviderNotFoundError(f"Provider '{provider_name}' is not registered in RuntimeRegistry.")
+        raise ProviderNotFoundError(
+            f"Provider '{provider_name}' is not registered in RuntimeRegistry."
+        )
 
     def get(self, provider_name: str) -> Optional[RuntimeProvider]:
         """Safely retrieves provider instance if present, else returns None."""

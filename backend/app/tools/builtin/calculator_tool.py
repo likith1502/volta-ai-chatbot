@@ -1,5 +1,3 @@
-from typing import Any
-from app.tools.exceptions import ToolExecutionError
 from app.tools.request import ToolRequest
 from app.tools.result import ToolResult
 from app.tools.tool import BaseTool
@@ -22,18 +20,18 @@ class CalculatorTool(BaseTool):
                     "operation": {
                         "type": "string",
                         "enum": ["add", "subtract", "multiply", "divide"],
-                        "description": "Arithmetic operation"
-                    }
+                        "description": "Arithmetic operation",
+                    },
                 },
-                "required": ["a", "b", "operation"]
+                "required": ["a", "b", "operation"],
             },
             output_schema={
                 "type": "object",
                 "properties": {
                     "result": {"type": "number"},
-                    "operation": {"type": "string"}
-                }
-            }
+                    "operation": {"type": "string"},
+                },
+            },
         )
 
     async def execute(self, request: ToolRequest) -> ToolResult:

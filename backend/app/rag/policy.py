@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+
 from app.rag.budget import RetrievalBudget
 
 

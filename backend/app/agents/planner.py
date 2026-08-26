@@ -1,5 +1,6 @@
 import logging
 from typing import Any, Optional
+
 from app.agents.agent import Agent
 from app.agents.definition import AgentDefinition
 from app.agents.identity import AgentIdentity
@@ -21,9 +22,24 @@ class PlannerAgent(Agent):
 
     def plan_task(self, goal: str, inputs: dict[str, Any]) -> list[AgentTask]:
         """Decomposes high-level goal into structured sub-tasks."""
-        t1 = AgentTask(title="research_goal", description=f"Gather research for: {goal}", priority=2, inputs=inputs)
-        t2 = AgentTask(title="execute_tools", description=f"Execute required tools for: {goal}", priority=1, inputs=inputs)
-        t3 = AgentTask(title="synthesize_results", description=f"Synthesize output for: {goal}", priority=1, inputs=inputs)
+        t1 = AgentTask(
+            title="research_goal",
+            description=f"Gather research for: {goal}",
+            priority=2,
+            inputs=inputs,
+        )
+        t2 = AgentTask(
+            title="execute_tools",
+            description=f"Execute required tools for: {goal}",
+            priority=1,
+            inputs=inputs,
+        )
+        t3 = AgentTask(
+            title="synthesize_results",
+            description=f"Synthesize output for: {goal}",
+            priority=1,
+            inputs=inputs,
+        )
 
         t2.parent_task_id = t1.task_id
         t3.parent_task_id = t2.task_id

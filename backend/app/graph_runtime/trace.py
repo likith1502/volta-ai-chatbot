@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 from typing import Any, Optional
+
 from pydantic import BaseModel, Field
 
 
@@ -23,7 +24,13 @@ class ExecutionTrace(BaseModel):
     execution_id: uuid.UUID = Field(default_factory=uuid.uuid4)
     steps: list[TraceStep] = Field(default_factory=list)
 
-    def add_step(self, node_id: str, action: str, latency_ms: float, payload: Optional[dict] = None) -> None:
+    def add_step(
+        self,
+        node_id: str,
+        action: str,
+        latency_ms: float,
+        payload: Optional[dict] = None,
+    ) -> None:
         idx = len(self.steps) + 1
         self.steps.append(
             TraceStep(

@@ -17,4 +17,6 @@ class ToolDependencyGraph(BaseModel):
                 if depends_on not in node.depends_on:
                     node.depends_on.append(depends_on)
                 return
-        self.nodes.append(ToolDependencyNode(tool_name=tool_name, depends_on=[depends_on]))
+        self.nodes.append(
+            ToolDependencyNode(tool_name=tool_name, depends_on=[depends_on])
+        )

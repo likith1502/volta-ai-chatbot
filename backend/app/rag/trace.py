@@ -1,5 +1,6 @@
 import uuid
 from typing import Any, Optional
+
 from pydantic import BaseModel, Field
 
 
@@ -18,7 +19,9 @@ class RetrievalTrace(BaseModel):
     query: str
     steps: list[RetrievalStepTrace] = Field(default_factory=list)
 
-    def add_step(self, step_name: str, latency_ms: float, output: Optional[dict[str, Any]] = None) -> None:
+    def add_step(
+        self, step_name: str, latency_ms: float, output: Optional[dict[str, Any]] = None
+    ) -> None:
         self.steps.append(
             RetrievalStepTrace(
                 step_name=step_name,

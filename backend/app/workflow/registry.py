@@ -2,8 +2,8 @@ from typing import Callable, List, Optional, Type, Union
 
 from app.workflow.base import BaseWorkflowNode
 from app.workflow.exceptions import (
-    DuplicateWorkflowNodeException,
-    WorkflowNodeNotFoundException,
+    DuplicateWorkflowNodeError,
+    WorkflowNodeNotFoundError,
 )
 from app.workflow.metadata import WorkflowNodeMetadata
 from app.workflow.node_types import WorkflowNodeType
@@ -13,11 +13,18 @@ class WorkflowNodeRegistry:
     """Registry for managing and discovering reusable workflow nodes."""
 
     def __init__(self) -> None:
-        self._nodes: dict[str, Union[BaseWorkflowNode, Type[BaseWorkflowNode], Callable[[], BaseWorkflowNode]]] = {}
+        self._nodes: dict[
+            str,
+            Union[
+                BaseWorkflowNode, Type[BaseWorkflowNode], Callable[[], BaseWorkflowNode]
+            ],
+        ] = {}
 
     def register(
         self,
-        node: Union[BaseWorkflowNode, Type[BaseWorkflowNode], Callable[[], BaseWorkflowNode]],
+        node: Union[
+            BaseWorkflowNode, Type[BaseWorkflowNode], Callable[[], BaseWorkflowNode]
+        ],
         node_id: Optional[str] = None,
         overwrite: bool = False,
     ) -> None:
@@ -34,7 +41,7 @@ class WorkflowNodeRegistry:
                 target_id = str(node)
 
         if target_id in self._nodes and not overwrite:
-            raise DuplicateWorkflowNodeException(
+            raise DuplicateWorkflowNodeError(
                 f"Workflow node with ID '{target_id}' is already registered."
             )
 
@@ -52,7 +59,7 @@ class WorkflowNodeRegistry:
     def unregister(self, node_id: str) -> None:
         """Unregisters a node by ID."""
         if node_id not in self._nodes:
-            raise WorkflowNodeNotFoundException(
+            raise WorkflowNodeNotFoundError(
                 f"Workflow node with ID '{node_id}' not found."
             )
         del self._nodes[node_id]
@@ -64,7 +71,7 @@ class WorkflowNodeRegistry:
     def lookup(self, node_id: str) -> BaseWorkflowNode:
         """Retrieves and instantiates (if lazy) a node by node_id."""
         if node_id not in self._nodes:
-            raise WorkflowNodeNotFoundException(
+            raise WorkflowNodeNotFoundError(
                 f"Workflow node with ID '{node_id}' not found."
             )
         target = self._nodes[node_id]
@@ -77,10 +84,12 @@ class WorkflowNodeRegistry:
             res = target()
             if isinstance(res, BaseWorkflowNode):
                 return res
-            raise WorkflowNodeNotFoundException(
+            raise WorkflowNodeNotFoundError(
                 f"Factory function for node '{node_id}' did not return a BaseWorkflowNode."
             )
-        raise WorkflowNodeNotFoundException(f"Invalid node registration type for '{node_id}'.")
+        raise WorkflowNodeNotFoundError(
+            f"Invalid node registration type for '{node_id}'."
+        )
 
     def list(self) -> List[str]:
         """Lists IDs of all registered workflow nodes."""

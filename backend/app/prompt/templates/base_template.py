@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional
-from app.prompt.contracts import ChatMessage, PromptMessage, PromptVariable
+
+from app.prompt.contracts import PromptMessage, PromptVariable
 from app.prompt.metadata import PromptTemplateMetadata
 from app.prompt.versioning import TemplateRevision
 
@@ -47,8 +48,27 @@ class BasePromptTemplate(ABC):
         """Returns template type discriminator (e.g. 'chat', 'system', 'tool', 'agent')."""
         pass
 
-    def add_message(self, role: str, content_template: str, metadata: Optional[dict] = None) -> None:
-        self.messages.append(PromptMessage(role=role, content_template=content_template, metadata=metadata or {}))
+    def add_message(
+        self, role: str, content_template: str, metadata: Optional[dict] = None
+    ) -> None:
+        self.messages.append(
+            PromptMessage(
+                role=role, content_template=content_template, metadata=metadata or {}
+            )
+        )
 
-    def add_variable(self, name: str, required: bool = True, default_value: Any = None, description: Optional[str] = None) -> None:
-        self.variables.append(PromptVariable(name=name, required=required, default_value=default_value, description=description))
+    def add_variable(
+        self,
+        name: str,
+        required: bool = True,
+        default_value: Any = None,
+        description: Optional[str] = None,
+    ) -> None:
+        self.variables.append(
+            PromptVariable(
+                name=name,
+                required=required,
+                default_value=default_value,
+                description=description,
+            )
+        )

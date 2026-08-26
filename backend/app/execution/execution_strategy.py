@@ -2,15 +2,14 @@ import time
 from abc import ABC, abstractmethod
 from typing import Any, Optional
 
-from app.context.events import WorkflowEvent, WorkflowEventType
 from app.context.state import ConversationState
+from app.execution.exceptions import ExecutionValidationError
 from app.execution.execution_context import ExecutionContext
 from app.execution.execution_metrics import ExecutionMetrics
 from app.execution.execution_policy import ExecutionPolicy
 from app.execution.execution_result import ExecutionResult
 from app.execution.execution_snapshot import ExecutionSnapshot
 from app.execution.execution_status import ExecutionStatus
-from app.execution.exceptions import ExecutionValidationException
 from app.graph.contracts import IGraph
 
 
@@ -50,7 +49,7 @@ class SequentialStrategy(ExecutionStrategy):
 
         current_node_id = graph.entry_node
         if not current_node_id:
-            raise ExecutionValidationException("Graph contains no entry node.")
+            raise ExecutionValidationError("Graph contains no entry node.")
 
         current_state = initial_state
         visited_nodes: list[str] = []
@@ -65,7 +64,7 @@ class SequentialStrategy(ExecutionStrategy):
         while current_node_id is not None:
             context.current_depth += 1
             if context.current_depth > policy.max_depth:
-                raise ExecutionValidationException(
+                raise ExecutionValidationError(
                     f"Maximum graph traversal depth of {policy.max_depth} exceeded at node '{current_node_id}'."
                 )
 

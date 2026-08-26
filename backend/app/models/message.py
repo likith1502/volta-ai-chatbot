@@ -1,7 +1,7 @@
 import uuid
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import Enum, ForeignKey, Integer, String, Text, UUID
+from sqlalchemy import UUID, Enum, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -28,7 +28,9 @@ class Message(UUIDMixin, TimestampMixin, SoftDeleteMixin, AuditMixin, Base):
         nullable=False,
     )
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    message_type: Mapped[str] = mapped_column(String(50), default="text", nullable=False)
+    message_type: Mapped[str] = mapped_column(
+        String(50), default="text", nullable=False
+    )
     sequence_number: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     token_count: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     processing_time_ms: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)

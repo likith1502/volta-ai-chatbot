@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from typing import Any
-from app.rag.document import Document
 
 
 class BaseDocumentParser(ABC):
@@ -19,7 +18,10 @@ class TextDocumentParser(BaseDocumentParser):
     """Reference parser for plain text and markdown documents."""
 
     def supports_mime_type(self, mime_type: str) -> bool:
-        return mime_type.startswith("text/") or mime_type in ["application/json", "text/markdown"]
+        return mime_type.startswith("text/") or mime_type in [
+            "application/json",
+            "text/markdown",
+        ]
 
     def parse(self, raw_text: str, metadata: dict[str, Any]) -> str:
         # Strip leading/trailing whitespace

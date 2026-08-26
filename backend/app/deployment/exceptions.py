@@ -1,37 +1,37 @@
 """Deployment exceptions."""
 
 
-class DeploymentException(Exception):
+class DeploymentError(Exception):
     """Base class for all deployment exceptions."""
 
 
-class DeploymentValidationError(DeploymentException):
+class DeploymentValidationError(DeploymentError):
     """Raised when deployment validation fails."""
 
 
-class DeploymentStrategyError(DeploymentException):
+class DeploymentStrategyError(DeploymentError):
     """Raised when a deployment strategy cannot execute."""
 
 
-class RollbackError(DeploymentException):
+class RollbackError(DeploymentError):
     """Raised when rollback execution fails."""
 
 
-class ScalingError(DeploymentException):
+class ScalingError(DeploymentError):
     """Raised when a scaling operation fails."""
 
 
-class BackupError(DeploymentException):
+class BackupError(DeploymentError):
     """Raised when a backup operation fails."""
 
 
-class RecoveryError(DeploymentException):
+class RecoveryError(DeploymentError):
     """Raised when disaster recovery execution fails."""
 
 
-class ReleaseCompatibilityError(DeploymentException):
+class ReleaseCompatibilityError(DeploymentError):
     """Raised when two releases are incompatible."""
 
 
-class EnvironmentNotFoundError(DeploymentException):
+class EnvironmentNotFoundError(DeploymentError):
     """Raised when an unknown environment is referenced."""

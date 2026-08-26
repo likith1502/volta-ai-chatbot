@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+
 from app.prompt.contracts import PromptMessage, PromptVariable
 
 
@@ -10,7 +11,9 @@ class PromptQualityReport(BaseModel):
     variable_coverage_pct: float = Field(default=100.0, ge=0.0, le=100.0)
     complexity_score: str = Field(default="low", description="'low', 'medium', 'high'")
     safety_score: float = Field(default=95.0, ge=0.0, le=100.0)
-    estimated_hallucination_risk: str = Field(default="low", description="'low', 'medium', 'high'")
+    estimated_hallucination_risk: str = Field(
+        default="low", description="'low', 'medium', 'high'"
+    )
     optimization_score: float = Field(default=90.0, ge=0.0, le=100.0)
     overall_quality_grade: str = Field(default="A", description="'A', 'B', 'C', 'D'")
 
@@ -45,7 +48,9 @@ class PromptQualityAnalyzer:
 
         return PromptQualityReport(
             readability_score=min(100.0, max(50.0, 100.0 - (length / 50.0))),
-            instruction_density=min(100.0, max(40.0, (word_count / (length + 1)) * 500.0)),
+            instruction_density=min(
+                100.0, max(40.0, (word_count / (length + 1)) * 500.0)
+            ),
             variable_coverage_pct=100.0 if variables else 0.0,
             complexity_score=complexity,
             safety_score=98.0,

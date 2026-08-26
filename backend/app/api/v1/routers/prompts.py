@@ -1,10 +1,10 @@
 import uuid
 from typing import Any, Optional
+
 from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
-from app.prompt.contracts import ChatMessage, PromptMessage, PromptRequest
-from app.prompt.cost import PromptCostEstimator
+from app.prompt.contracts import PromptRequest
 from app.prompt.manager import PromptManager
 from app.prompt.result import PromptResult
 from app.prompt.templates.chat_template import ChatPromptTemplate
@@ -19,10 +19,15 @@ _prompt_manager = PromptManager()
 class PromptRenderPayload(BaseModel):
     """Payload for prompt rendering, linting, validation, and optimization."""
 
-    template_id: str = Field(..., description="Target template ID (e.g. 'mobility_assistant_v1', 'ride_booking_v1')")
+    template_id: str = Field(
+        ...,
+        description="Target template ID (e.g. 'mobility_assistant_v1', 'ride_booking_v1')",
+    )
     revision_id: Optional[str] = Field(default="v1", description="Template revision ID")
     profile_id: Optional[str] = Field(default=None, description="Generation profile ID")
-    variables: dict[str, Any] = Field(default_factory=dict, description="Variables to substitute into placeholders")
+    variables: dict[str, Any] = Field(
+        default_factory=dict, description="Variables to substitute into placeholders"
+    )
     system_prompt_override: Optional[str] = Field(default=None)
     provider: Optional[str] = Field(default=None)
     model: Optional[str] = Field(default=None)
@@ -35,7 +40,9 @@ class ScratchPromptPayload(BaseModel):
     """Payload for unsaved scratch prompt sandbox execution."""
 
     system_instruction: str = Field(default="You are a helpful AI assistant.")
-    user_prompt_template: str = Field(..., description="Raw text template string containing {placeholders}")
+    user_prompt_template: str = Field(
+        ..., description="Raw text template string containing {placeholders}"
+    )
     variables: dict[str, Any] = Field(default_factory=dict)
     provider: Optional[str] = Field(default="mock")
     model: Optional[str] = Field(default="mock-model-v1")
@@ -45,7 +52,9 @@ class ProviderComparePayload(BaseModel):
     """Payload for comparing prompt execution across multiple providers."""
 
     template_id: str = "mobility_assistant_v1"
-    variables: dict[str, Any] = Field(default_factory=lambda: {"city_name": "San Francisco", "user_name": "Likith"})
+    variables: dict[str, Any] = Field(
+        default_factory=lambda: {"city_name": "San Francisco", "user_name": "Likith"}
+    )
     providers: list[str] = Field(default_factory=lambda: ["mock", "gemini"])
 
 
@@ -222,7 +231,9 @@ async def list_profiles() -> dict[str, Any]:
     status_code=status.HTTP_200_OK,
     summary="Get Prompt Execution History & Snapshots",
 )
-async def get_prompt_history(limit: int = Query(default=20, ge=1, le=100)) -> dict[str, Any]:
+async def get_prompt_history(
+    limit: int = Query(default=20, ge=1, le=100),
+) -> dict[str, Any]:
     """Returns recent prompt execution results and rendering snapshots."""
     results = await _prompt_manager.execution_store.list_recent_results(limit=limit)
     snapshots = await _prompt_manager.execution_store.list_recent_snapshots(limit=limit)

@@ -1,6 +1,5 @@
-import asyncio
 import time
-from app.tools.exceptions import ToolExecutionError
+
 from app.tools.request import ToolRequest
 from app.tools.result import ToolResult
 from app.tools.tool import BaseTool
@@ -9,7 +8,9 @@ from app.tools.tool import BaseTool
 class ToolExecutor:
     """Executes BaseTool instances asynchronously with latency tracking and error boundary management."""
 
-    async def execute(self, tool_instance: BaseTool, request: ToolRequest) -> ToolResult:
+    async def execute(
+        self, tool_instance: BaseTool, request: ToolRequest
+    ) -> ToolResult:
         t0 = time.perf_counter()
         try:
             result = await tool_instance.execute(request)

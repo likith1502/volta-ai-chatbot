@@ -1,9 +1,9 @@
 """Structured logging provider."""
 
+import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any
-import logging
 
 
 @dataclass
@@ -37,7 +37,9 @@ class StructuredLoggingProvider(LoggingProvider):
         self._logger = logging.getLogger(f"observability.{service}")
 
     def log(self, level: str, message: str, **kwargs: Any) -> None:
-        entry = LogEntry(level=level, message=message, service=self._service, labels=kwargs)
+        entry = LogEntry(
+            level=level, message=message, service=self._service, labels=kwargs
+        )
         self._entries.append(entry)
         getattr(self._logger, level.lower(), self._logger.info)(message, extra=kwargs)
 

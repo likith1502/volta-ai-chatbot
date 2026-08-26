@@ -1,4 +1,3 @@
-from typing import Any
 from app.tools.request import ToolRequest
 from app.tools.result import ToolResult
 from app.tools.tool import BaseTool
@@ -18,14 +17,12 @@ class EchoTool(BaseTool):
                 "properties": {
                     "message": {"type": "string", "description": "Text message to echo"}
                 },
-                "required": ["message"]
+                "required": ["message"],
             },
             output_schema={
                 "type": "object",
-                "properties": {
-                    "echo": {"type": "string"}
-                }
-            }
+                "properties": {"echo": {"type": "string"}},
+            },
         )
 
     async def execute(self, request: ToolRequest) -> ToolResult:

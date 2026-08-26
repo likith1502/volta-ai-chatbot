@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Optional
+
 from app.prompt.contracts import PromptResponse
 
 
@@ -12,7 +13,9 @@ class PromptCache(ABC):
         pass
 
     @abstractmethod
-    async def set(self, cache_key: str, response: PromptResponse, ttl_seconds: int = 3600) -> None:
+    async def set(
+        self, cache_key: str, response: PromptResponse, ttl_seconds: int = 3600
+    ) -> None:
         """Stores PromptResponse in cache."""
         pass
 

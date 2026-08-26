@@ -1,6 +1,8 @@
 import logging
 from typing import Any
+
 from pydantic import BaseModel, Field
+
 from app.prompt.registry import PromptRegistry
 
 logger = logging.getLogger("app.prompt.health")

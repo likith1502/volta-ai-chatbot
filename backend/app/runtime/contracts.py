@@ -1,16 +1,26 @@
 import uuid
 from datetime import datetime, timezone
 from typing import Any, Optional
+
 from pydantic import BaseModel, Field
 
 
 class ChatMessage(BaseModel):
     """Structured, extensible chat message primitive supporting multi-role conversational turns."""
 
-    role: str = Field(default="user", description="Message role: 'system', 'user', 'assistant', 'tool'")
+    role: str = Field(
+        default="user",
+        description="Message role: 'system', 'user', 'assistant', 'tool'",
+    )
     content: str = Field(..., description="Text content payload")
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), description="Creation timestamp")
-    metadata: dict[str, Any] = Field(default_factory=dict, description="Metadata envelope for multimodal attachments or tool IDs")
+    timestamp: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        description="Creation timestamp",
+    )
+    metadata: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Metadata envelope for multimodal attachments or tool IDs",
+    )
 
 
 class RuntimeTokenUsage(BaseModel):

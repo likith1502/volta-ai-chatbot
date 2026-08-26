@@ -1,8 +1,8 @@
 import uuid
-from typing import Any, Optional
+from typing import Optional
+
 from pydantic import BaseModel, Field
 
-from app.prompt.contracts import PromptRequest
 from app.prompt.result import PromptResult
 
 

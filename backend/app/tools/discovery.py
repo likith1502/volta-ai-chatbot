@@ -1,5 +1,6 @@
 import logging
 from typing import Optional
+
 from app.tools.manifest import ToolManifest
 from app.tools.permission import ToolPermission
 from app.tools.repository import ToolRepository
@@ -31,9 +32,15 @@ class ToolDiscoveryService:
                 continue
             if permission and m.required_permission != permission:
                 continue
-            if supports_async is not None and m.capabilities.supports_async != supports_async:
+            if (
+                supports_async is not None
+                and m.capabilities.supports_async != supports_async
+            ):
                 continue
-            if supports_batch is not None and m.capabilities.supports_batch != supports_batch:
+            if (
+                supports_batch is not None
+                and m.capabilities.supports_batch != supports_batch
+            ):
                 continue
             matched.append(m)
 

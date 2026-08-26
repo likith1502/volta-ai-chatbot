@@ -50,14 +50,24 @@ class IntegrationManager:
             adapters = IntegrationFactory.create_reference_adapters()
             for a in adapters:
                 self.registry.register_provider(a)
-                self.audit_logger.log_event(a.provider_id, "Register", {"name": a.name, "category": a.category.value})
+                self.audit_logger.log_event(
+                    a.provider_id,
+                    "Register",
+                    {"name": a.name, "category": a.category.value},
+                )
 
-    async def register_provider(self, payload: IntegrationProviderRegisterPayload) -> IntegrationProvider:
+    async def register_provider(
+        self, payload: IntegrationProviderRegisterPayload
+    ) -> IntegrationProvider:
         """Registers a new provider dynamically."""
-        adapter = FilesystemStorageAdapter(provider_id=payload.provider_id, priority=payload.priority)
+        adapter = FilesystemStorageAdapter(
+            provider_id=payload.provider_id, priority=payload.priority
+        )
         await adapter.initialize()
         self.registry.register_provider(adapter)
-        self.audit_logger.log_event(payload.provider_id, "Register", payload.model_dump())
+        self.audit_logger.log_event(
+            payload.provider_id, "Register", payload.model_dump()
+        )
         self.statistics.total_providers_registered += 1
         return adapter
 
@@ -66,16 +76,22 @@ class IntegrationManager:
         p = self.registry.get_provider(payload.provider_id)
         if not p:
             raise ValueError(f"Provider '{payload.provider_id}' not found.")
-        self.audit_logger.log_event(payload.provider_id, "Configure", payload.model_dump())
+        self.audit_logger.log_event(
+            payload.provider_id, "Configure", payload.model_dump()
+        )
         return True
 
-    async def test_provider_connection(self, payload: IntegrationTestPayload) -> dict[str, Any]:
+    async def test_provider_connection(
+        self, payload: IntegrationTestPayload
+    ) -> dict[str, Any]:
         """Tests live connectivity for a provider."""
         p = self.registry.get_provider(payload.provider_id)
         if not p:
             raise ValueError(f"Provider '{payload.provider_id}' not found.")
         report = await p.check_health()
-        self.audit_logger.log_event(payload.provider_id, "ConnectionTest", {"is_healthy": report.is_healthy})
+        self.audit_logger.log_event(
+            payload.provider_id, "ConnectionTest", {"is_healthy": report.is_healthy}
+        )
         return report.model_dump()
 
     async def get_provider_health(self, provider_id: str) -> IntegrationHealthReport:
@@ -92,9 +108,13 @@ class IntegrationManager:
     def get_provider(self, provider_id: str) -> Optional[IntegrationProvider]:
         return self.registry.get_provider(provider_id)
 
-    def list_providers(self, category: Optional[IntegrationCapability] = None) -> list[IntegrationProvider]:
+    def list_providers(
+        self, category: Optional[IntegrationCapability] = None
+    ) -> list[IntegrationProvider]:
         return self.registry.list_providers(category)
 
-    def resolve_active_provider(self, category: IntegrationCapability) -> Optional[IntegrationProvider]:
+    def resolve_active_provider(
+        self, category: IntegrationCapability
+    ) -> Optional[IntegrationProvider]:
         """Resolves active provider with automatic priority failover."""
         return self.registry.resolve_active_provider(category)

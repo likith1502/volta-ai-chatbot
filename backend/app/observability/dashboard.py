@@ -2,7 +2,6 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any
 
 
 @dataclass
@@ -34,19 +33,36 @@ class GrafanaDashboardProvider(DashboardProvider):
                 dashboard_id="platform_health",
                 title="VOLTA Platform Health",
                 url="http://grafana:3000/d/platform_health",
-                panels=["CPU", "Memory", "Request Rate", "Error Rate", "Latency P95", "Replica Count"],
+                panels=[
+                    "CPU",
+                    "Memory",
+                    "Request Rate",
+                    "Error Rate",
+                    "Latency P95",
+                    "Replica Count",
+                ],
             ),
             "rag_performance": Dashboard(
                 dashboard_id="rag_performance",
                 title="RAG Engine Performance",
                 url="http://grafana:3000/d/rag_performance",
-                panels=["Retrieval Latency", "Chunk Quality Score", "Cache Hit Rate", "Ingestion Queue Depth"],
+                panels=[
+                    "Retrieval Latency",
+                    "Chunk Quality Score",
+                    "Cache Hit Rate",
+                    "Ingestion Queue Depth",
+                ],
             ),
             "agent_activity": Dashboard(
                 dashboard_id="agent_activity",
                 title="Multi-Agent Runtime Activity",
                 url="http://grafana:3000/d/agent_activity",
-                panels=["Active Agents", "Task Queue Depth", "Delegation Rate", "Budget Exhaustion Events"],
+                panels=[
+                    "Active Agents",
+                    "Task Queue Depth",
+                    "Delegation Rate",
+                    "Budget Exhaustion Events",
+                ],
             ),
         }
 

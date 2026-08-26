@@ -5,7 +5,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.ai.base import AIProvider
-from app.ai.exceptions import AIProviderException
+from app.ai.exceptions import AIProviderError
 from app.ai.factory import AIProviderFactory
 from app.ai.memory.factory import MemoryStrategyFactory
 from app.ai.memory.recent import RecentConversationStrategy
@@ -43,7 +43,7 @@ def test_ai_provider_factory_and_openai_provider():
     provider = AIProviderFactory.get_provider("openai")
     assert isinstance(provider, OpenAIProvider)
 
-    with pytest.raises(AIProviderException):
+    with pytest.raises(AIProviderError):
         AIProviderFactory.get_provider("unknown_provider")
 
 
@@ -53,7 +53,7 @@ async def test_memory_strategy_factory_and_recent_strategy():
     strategy = MemoryStrategyFactory.get_strategy("recent")
     assert isinstance(strategy, RecentConversationStrategy)
 
-    with pytest.raises(AIProviderException):
+    with pytest.raises(AIProviderError):
         MemoryStrategyFactory.get_strategy("unknown_strategy")
 
     session = AsyncMock()

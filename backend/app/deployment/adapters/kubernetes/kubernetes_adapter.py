@@ -12,8 +12,12 @@ class KubernetesAdapterConfig:
     context: str = "volta-cluster"
     image_pull_policy: str = "Always"
     service_account: str = "volta-sa"
-    resource_requests: dict[str, str] = field(default_factory=lambda: {"cpu": "250m", "memory": "512Mi"})
-    resource_limits: dict[str, str] = field(default_factory=lambda: {"cpu": "1000m", "memory": "2Gi"})
+    resource_requests: dict[str, str] = field(
+        default_factory=lambda: {"cpu": "250m", "memory": "512Mi"}
+    )
+    resource_limits: dict[str, str] = field(
+        default_factory=lambda: {"cpu": "1000m", "memory": "2Gi"}
+    )
 
 
 class KubernetesAdapter:
@@ -25,7 +29,9 @@ class KubernetesAdapter:
     def __init__(self, config: KubernetesAdapterConfig | None = None) -> None:
         self.config = config or KubernetesAdapterConfig()
 
-    async def deploy(self, deployment_id: str, image_tag: str, replicas: int = 2) -> dict[str, Any]:
+    async def deploy(
+        self, deployment_id: str, image_tag: str, replicas: int = 2
+    ) -> dict[str, Any]:
         return {
             "adapter": self.adapter_id,
             "namespace": self.config.namespace,
@@ -76,10 +82,19 @@ class SystemdAdapter:
         return {"adapter": self.adapter_id, "service": service_name, "status": "active"}
 
     async def stop(self, service_name: str) -> dict[str, Any]:
-        return {"adapter": self.adapter_id, "service": service_name, "status": "inactive"}
+        return {
+            "adapter": self.adapter_id,
+            "service": service_name,
+            "status": "inactive",
+        }
 
     async def restart(self, service_name: str) -> dict[str, Any]:
-        return {"adapter": self.adapter_id, "service": service_name, "status": "active", "restarted": True}
+        return {
+            "adapter": self.adapter_id,
+            "service": service_name,
+            "status": "active",
+            "restarted": True,
+        }
 
     async def health_check(self) -> dict[str, Any]:
         return {"adapter": self.adapter_id, "healthy": True, "engine": "systemd"}

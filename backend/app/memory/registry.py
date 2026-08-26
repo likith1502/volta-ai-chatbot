@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
+
 from app.memory.factory import MemoryFactory
-from app.memory.inmemory_repository import InMemoryMemoryRepository
 from app.memory.repository import MemoryRepository
 
 logger = logging.getLogger("app.memory.registry")

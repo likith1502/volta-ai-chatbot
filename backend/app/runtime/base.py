@@ -1,6 +1,12 @@
 from abc import ABC, abstractmethod
 from typing import AsyncIterator, Union
-from app.runtime.contracts import ChatMessage, ProviderCapabilities, RuntimeRequest, RuntimeResponse
+
+from app.runtime.contracts import (
+    ChatMessage,
+    ProviderCapabilities,
+    RuntimeRequest,
+    RuntimeResponse,
+)
 from app.streaming import StreamMessage
 
 
@@ -24,7 +30,9 @@ class RuntimeProvider(ABC):
         pass
 
     @abstractmethod
-    async def generate_stream(self, request: RuntimeRequest) -> AsyncIterator[StreamMessage]:
+    async def generate_stream(
+        self, request: RuntimeRequest
+    ) -> AsyncIterator[StreamMessage]:
         """Executes a streaming response turn yielding StreamMessage tokens."""
         pass
 

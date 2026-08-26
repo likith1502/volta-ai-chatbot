@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+
 from app.agents.registry import AgentRegistry
 
 

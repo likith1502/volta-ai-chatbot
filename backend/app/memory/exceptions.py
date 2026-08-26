@@ -1,8 +1,9 @@
 from typing import Optional
-from app.core.exceptions import AppException
+
+from app.core.exceptions import AppError
 
 
-class MemoryException(AppException):
+class MemoryError(AppError):
     """Base exception for all Memory Runtime failures."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -10,7 +11,7 @@ class MemoryException(AppException):
         self.code = "MEMORY_ERROR"
 
 
-class MemoryNotFoundError(MemoryException):
+class MemoryNotFoundError(MemoryError):
     """Raised when a requested memory ID is not found."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -19,7 +20,7 @@ class MemoryNotFoundError(MemoryException):
         self.status_code = 404
 
 
-class MemoryValidationError(MemoryException):
+class MemoryValidationError(MemoryError):
     """Raised when memory validation fails."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -28,7 +29,7 @@ class MemoryValidationError(MemoryException):
         self.status_code = 400
 
 
-class MemoryLimitExceededError(MemoryException):
+class MemoryLimitExceededError(MemoryError):
     """Raised when memory storage limits or capacity budget are exceeded."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -37,7 +38,7 @@ class MemoryLimitExceededError(MemoryException):
         self.status_code = 400
 
 
-class ContextOverflowError(MemoryException):
+class ContextOverflowError(MemoryError):
     """Raised when memory context assembly exceeds token budget limit."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -46,7 +47,7 @@ class ContextOverflowError(MemoryException):
         self.status_code = 400
 
 
-class MemoryRepositoryException(MemoryException):
+class MemoryRepositoryError(MemoryError):
     """Raised when repository storage operations fail."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -54,7 +55,7 @@ class MemoryRepositoryException(MemoryException):
         self.code = "MEMORY_REPOSITORY_ERROR"
 
 
-class MemoryPolicyException(MemoryException):
+class MemoryPolicyError(MemoryError):
     """Raised when policy evaluation fails."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:

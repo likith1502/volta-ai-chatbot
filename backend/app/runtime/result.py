@@ -1,4 +1,5 @@
 from typing import Any, Optional
+
 from pydantic import BaseModel, Field
 
 from app.runtime.context import RuntimeContext
@@ -12,7 +13,9 @@ class RuntimeResult(BaseModel):
     response: Optional[RuntimeResponse] = None
     metrics: RuntimeMetrics = Field(default_factory=RuntimeMetrics)
     context: RuntimeContext
-    execution_status: str = Field(default="COMPLETED", description="'COMPLETED', 'FAILED', 'DEGRADED'")
+    execution_status: str = Field(
+        default="COMPLETED", description="'COMPLETED', 'FAILED', 'DEGRADED'"
+    )
     warnings: list[str] = Field(default_factory=list)
     errors: list[str] = Field(default_factory=list)
     runtime_version: str = "7.0.0"

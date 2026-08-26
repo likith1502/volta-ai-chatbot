@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 
 class ScalingDirection(str, Enum):
@@ -16,6 +16,7 @@ class ScalingDirection(str, Enum):
 @dataclass
 class ResourceLimits:
     """CPU and memory resource limits for a deployment."""
+
     cpu_request: str = "250m"
     cpu_limit: str = "1000m"
     memory_request: str = "512Mi"
@@ -26,6 +27,7 @@ class ResourceLimits:
 @dataclass
 class ReplicaPolicy:
     """Replica count policy for a deployment target."""
+
     min_replicas: int = 1
     max_replicas: int = 10
     desired_replicas: int = 2
@@ -36,6 +38,7 @@ class ReplicaPolicy:
 @dataclass
 class AutoScalingPolicy:
     """Policy controlling auto-scaling trigger thresholds."""
+
     enabled: bool = True
     cpu_threshold_pct: float = 70.0
     memory_threshold_pct: float = 80.0
@@ -47,6 +50,7 @@ class AutoScalingPolicy:
 @dataclass
 class ScalingEvent:
     """A recorded scaling event."""
+
     event_id: str
     deployment_id: str
     direction: ScalingDirection
@@ -65,18 +69,30 @@ class HorizontalScaling:
         self.auto_policy = auto_policy
         self._events: list[ScalingEvent] = []
 
-    def compute_desired_replicas(self, current_replicas: int, cpu_pct: float, memory_pct: float) -> int:
+    def compute_desired_replicas(
+        self, current_replicas: int, cpu_pct: float, memory_pct: float
+    ) -> int:
         """Compute target replica count based on resource utilisation."""
-        if cpu_pct >= self.auto_policy.cpu_threshold_pct or memory_pct >= self.auto_policy.memory_threshold_pct:
+        if (
+            cpu_pct >= self.auto_policy.cpu_threshold_pct
+            or memory_pct >= self.auto_policy.memory_threshold_pct
+        ):
             return min(current_replicas + 1, self.policy.max_replicas)
-        if cpu_pct < self.auto_policy.cpu_threshold_pct * 0.4 and current_replicas > self.policy.min_replicas:
+        if (
+            cpu_pct < self.auto_policy.cpu_threshold_pct * 0.4
+            and current_replicas > self.policy.min_replicas
+        ):
             return max(current_replicas - 1, self.policy.min_replicas)
         return current_replicas
 
-    async def scale(self, deployment_id: str, current: int, target: int) -> ScalingEvent:
+    async def scale(
+        self, deployment_id: str, current: int, target: int
+    ) -> ScalingEvent:
         direction = (
-            ScalingDirection.UP if target > current
-            else ScalingDirection.DOWN if target < current
+            ScalingDirection.UP
+            if target > current
+            else ScalingDirection.DOWN
+            if target < current
             else ScalingDirection.NONE
         )
         evt = ScalingEvent(

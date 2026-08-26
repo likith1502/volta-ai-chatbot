@@ -1,28 +1,28 @@
-class ExecutionException(Exception):
+class ExecutionError(Exception):
     """Base exception for all graph execution engine errors."""
 
     pass
 
 
-class ExecutionTimeoutException(ExecutionException):
+class ExecutionTimeoutError(ExecutionError):
     """Raised when graph execution exceeds allowed maximum execution time."""
 
     pass
 
 
-class ExecutionCancelledException(ExecutionException):
+class ExecutionCancelledError(ExecutionError):
     """Raised when graph execution is cancelled."""
 
     pass
 
 
-class ExecutionValidationException(ExecutionException):
+class ExecutionValidationError(ExecutionError):
     """Raised when graph structure validation fails prior to or during execution."""
 
     pass
 
 
-class ExecutionStrategyException(ExecutionException):
+class ExecutionStrategyError(ExecutionError):
     """Raised when an error occurs within an execution strategy."""
 
     pass

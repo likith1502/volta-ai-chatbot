@@ -1,5 +1,6 @@
 import uuid
-from typing import Any, Optional
+from typing import Any
+
 from pydantic import BaseModel, Field
 
 
@@ -17,7 +18,9 @@ class Chunk(BaseModel):
 class EmbeddedChunk(BaseModel):
     """Vector embedding binding for a text Chunk."""
 
-    embedded_chunk_id: str = Field(default_factory=lambda: f"emb_chk_{uuid.uuid4().hex[:8]}")
+    embedded_chunk_id: str = Field(
+        default_factory=lambda: f"emb_chk_{uuid.uuid4().hex[:8]}"
+    )
     chunk_id: str
     document_id: str
     vector: list[float] = Field(default_factory=list)

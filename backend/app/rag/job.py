@@ -1,6 +1,8 @@
 import uuid
 from typing import Optional
+
 from pydantic import BaseModel, Field
+
 from app.rag.job_status import JobStatus
 
 

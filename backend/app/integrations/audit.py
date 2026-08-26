@@ -1,6 +1,7 @@
-import uuid
 import logging
+import uuid
 from typing import Any, Optional
+
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger("app.integrations.audit")
@@ -20,13 +21,19 @@ class IntegrationAuditLogger:
     def __init__(self) -> None:
         self._events: list[IntegrationAuditEvent] = []
 
-    def log_event(self, provider_id: str, action: str, details: Optional[dict[str, Any]] = None) -> IntegrationAuditEvent:
-        evt = IntegrationAuditEvent(provider_id=provider_id, action=action, details=details or {})
+    def log_event(
+        self, provider_id: str, action: str, details: Optional[dict[str, Any]] = None
+    ) -> IntegrationAuditEvent:
+        evt = IntegrationAuditEvent(
+            provider_id=provider_id, action=action, details=details or {}
+        )
         self._events.append(evt)
         logger.info(f"IntegrationAuditLogger: [{action}] provider '{provider_id}'")
         return evt
 
-    def get_events(self, provider_id: Optional[str] = None) -> list[IntegrationAuditEvent]:
+    def get_events(
+        self, provider_id: Optional[str] = None
+    ) -> list[IntegrationAuditEvent]:
         if provider_id:
             return [e for e in self._events if e.provider_id == provider_id]
         return list(self._events)

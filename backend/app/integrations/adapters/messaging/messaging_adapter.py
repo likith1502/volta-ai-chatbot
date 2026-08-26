@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional
+
 from app.integrations.capabilities import IntegrationCapability
 from app.integrations.health_level import HealthLevel
 from app.integrations.provider import IntegrationHealthReport, IntegrationProvider
@@ -10,7 +11,12 @@ class MessagingAdapter(IntegrationProvider, ABC):
     """Abstract interface for messaging queue and webhook event dispatchers."""
 
     def __init__(self, provider_id: str, name: str, priority: int = 10) -> None:
-        super().__init__(provider_id=provider_id, name=name, category=IntegrationCapability.MESSAGING, priority=priority)
+        super().__init__(
+            provider_id=provider_id,
+            name=name,
+            category=IntegrationCapability.MESSAGING,
+            priority=priority,
+        )
 
     @abstractmethod
     async def publish_message(self, topic_or_url: str, payload: dict[str, Any]) -> bool:
@@ -21,7 +27,11 @@ class WebhookMessagingAdapter(MessagingAdapter):
     """Reference messaging adapter dispatching HTTP Webhooks."""
 
     def __init__(self) -> None:
-        super().__init__(provider_id="messaging.webhook", name="HTTP Webhook Messaging Adapter", priority=10)
+        super().__init__(
+            provider_id="messaging.webhook",
+            name="HTTP Webhook Messaging Adapter",
+            priority=10,
+        )
         self._status = IntegrationStatus.CONFIGURED
 
     async def initialize(self, context: Optional[Any] = None) -> None:

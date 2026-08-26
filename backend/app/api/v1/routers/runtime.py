@@ -1,5 +1,6 @@
 import uuid
 from typing import Any, Optional
+
 from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
@@ -19,12 +20,19 @@ class ChatTurnPayload(BaseModel):
 
     message: str = Field(..., min_length=1, description="User input message text")
     provider: Optional[str] = Field(default=None, description="'gemini', 'mock'")
-    model: Optional[str] = Field(default=None, description="'gemini-2.5-flash', 'gemini-2.5-pro', 'mock-model-v1'")
-    system_prompt: Optional[str] = Field(default=None, description="Optional system instruction override")
+    model: Optional[str] = Field(
+        default=None,
+        description="'gemini-2.5-flash', 'gemini-2.5-pro', 'mock-model-v1'",
+    )
+    system_prompt: Optional[str] = Field(
+        default=None, description="Optional system instruction override"
+    )
     temperature: Optional[float] = Field(default=None, ge=0.0, le=2.0)
     max_tokens: Optional[int] = Field(default=None, ge=1)
     conversation_id: Optional[uuid.UUID] = None
-    history: list[dict[str, Any]] = Field(default_factory=list, description="Prior conversation turn history")
+    history: list[dict[str, Any]] = Field(
+        default_factory=list, description="Prior conversation turn history"
+    )
 
 
 @router.post(
@@ -88,7 +96,9 @@ async def list_providers() -> dict[str, Any]:
 )
 async def get_provider_health(provider_name: str) -> dict[str, Any]:
     """Checks health status and reports capabilities for specified provider."""
-    health_status = await _runtime_manager.health_manager.check_provider_health(provider_name)
+    health_status = await _runtime_manager.health_manager.check_provider_health(
+        provider_name
+    )
     return success_response(
         data=health_status.model_dump(),
         message=f"Health status for provider '{provider_name}' retrieved",
@@ -102,7 +112,10 @@ async def get_provider_health(provider_name: str) -> dict[str, Any]:
 )
 async def list_models(provider: Optional[str] = Query(default=None)) -> dict[str, Any]:
     """Returns list of all model definitions and cost structures from ModelRegistry."""
-    models = [m.model_dump() for m in _runtime_manager.model_registry.list_models(provider=provider)]
+    models = [
+        m.model_dump()
+        for m in _runtime_manager.model_registry.list_models(provider=provider)
+    ]
     return success_response(
         data=models,
         message="Registered models retrieved",
@@ -127,7 +140,9 @@ async def get_runtime_config() -> dict[str, Any]:
     status_code=status.HTTP_200_OK,
     summary="List Execution History",
 )
-async def list_execution_history(limit: int = Query(default=20, ge=1, le=100)) -> dict[str, Any]:
+async def list_execution_history(
+    limit: int = Query(default=20, ge=1, le=100),
+) -> dict[str, Any]:
     """Returns recent execution history records from RuntimeExecutionStore."""
     records = await _runtime_manager.execution_store.list_recent(limit=limit)
     return success_response(

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Optional
+
 from app.agents.agent import Agent
 from app.agents.definition import AgentDefinition
 

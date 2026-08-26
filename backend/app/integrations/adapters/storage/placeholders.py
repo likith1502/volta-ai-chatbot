@@ -1,4 +1,5 @@
 from typing import Any, Optional
+
 from app.integrations.adapters.storage.storage_adapter import StorageAdapter
 from app.integrations.health_level import HealthLevel
 from app.integrations.provider import IntegrationHealthReport
@@ -9,7 +10,9 @@ class S3StorageAdapter(StorageAdapter):
     """Extension placeholder for AWS S3 Storage Adapter."""
 
     def __init__(self, bucket: str = "volta-s3-bucket") -> None:
-        super().__init__(provider_id="storage.s3", name="AWS S3 Storage Adapter", priority=100)
+        super().__init__(
+            provider_id="storage.s3", name="AWS S3 Storage Adapter", priority=100
+        )
         self.bucket = bucket
         self._status = IntegrationStatus.CONFIGURED
 
@@ -24,7 +27,9 @@ class S3StorageAdapter(StorageAdapter):
         self._status = IntegrationStatus.DISCONNECTED
         return True
 
-    async def upload(self, key: str, data: bytes, metadata: Optional[dict[str, Any]] = None) -> str:
+    async def upload(
+        self, key: str, data: bytes, metadata: Optional[dict[str, Any]] = None
+    ) -> str:
         return f"s3://{self.bucket}/{key}"
 
     async def download(self, key: str) -> bytes:

@@ -18,6 +18,7 @@ class EnvironmentType(str, Enum):
 @dataclass
 class EnvironmentConfig:
     """Configuration bundle for a deployment environment."""
+
     database_url: str = "postgresql+asyncpg://localhost/volta_dev"
     redis_url: str = "redis://localhost:6379/0"
     log_level: str = "INFO"
@@ -33,6 +34,7 @@ class EnvironmentConfig:
 @dataclass
 class Environment:
     """Full environment definition."""
+
     env_id: str
     env_type: EnvironmentType
     name: str
@@ -85,7 +87,9 @@ class EnvironmentManager:
     """Manages deployment environments, promotion, and configuration snapshots."""
 
     def __init__(self) -> None:
-        self._environments: dict[EnvironmentType, Environment] = dict(_DEFAULT_ENVIRONMENTS)
+        self._environments: dict[EnvironmentType, Environment] = dict(
+            _DEFAULT_ENVIRONMENTS
+        )
         self._active_env: EnvironmentType = EnvironmentType.PRODUCTION
 
     def get_environment(self, env_type: EnvironmentType) -> Optional[Environment]:
@@ -108,7 +112,9 @@ class EnvironmentManager:
     def active_environment(self) -> Optional[Environment]:
         return self._environments.get(self._active_env)
 
-    def update_config(self, env_type: EnvironmentType, config: EnvironmentConfig) -> bool:
+    def update_config(
+        self, env_type: EnvironmentType, config: EnvironmentConfig
+    ) -> bool:
         env = self._environments.get(env_type)
         if not env:
             return False

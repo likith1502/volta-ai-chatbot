@@ -9,7 +9,9 @@ class CitationBuilder:
     def __init__(self, document_repository: DocumentRepository) -> None:
         self.document_repository = document_repository
 
-    def build_citations(self, ranked_chunks: list[tuple[Chunk, float]]) -> list[Citation]:
+    def build_citations(
+        self, ranked_chunks: list[tuple[Chunk, float]]
+    ) -> list[Citation]:
         citations: list[Citation] = []
         for chk, score in ranked_chunks:
             doc = self.document_repository.get_document(chk.document_id)

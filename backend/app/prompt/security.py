@@ -1,5 +1,6 @@
 import re
 from typing import Optional
+
 from pydantic import BaseModel, Field
 
 
@@ -7,8 +8,12 @@ class PromptSecurityPolicy(BaseModel):
     """Provider-independent security policy defining length bounds, blocked keywords, and injection detection."""
 
     max_prompt_length_chars: int = Field(default=50000, ge=100)
-    blocked_placeholders: list[str] = Field(default_factory=lambda: ["__system__", "__admin__", "eval("])
-    restricted_variable_names: list[str] = Field(default_factory=lambda: ["api_key", "secret", "password"])
+    blocked_placeholders: list[str] = Field(
+        default_factory=lambda: ["__system__", "__admin__", "eval("]
+    )
+    restricted_variable_names: list[str] = Field(
+        default_factory=lambda: ["api_key", "secret", "password"]
+    )
     enable_injection_detection: bool = True
 
     def validate_variable_name(self, name: str) -> bool:
@@ -21,7 +26,10 @@ class PromptSecurityPolicy(BaseModel):
             return None
 
         patterns = [
-            (r"ignore\s+(all\s+)?previous\s+instructions", "Prompt injection attempt detected: ignore previous instructions"),
+            (
+                r"ignore\s+(all\s+)?previous\s+instructions",
+                "Prompt injection attempt detected: ignore previous instructions",
+            ),
             (r"system\s*:\s*you\s+are", "System role override attempt detected"),
             (r"<script.*?>", "HTML/XSS injection pattern detected"),
         ]

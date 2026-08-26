@@ -16,7 +16,9 @@ class AIToolDispatcher:
         """Locates and executes a tool call using the registered AITool implementation."""
         tool = self.registry.get(tool_call.tool_name)
         if not tool:
-            logger.warning(f"Attempted to dispatch unregistered tool: '{tool_call.tool_name}'")
+            logger.warning(
+                f"Attempted to dispatch unregistered tool: '{tool_call.tool_name}'"
+            )
             return AIToolResult(
                 tool_name=tool_call.tool_name,
                 success=False,

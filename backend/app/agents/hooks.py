@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from app.agents.agent import Agent
 from app.agents.task import AgentTask, TaskResult
 

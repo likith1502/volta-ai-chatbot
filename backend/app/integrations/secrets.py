@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 from abc import ABC, abstractmethod
 from typing import Optional
 
@@ -61,5 +61,7 @@ class EnvSecretProvider(SecretProvider):
         os.environ[key] = new_value
         self._cache[key] = new_value
         self._versions[key] = self._versions.get(key, 1) + 1
-        logger.info(f"EnvSecretProvider rotated secret '{key}' to version {self.secret_version(key)}")
+        logger.info(
+            f"EnvSecretProvider rotated secret '{key}' to version {self.secret_version(key)}"
+        )
         return True

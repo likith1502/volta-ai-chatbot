@@ -1,4 +1,7 @@
-from app.graph_runtime.analytics import GraphRuntimeAnalyticsManager, GraphRuntimeAnalyticsReport
+from app.graph_runtime.analytics import (
+    GraphRuntimeAnalyticsManager,
+    GraphRuntimeAnalyticsReport,
+)
 from app.graph_runtime.capabilities import GraphRuntimeCapabilities
 from app.graph_runtime.checkpoint import GraphCheckpointIntegration
 from app.graph_runtime.config import GraphRuntimeConfig
@@ -23,7 +26,7 @@ from app.graph_runtime.exceptions import (
     GraphExecutionInterruptedError,
     GraphNodeNotFoundError,
     GraphPlanningError,
-    GraphRuntimeException,
+    GraphRuntimeError,
     GraphSchedulingError,
 )
 from app.graph_runtime.execution_plan import GraphExecutionPlan
@@ -111,7 +114,7 @@ __all__ = [
     "GraphRuntimeFactory",
     "GraphRuntimeExecutor",
     "GraphRuntimeManager",
-    "GraphRuntimeException",
+    "GraphRuntimeError",
     "GraphNodeNotFoundError",
     "GraphPlanningError",
     "GraphSchedulingError",

@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import time
 import uuid
@@ -8,14 +7,17 @@ from app.events.event import WorkflowEvent
 from app.events.event_bus import WorkflowEventBus
 from app.prompt.compiler import PromptCompiler
 from app.prompt.context import PromptContext
-from app.prompt.contracts import PromptRequest, PromptResponse
-from app.prompt.exceptions import PromptRenderError, TemplateNotFoundError
-from app.prompt.execution_store import InMemoryPromptExecutionStore, PromptExecutionStore, PromptSnapshot
+from app.prompt.contracts import PromptRequest
+from app.prompt.execution_store import (
+    InMemoryPromptExecutionStore,
+    PromptExecutionStore,
+    PromptSnapshot,
+)
 from app.prompt.factory import PromptFactory
 from app.prompt.health import PromptHealthManager
 from app.prompt.metrics import PromptMetrics
 from app.prompt.middleware.audit_mw import AuditMiddleware
-from app.prompt.middleware.base import PromptMiddleware, PromptPipeline
+from app.prompt.middleware.base import PromptPipeline
 from app.prompt.middleware.injection_mw import VariableInjectionMiddleware
 from app.prompt.middleware.optimization_mw import OptimizationMiddleware
 from app.prompt.middleware.rendering_mw import RenderingMiddleware
@@ -51,9 +53,13 @@ class PromptManager:
 
         # Register default presets if empty
         if not self.registry.exists_template("mobility_assistant_v1"):
-            self.registry.register_template(PromptFactory.create_mobility_assistant_template())
+            self.registry.register_template(
+                PromptFactory.create_mobility_assistant_template()
+            )
         if not self.registry.exists_template("ride_booking_v1"):
-            self.registry.register_template(PromptFactory.create_ride_booking_template())
+            self.registry.register_template(
+                PromptFactory.create_ride_booking_template()
+            )
         if not self.registry.exists_template("system_chat_v1"):
             self.registry.register_template(PromptFactory.create_system_chat_template())
 
@@ -114,15 +120,21 @@ class PromptManager:
         metrics = PromptMetrics()
         trace = PromptTrace()
 
-        await self._emit_event("created", {"prompt_id": str(prompt_id), "template_id": request.template_id})
+        await self._emit_event(
+            "created", {"prompt_id": str(prompt_id), "template_id": request.template_id}
+        )
 
         # 1. Lookup Template
         template = await self.registry.lookup_template_async(request.template_id)
 
         # Handle template inheritance
         effective_system_instruction = template.system_instruction
-        if template.parent_template_id and self.registry.exists_template(template.parent_template_id):
-            parent = await self.registry.lookup_template_async(template.parent_template_id)
+        if template.parent_template_id and self.registry.exists_template(
+            template.parent_template_id
+        ):
+            parent = await self.registry.lookup_template_async(
+                template.parent_template_id
+            )
             if parent.system_instruction and not effective_system_instruction:
                 effective_system_instruction = parent.system_instruction
 
@@ -138,7 +150,9 @@ class PromptManager:
 
         warnings = list(val_res.warnings)
         if not val_res.is_valid:
-            await self._emit_event("failed", {"prompt_id": str(prompt_id), "errors": val_res.errors})
+            await self._emit_event(
+                "failed", {"prompt_id": str(prompt_id), "errors": val_res.errors}
+            )
             return PromptResult(
                 rendered_prompt=None,
                 metrics=metrics,
@@ -186,7 +200,13 @@ class PromptManager:
         total_chars = sum(len(m.content) for m in rendered_resp.messages)
         metrics.token_estimate = max(1, total_chars // 4)
 
-        await self._emit_event("optimized", {"prompt_id": str(prompt_id), "compression_ratio": metrics.compression_ratio})
+        await self._emit_event(
+            "optimized",
+            {
+                "prompt_id": str(prompt_id),
+                "compression_ratio": metrics.compression_ratio,
+            },
+        )
 
         metrics.execution_time_ms = (time.perf_counter() - start_time) * 1000.0
 
@@ -220,10 +240,16 @@ class PromptManager:
             return prompt_res
 
         # Lookup profile if supplied
-        profile = self.registry.lookup_profile(request.profile_id) if request.profile_id else None
+        profile = (
+            self.registry.lookup_profile(request.profile_id)
+            if request.profile_id
+            else None
+        )
 
         # Compile prompt
-        compiled = self.compiler.compile(request, prompt_res.rendered_prompt, profile=profile)
+        compiled = self.compiler.compile(
+            request, prompt_res.rendered_prompt, profile=profile
+        )
 
         # Construct RuntimeRequest
         runtime_req = RuntimeRequest(
@@ -242,7 +268,13 @@ class PromptManager:
         prompt_res.runtime_result = runtime_res
         prompt_res.context.runtime_id = runtime_res.context.runtime_id
 
-        await self._emit_event("executed", {"prompt_id": str(prompt_res.context.prompt_id), "runtime_id": str(runtime_res.context.runtime_id)})
+        await self._emit_event(
+            "executed",
+            {
+                "prompt_id": str(prompt_res.context.prompt_id),
+                "runtime_id": str(runtime_res.context.runtime_id),
+            },
+        )
         await self.execution_store.save_result(prompt_res)
 
         return prompt_res

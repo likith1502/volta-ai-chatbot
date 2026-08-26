@@ -11,11 +11,11 @@ from app.memory.contracts import MemoryRequest, MemoryResponse, MemorySearchResu
 from app.memory.cost import MemoryCostEstimate, MemoryCostEstimator
 from app.memory.exceptions import (
     ContextOverflowError,
-    MemoryException,
+    MemoryError,
     MemoryLimitExceededError,
     MemoryNotFoundError,
-    MemoryPolicyException,
-    MemoryRepositoryException,
+    MemoryPolicyError,
+    MemoryRepositoryError,
     MemoryValidationError,
 )
 from app.memory.factory import MemoryFactory
@@ -46,7 +46,13 @@ from app.memory.serializer import MemorySerializer
 from app.memory.snapshot import MemorySnapshot
 from app.memory.statistics import MemoryStatistics
 from app.memory.status import MemoryStatus
-from app.memory.strategy import ContextAssemblyStrategy, HybridStrategy, ImportanceStrategy, RecentStrategy, SlidingWindowStrategy
+from app.memory.strategy import (
+    ContextAssemblyStrategy,
+    HybridStrategy,
+    ImportanceStrategy,
+    RecentStrategy,
+    SlidingWindowStrategy,
+)
 from app.memory.token_estimator import MemoryTokenEstimator
 from app.memory.types import MemoryType
 from app.memory.versioning import MemoryVersion
@@ -98,13 +104,13 @@ __all__ = [
     "MemorySnapshot",
     "MemoryMetrics",
     "MemorySerializer",
-    "MemoryException",
+    "MemoryError",
     "MemoryNotFoundError",
     "MemoryValidationError",
     "MemoryLimitExceededError",
     "ContextOverflowError",
-    "MemoryRepositoryException",
-    "MemoryPolicyException",
+    "MemoryRepositoryError",
+    "MemoryPolicyError",
     "BeforeCreateHook",
     "AfterCreateHook",
     "BeforeSearchHook",

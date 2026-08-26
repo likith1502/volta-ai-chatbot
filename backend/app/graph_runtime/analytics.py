@@ -19,7 +19,9 @@ class GraphRuntimeAnalyticsManager:
         self.total_duration_ms = 0.0
         self.node_counts: dict[str, int] = {}
 
-    def record_run(self, duration_ms: float, success: bool, visited_nodes: list[str]) -> None:
+    def record_run(
+        self, duration_ms: float, success: bool, visited_nodes: list[str]
+    ) -> None:
         self.executions += 1
         if success:
             self.successes += 1
@@ -28,8 +30,14 @@ class GraphRuntimeAnalyticsManager:
             self.node_counts[n] = self.node_counts.get(n, 0) + 1
 
     def get_report(self) -> GraphRuntimeAnalyticsReport:
-        top_node = max(self.node_counts, key=self.node_counts.get) if self.node_counts else "llm_node"
-        avg_dur = (self.total_duration_ms / self.executions) if self.executions > 0 else 0.0
+        top_node = (
+            max(self.node_counts, key=self.node_counts.get)
+            if self.node_counts
+            else "llm_node"
+        )
+        avg_dur = (
+            (self.total_duration_ms / self.executions) if self.executions > 0 else 0.0
+        )
         rate = (self.successes / self.executions) if self.executions > 0 else 1.0
 
         return GraphRuntimeAnalyticsReport(

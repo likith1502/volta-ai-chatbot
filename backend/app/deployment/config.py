@@ -7,6 +7,7 @@ from typing import Any
 @dataclass
 class DeploymentConfig:
     """Global deployment configuration."""
+
     platform_version: str = "7.8.0"
     default_environment: str = "production"
     default_strategy: str = "rolling"

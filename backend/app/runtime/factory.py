@@ -1,4 +1,5 @@
 import logging
+
 from app.config.settings import settings
 from app.runtime.base import RuntimeProvider
 from app.runtime.providers.gemini_provider import GeminiProvider
@@ -22,5 +23,7 @@ class RuntimeFactory:
         elif name == "mock":
             return MockProvider(latency_ms=15.0)
         else:
-            logger.warning(f"Unknown provider '{provider_name}' requested from RuntimeFactory. Falling back to MockProvider.")
+            logger.warning(
+                f"Unknown provider '{provider_name}' requested from RuntimeFactory. Falling back to MockProvider."
+            )
             return MockProvider()

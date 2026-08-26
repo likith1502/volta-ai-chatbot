@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Optional
+from typing import Optional
 
 from app.agents.definition import AgentDefinition
 from app.agents.instance import AgentInstance
@@ -14,9 +14,13 @@ logger = logging.getLogger("app.agents.agent")
 class Agent:
     """Core domain class encapsulating AgentDefinition blueprint and active AgentInstance worker state."""
 
-    def __init__(self, definition: AgentDefinition, instance: Optional[AgentInstance] = None) -> None:
+    def __init__(
+        self, definition: AgentDefinition, instance: Optional[AgentInstance] = None
+    ) -> None:
         self.definition = definition
-        self.instance = instance or AgentInstance(definition_id=definition.definition_id)
+        self.instance = instance or AgentInstance(
+            definition_id=definition.definition_id
+        )
 
     @property
     def agent_id(self) -> str:

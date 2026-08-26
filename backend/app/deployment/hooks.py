@@ -1,7 +1,7 @@
 """Deployment hooks — pre/post deploy, pre/post rollback, pre/post scale."""
 
 from dataclasses import dataclass
-from typing import Any, Callable, Awaitable
+from typing import Any, Awaitable, Callable
 
 
 @dataclass
@@ -20,12 +20,20 @@ class DeploymentHooks:
     def register(self, event: str, fn: Callable[..., Awaitable[bool]]) -> None:
         self._hooks.setdefault(event, []).append(fn)
 
-    async def run(self, event: str, context: dict[str, Any] | None = None) -> list[DeploymentHookResult]:
+    async def run(
+        self, event: str, context: dict[str, Any] | None = None
+    ) -> list[DeploymentHookResult]:
         results: list[DeploymentHookResult] = []
         for fn in self._hooks.get(event, []):
             try:
                 passed = await fn(context or {})
-                results.append(DeploymentHookResult(hook_name=fn.__name__, passed=passed))
+                results.append(
+                    DeploymentHookResult(hook_name=fn.__name__, passed=passed)
+                )
             except Exception as exc:
-                results.append(DeploymentHookResult(hook_name=fn.__name__, passed=False, message=str(exc)))
+                results.append(
+                    DeploymentHookResult(
+                        hook_name=fn.__name__, passed=False, message=str(exc)
+                    )
+                )
         return results

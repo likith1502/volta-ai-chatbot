@@ -8,9 +8,8 @@ Any → TERMINATED
 Any → FAILED
 """
 
-from enum import Enum
-from typing import Optional
 import logging
+from enum import Enum
 
 logger = logging.getLogger("app.deployment.lifecycle")
 
@@ -85,7 +84,9 @@ class DeploymentLifecycleManager:
 
     def __init__(self) -> None:
         self._state = DeploymentLifecycleState.CREATED
-        self._history: list[DeploymentLifecycleState] = [DeploymentLifecycleState.CREATED]
+        self._history: list[DeploymentLifecycleState] = [
+            DeploymentLifecycleState.CREATED
+        ]
 
     @property
     def state(self) -> DeploymentLifecycleState:

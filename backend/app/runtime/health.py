@@ -1,8 +1,8 @@
 import logging
 from typing import Any, Optional
-from pydantic import BaseModel, Field
 
-from app.runtime.base import RuntimeProvider
+from pydantic import BaseModel
+
 from app.runtime.registry import RuntimeRegistry
 
 logger = logging.getLogger("app.runtime.health")
@@ -47,7 +47,9 @@ class RuntimeHealthManager:
                 is_initialized=True,
                 sdk_installed=True,
                 api_key_configured=True,
-                message="Provider is healthy and reachable." if is_healthy else "Health check ping failed.",
+                message="Provider is healthy and reachable."
+                if is_healthy
+                else "Health check ping failed.",
                 capabilities=capabilities,
             )
         except Exception as exc:

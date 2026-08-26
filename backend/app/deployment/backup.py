@@ -25,14 +25,21 @@ class BackupType(str, Enum):
 @dataclass
 class BackupPlan:
     """Configuration for a recurring backup schedule."""
+
     plan_id: str
     name: str
     backup_type: BackupType = BackupType.FULL
     schedule_cron: str = "0 2 * * *"  # Daily at 02:00
     retention_days: int = 30
-    targets: list[str] = field(default_factory=lambda: [
-        "database", "vector_store", "memory_cache", "config", "secrets_metadata"
-    ])
+    targets: list[str] = field(
+        default_factory=lambda: [
+            "database",
+            "vector_store",
+            "memory_cache",
+            "config",
+            "secrets_metadata",
+        ]
+    )
     compression: bool = True
     encryption: bool = True
     enabled: bool = True
@@ -41,6 +48,7 @@ class BackupPlan:
 @dataclass
 class BackupSnapshot:
     """A completed backup snapshot."""
+
     snapshot_id: str
     plan_id: str
     backup_type: BackupType

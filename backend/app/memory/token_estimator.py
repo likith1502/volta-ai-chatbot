@@ -1,4 +1,3 @@
-from typing import Union
 from app.memory.context import MemoryContext
 from app.memory.memory import Memory
 

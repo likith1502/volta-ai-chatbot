@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional
+
 from app.integrations.capabilities import IntegrationCapability
 from app.integrations.health_level import HealthLevel
 from app.integrations.provider import IntegrationHealthReport, IntegrationProvider
@@ -10,7 +11,12 @@ class DatabaseAdapter(IntegrationProvider, ABC):
     """Abstract interface wrapping relational & key-value database repositories."""
 
     def __init__(self, provider_id: str, name: str, priority: int = 10) -> None:
-        super().__init__(provider_id=provider_id, name=name, category=IntegrationCapability.DATABASE, priority=priority)
+        super().__init__(
+            provider_id=provider_id,
+            name=name,
+            category=IntegrationCapability.DATABASE,
+            priority=priority,
+        )
 
     @abstractmethod
     async def execute_query(self, query: str) -> Any:
@@ -21,7 +27,11 @@ class PostgresDatabaseAdapter(DatabaseAdapter):
     """Reference database adapter wrapping Async PostgreSQL connection pool."""
 
     def __init__(self) -> None:
-        super().__init__(provider_id="database.postgres", name="PostgreSQL Async Database Adapter", priority=10)
+        super().__init__(
+            provider_id="database.postgres",
+            name="PostgreSQL Async Database Adapter",
+            priority=10,
+        )
         self._status = IntegrationStatus.CONFIGURED
 
     async def initialize(self, context: Optional[Any] = None) -> None:

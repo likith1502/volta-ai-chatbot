@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field
-from app.memory.memory import Memory
 
 
 class MemoryChainStep(BaseModel):

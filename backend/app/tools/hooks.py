@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from app.tools.request import ToolRequest
 from app.tools.result import ToolResult
 

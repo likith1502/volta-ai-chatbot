@@ -6,24 +6,45 @@ from app.prompt.capabilities import PromptCapabilities
 from app.prompt.chain import ChainResult, PromptChain, PromptStep
 from app.prompt.compiler import PromptCompiler
 from app.prompt.context import PromptContext
-from app.prompt.contracts import CompiledPrompt, PromptMessage, PromptRequest, PromptResponse, PromptVariable
+from app.prompt.contracts import (
+    CompiledPrompt,
+    PromptMessage,
+    PromptRequest,
+    PromptResponse,
+    PromptVariable,
+)
 from app.prompt.cost import PromptCostEstimate, PromptCostEstimator
 from app.prompt.exceptions import (
-    PromptException,
+    PromptError,
     PromptOptimizationError,
     PromptRenderError,
     PromptSecurityViolationError,
     PromptValidationError,
     TemplateNotFoundError,
 )
-from app.prompt.execution_store import InMemoryPromptExecutionStore, PromptExecutionStore, PromptSnapshot
+from app.prompt.execution_store import (
+    InMemoryPromptExecutionStore,
+    PromptExecutionStore,
+    PromptSnapshot,
+)
 from app.prompt.factory import PromptFactory
 from app.prompt.health import PromptHealthManager, PromptHealthStatus
-from app.prompt.hooks import PostExecutionHook, PostRenderHook, PreExecutionHook, PreRenderHook
+from app.prompt.hooks import (
+    PostExecutionHook,
+    PostRenderHook,
+    PreExecutionHook,
+    PreRenderHook,
+)
 from app.prompt.manager import PromptManager
 from app.prompt.metadata import PromptExecutionMetadata, PromptTemplateMetadata
 from app.prompt.metrics import PromptMetrics
-from app.prompt.processors import LintIssue, PromptLinter, PromptOptimizer, PromptRenderer, PromptValidator
+from app.prompt.processors import (
+    LintIssue,
+    PromptLinter,
+    PromptOptimizer,
+    PromptRenderer,
+    PromptValidator,
+)
 from app.prompt.profile import PromptProfile
 from app.prompt.registry import PromptRegistry
 from app.prompt.repository import InMemoryPromptRepository, PromptRepository
@@ -69,6 +90,11 @@ __all__ = [
     "PromptBenchmarkResult",
     "PromptAnalyticsManager",
     "PromptAnalyticsReport",
+    "LintIssue",
+    "PromptLinter",
+    "PromptOptimizer",
+    "PromptRenderer",
+    "PromptValidator",
     "VariableProvider",
     "DefaultVariableProvider",
     "PreRenderHook",
@@ -84,7 +110,7 @@ __all__ = [
     "PromptHealthStatus",
     "PromptSerializer",
     "PromptManager",
-    "PromptException",
+    "PromptError",
     "TemplateNotFoundError",
     "PromptValidationError",
     "PromptRenderError",

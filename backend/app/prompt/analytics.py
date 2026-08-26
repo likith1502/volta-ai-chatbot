@@ -1,4 +1,3 @@
-from typing import Any
 from pydantic import BaseModel, Field
 
 
@@ -24,7 +23,9 @@ class PromptAnalyticsManager:
         self.failures = 0
         self.template_counts: dict[str, int] = {}
 
-    def record_render(self, template_id: str, duration_ms: float, is_success: bool = True) -> None:
+    def record_render(
+        self, template_id: str, duration_ms: float, is_success: bool = True
+    ) -> None:
         self.render_count += 1
         self.total_render_ms += duration_ms
         self.template_counts[template_id] = self.template_counts.get(template_id, 0) + 1
@@ -35,9 +36,19 @@ class PromptAnalyticsManager:
         self.exec_count += 1
 
     def get_report(self) -> PromptAnalyticsReport:
-        avg_render = (self.total_render_ms / self.render_count) if self.render_count > 0 else 0.0
-        fail_pct = (self.failures / self.render_count * 100.0) if self.render_count > 0 else 0.0
-        top = sorted(self.template_counts.keys(), key=lambda k: self.template_counts[k], reverse=True)[:5]
+        avg_render = (
+            (self.total_render_ms / self.render_count) if self.render_count > 0 else 0.0
+        )
+        fail_pct = (
+            (self.failures / self.render_count * 100.0)
+            if self.render_count > 0
+            else 0.0
+        )
+        top = sorted(
+            self.template_counts.keys(),
+            key=lambda k: self.template_counts[k],
+            reverse=True,
+        )[:5]
 
         return PromptAnalyticsReport(
             total_executions=self.exec_count,

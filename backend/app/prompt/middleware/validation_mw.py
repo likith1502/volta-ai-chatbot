@@ -1,5 +1,6 @@
 import time
 from typing import Awaitable, Callable
+
 from app.prompt.contracts import PromptRequest
 from app.prompt.exceptions import PromptValidationError
 from app.prompt.middleware.base import PromptMiddleware
@@ -16,7 +17,9 @@ class ValidationMiddleware(PromptMiddleware):
     ) -> PromptResult:
         t0 = time.perf_counter()
         if not request.template_id or not request.template_id.strip():
-            raise PromptValidationError("PromptRequest must specify a valid non-empty 'template_id'.")
+            raise PromptValidationError(
+                "PromptRequest must specify a valid non-empty 'template_id'."
+            )
 
         result = await call_next(request)
         dt = (time.perf_counter() - t0) * 1000.0

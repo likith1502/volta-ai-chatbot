@@ -1,9 +1,9 @@
 import uuid
 from typing import Any, Optional
+
 from pydantic import BaseModel, Field
 
 from app.memory.memory import Memory
-from app.memory.status import MemoryStatus
 from app.memory.types import MemoryType
 
 
@@ -15,7 +15,9 @@ class MemoryRequest(BaseModel):
     execution_id: Optional[uuid.UUID] = None
     memory_type: MemoryType = Field(default=MemoryType.SHORT_TERM)
     importance: float = Field(default=0.5, ge=0.0, le=1.0)
-    ttl_seconds: Optional[int] = Field(default=None, description="Optional Time-To-Live in seconds")
+    ttl_seconds: Optional[int] = Field(
+        default=None, description="Optional Time-To-Live in seconds"
+    )
     tags: list[str] = Field(default_factory=list)
     custom_attributes: dict[str, Any] = Field(default_factory=dict)
 

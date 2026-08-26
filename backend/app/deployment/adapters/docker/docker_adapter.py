@@ -40,10 +40,18 @@ class DockerAdapter:
         }
 
     async def rollback(self, deployment_id: str) -> dict[str, Any]:
-        return {"adapter": self.adapter_id, "deployment_id": deployment_id, "rolledback": True}
+        return {
+            "adapter": self.adapter_id,
+            "deployment_id": deployment_id,
+            "rolledback": True,
+        }
 
     async def scale(self, deployment_id: str, replicas: int) -> dict[str, Any]:
-        return {"adapter": self.adapter_id, "deployment_id": deployment_id, "replicas": replicas}
+        return {
+            "adapter": self.adapter_id,
+            "deployment_id": deployment_id,
+            "replicas": replicas,
+        }
 
     async def health_check(self) -> dict[str, Any]:
         return {"adapter": self.adapter_id, "healthy": True, "engine": "Docker"}

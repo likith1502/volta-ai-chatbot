@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional
+
 from app.integrations.capabilities import IntegrationCapability
 from app.integrations.health_level import HealthLevel
 from app.integrations.provider import IntegrationHealthReport, IntegrationProvider
@@ -10,10 +11,17 @@ class ObservabilityAdapter(IntegrationProvider, ABC):
     """Abstract interface for metrics, tracing, and log observability exporters."""
 
     def __init__(self, provider_id: str, name: str, priority: int = 10) -> None:
-        super().__init__(provider_id=provider_id, name=name, category=IntegrationCapability.OBSERVABILITY, priority=priority)
+        super().__init__(
+            provider_id=provider_id,
+            name=name,
+            category=IntegrationCapability.OBSERVABILITY,
+            priority=priority,
+        )
 
     @abstractmethod
-    async def record_metric(self, name: str, value: float, tags: Optional[dict[str, str]] = None) -> None:
+    async def record_metric(
+        self, name: str, value: float, tags: Optional[dict[str, str]] = None
+    ) -> None:
         pass
 
 
@@ -21,7 +29,11 @@ class PrometheusObservabilityAdapter(ObservabilityAdapter):
     """Reference observability adapter exporting Prometheus metrics."""
 
     def __init__(self) -> None:
-        super().__init__(provider_id="observability.prometheus", name="Prometheus Observability Adapter", priority=10)
+        super().__init__(
+            provider_id="observability.prometheus",
+            name="Prometheus Observability Adapter",
+            priority=10,
+        )
         self._status = IntegrationStatus.CONFIGURED
 
     async def initialize(self, context: Optional[Any] = None) -> None:
@@ -36,7 +48,9 @@ class PrometheusObservabilityAdapter(ObservabilityAdapter):
         self._status = IntegrationStatus.DISCONNECTED
         return True
 
-    async def record_metric(self, name: str, value: float, tags: Optional[dict[str, str]] = None) -> None:
+    async def record_metric(
+        self, name: str, value: float, tags: Optional[dict[str, str]] = None
+    ) -> None:
         pass
 
     async def check_health(self) -> IntegrationHealthReport:

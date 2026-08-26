@@ -1,8 +1,9 @@
 from typing import Optional
-from app.core.exceptions import AppException
+
+from app.core.exceptions import AppError
 
 
-class PromptException(AppException):
+class PromptError(AppError):
     """Base exception for all Prompt Execution Engine failures."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -10,7 +11,7 @@ class PromptException(AppException):
         self.code = "PROMPT_ERROR"
 
 
-class TemplateNotFoundError(PromptException):
+class TemplateNotFoundError(PromptError):
     """Raised when a requested prompt template or revision is not found."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -19,7 +20,7 @@ class TemplateNotFoundError(PromptException):
         self.status_code = 404
 
 
-class PromptValidationError(PromptException):
+class PromptValidationError(PromptError):
     """Raised when prompt validation fails due to missing variables or constraint violations."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -28,7 +29,7 @@ class PromptValidationError(PromptException):
         self.status_code = 400
 
 
-class PromptRenderError(PromptException):
+class PromptRenderError(PromptError):
     """Raised when template rendering fails during variable substitution."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -37,7 +38,7 @@ class PromptRenderError(PromptException):
         self.status_code = 500
 
 
-class PromptOptimizationError(PromptException):
+class PromptOptimizationError(PromptError):
     """Raised when prompt optimization encounters structural invalidity."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -46,7 +47,7 @@ class PromptOptimizationError(PromptException):
         self.status_code = 500
 
 
-class PromptSecurityViolationError(PromptException):
+class PromptSecurityViolationError(PromptError):
     """Raised when prompt violates security policy (e.g. injection attempt detected)."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:

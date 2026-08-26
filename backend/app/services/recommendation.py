@@ -3,7 +3,11 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.exceptions.domain import ConversationClosedException, ConversationNotFoundException, RecommendationNotFoundException
+from app.exceptions.domain import (
+    ConversationClosedError,
+    ConversationNotFoundError,
+    RecommendationNotFoundError,
+)
 from app.models.enums import ConversationStatus, RecommendationStatus
 from app.models.recommendation import Recommendation
 from app.repositories.conversation import ConversationRepository
@@ -30,10 +34,14 @@ class RecommendationService(BaseService):
         """Creates and persists a new recommendation for an active conversation session."""
         conversation = await self.conversation_repo.get_by_id(conversation_id)
         if not conversation:
-            raise ConversationNotFoundException(f"Conversation with ID '{conversation_id}' not found.")
+            raise ConversationNotFoundError(
+                f"Conversation with ID '{conversation_id}' not found."
+            )
 
         if conversation.status != ConversationStatus.ACTIVE:
-            raise ConversationClosedException("Cannot attach recommendations to a closed or archived conversation.")
+            raise ConversationClosedError(
+                "Cannot attach recommendations to a closed or archived conversation."
+            )
 
         recommendation = await self.recommendation_repo.create(
             {
@@ -49,21 +57,31 @@ class RecommendationService(BaseService):
         return recommendation
 
     async def get_recommendation(self, recommendation_id: uuid.UUID) -> Recommendation:
-        """Retrieves a recommendation by primary key UUID or raises RecommendationNotFoundException."""
+        """Retrieves a recommendation by primary key UUID or raises RecommendationNotFoundError."""
         recommendation = await self.recommendation_repo.get_by_id(recommendation_id)
         if not recommendation:
-            raise RecommendationNotFoundException(f"Recommendation with ID '{recommendation_id}' not found.")
+            raise RecommendationNotFoundError(
+                f"Recommendation with ID '{recommendation_id}' not found."
+            )
         return recommendation
 
-    async def get_active_recommendations(self, conversation_id: uuid.UUID) -> list[Recommendation]:
+    async def get_active_recommendations(
+        self, conversation_id: uuid.UUID
+    ) -> list[Recommendation]:
         """Retrieves all pending/active recommendations for a conversation session."""
         conversation = await self.conversation_repo.get_by_id(conversation_id)
         if not conversation:
-            raise ConversationNotFoundException(f"Conversation with ID '{conversation_id}' not found.")
+            raise ConversationNotFoundError(
+                f"Conversation with ID '{conversation_id}' not found."
+            )
 
-        return await self.recommendation_repo.get_active_recommendations(conversation_id)
+        return await self.recommendation_repo.get_active_recommendations(
+            conversation_id
+        )
 
-    async def expire_recommendation(self, recommendation_id: uuid.UUID) -> Recommendation:
+    async def expire_recommendation(
+        self, recommendation_id: uuid.UUID
+    ) -> Recommendation:
         """Marks a pending recommendation as EXPIRED."""
         await self.get_recommendation(recommendation_id)
 
@@ -72,6 +90,8 @@ class RecommendationService(BaseService):
             {"status": RecommendationStatus.EXPIRED},
         )
         if not expired:
-            raise RecommendationNotFoundException(f"Recommendation with ID '{recommendation_id}' not found.")
+            raise RecommendationNotFoundError(
+                f"Recommendation with ID '{recommendation_id}' not found."
+            )
         await self.commit()
         return expired

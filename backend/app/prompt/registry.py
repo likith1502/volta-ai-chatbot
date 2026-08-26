@@ -1,5 +1,6 @@
 import logging
 from typing import Optional
+
 from app.prompt.exceptions import TemplateNotFoundError
 from app.prompt.profile import PromptProfile
 from app.prompt.repository import InMemoryPromptRepository, PromptRepository
@@ -44,7 +45,9 @@ class PromptRegistry:
     async def register_template_async(self, template: BasePromptTemplate) -> None:
         """Asynchronously registers or updates a template in repository."""
         await self.repository.save_template(template)
-        logger.info(f"Registered BasePromptTemplate '{template.template_id}' in PromptRepository")
+        logger.info(
+            f"Registered BasePromptTemplate '{template.template_id}' in PromptRepository"
+        )
 
     def unregister_template(self, template_id: str) -> None:
         if isinstance(self.repository, InMemoryPromptRepository):
@@ -52,6 +55,7 @@ class PromptRegistry:
             self.repository._templates.pop(tid, None)
         else:
             import asyncio
+
             asyncio.run(self.unregister_template_async(template_id))
 
     def register_template(self, template: BasePromptTemplate) -> None:
@@ -61,6 +65,7 @@ class PromptRegistry:
             self.repository._templates[tid] = template
         else:
             import asyncio
+
             asyncio.run(self.repository.save_template(template))
         logger.info(f"Registered BasePromptTemplate '{template.template_id}'")
 
@@ -69,7 +74,9 @@ class PromptRegistry:
         t = await self.repository.get_template(template_id)
         if t:
             return t
-        raise TemplateNotFoundError(f"Prompt template '{template_id}' is not registered in PromptRepository.")
+        raise TemplateNotFoundError(
+            f"Prompt template '{template_id}' is not registered in PromptRepository."
+        )
 
     def lookup_template(self, template_id: str) -> BasePromptTemplate:
         """Synchronous lookup helper for in-memory or sync contexts."""
@@ -78,12 +85,17 @@ class PromptRegistry:
             t = self.repository._templates.get(tid)
             if t:
                 return t
-            raise TemplateNotFoundError(f"Prompt template '{template_id}' is not registered in PromptRepository.")
-        
+            raise TemplateNotFoundError(
+                f"Prompt template '{template_id}' is not registered in PromptRepository."
+            )
+
         import asyncio
+
         return asyncio.run(self.lookup_template_async(template_id))
 
-    async def get_template_async(self, template_id: str) -> Optional[BasePromptTemplate]:
+    async def get_template_async(
+        self, template_id: str
+    ) -> Optional[BasePromptTemplate]:
         try:
             return await self.lookup_template_async(template_id)
         except TemplateNotFoundError:
@@ -104,6 +116,7 @@ class PromptRegistry:
         if isinstance(self.repository, InMemoryPromptRepository):
             return list(self.repository._templates.values())
         import asyncio
+
         return asyncio.run(self.repository.list_templates())
 
     async def list_templates_async(self) -> list[BasePromptTemplate]:

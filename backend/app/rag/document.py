@@ -1,9 +1,10 @@
 import uuid
-from typing import Any, Optional
+from typing import Any
+
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.rag.lifecycle import DocumentLifecycleManager, DocumentLifecycleState
-from app.rag.source import DocumentSource, DocumentSourceLocator
+from app.rag.source import DocumentSourceLocator
 
 
 class Document(BaseModel):
@@ -19,7 +20,9 @@ class Document(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
     checksum: str = Field(default="")
     version: int = Field(default=1, ge=1)
-    lifecycle: DocumentLifecycleManager = Field(default_factory=DocumentLifecycleManager)
+    lifecycle: DocumentLifecycleManager = Field(
+        default_factory=DocumentLifecycleManager
+    )
     created_at: float = Field(default_factory=lambda: 1786088000.0)
 
     @property

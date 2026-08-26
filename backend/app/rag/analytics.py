@@ -1,4 +1,3 @@
-from pydantic import BaseModel, Field
 from app.rag.metrics import RAGMetrics
 
 
@@ -16,8 +15,16 @@ class RAGAnalyticsManager:
         self.total_chunks_retrieved += chunks_count
 
     def get_metrics(self) -> RAGMetrics:
-        avg_dur = (self.total_duration_ms / self.queries_count) if self.queries_count > 0 else 0.0
-        avg_chk = (self.total_chunks_retrieved / self.queries_count) if self.queries_count > 0 else 0.0
+        avg_dur = (
+            (self.total_duration_ms / self.queries_count)
+            if self.queries_count > 0
+            else 0.0
+        )
+        avg_chk = (
+            (self.total_chunks_retrieved / self.queries_count)
+            if self.queries_count > 0
+            else 0.0
+        )
 
         return RAGMetrics(
             retrieval_latency_ms=round(avg_dur, 2),

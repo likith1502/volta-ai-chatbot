@@ -1,18 +1,19 @@
 from typing import Optional
+
 from app.prompt.contracts import PromptMessage, PromptVariable
 from app.prompt.variables import PromptVariableStore
 
 
 class LintIssue:
-
-    def __init__(self, issue_type: str, message: str, severity: str = "warning") -> None:
+    def __init__(
+        self, issue_type: str, message: str, severity: str = "warning"
+    ) -> None:
         self.issue_type = issue_type  # 'duplicate_instruction', 'contradiction', 'excessive_length', 'unreachable_placeholder'
         self.message = message
         self.severity = severity  # 'info', 'warning', 'error'
 
 
 class PromptLintResult:
-
     def __init__(self) -> None:
         self.issues: list[LintIssue] = []
 
@@ -31,7 +32,9 @@ class PromptLinter:
         declared_variables: Optional[list[PromptVariable]] = None,
     ) -> PromptLintResult:
         result = PromptLintResult()
-        declared_names = {v.name for v in declared_variables} if declared_variables else set()
+        declared_names = (
+            {v.name for v in declared_variables} if declared_variables else set()
+        )
 
         # 1. System prompt length check
         if system_instruction and len(system_instruction) > 2000:
@@ -59,7 +62,9 @@ class PromptLinter:
 
         # 3. Check for undeclared placeholders
         for msg in messages:
-            placeholders = PromptVariableStore.extract_placeholders(msg.content_template)
+            placeholders = PromptVariableStore.extract_placeholders(
+                msg.content_template
+            )
             for ph in placeholders:
                 if declared_names and ph not in declared_names:
                     result.issues.append(

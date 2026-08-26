@@ -1,5 +1,7 @@
 import logging
+
 from pydantic import BaseModel, Field
+
 from app.memory.registry import MemoryRegistry
 
 logger = logging.getLogger("app.memory.health")

@@ -1,6 +1,7 @@
-import asyncio
 import time
-from pydantic import BaseModel, Field
+
+from pydantic import BaseModel
+
 from app.prompt.contracts import PromptRequest
 
 
@@ -22,7 +23,9 @@ class PromptBenchmarkRunner:
     def __init__(self, prompt_manager) -> None:
         self.prompt_manager = prompt_manager
 
-    async def benchmark(self, request: PromptRequest, iterations: int = 5) -> PromptBenchmarkResult:
+    async def benchmark(
+        self, request: PromptRequest, iterations: int = 5
+    ) -> PromptBenchmarkResult:
         latencies: list[float] = []
         tokens = 0
         cost = 0.0

@@ -1,4 +1,5 @@
 from typing import Any
+
 from app.tools.exceptions import ToolValidationError
 from app.tools.manifest import ToolManifest
 
@@ -13,6 +14,8 @@ class ToolValidator:
         req_params = manifest.schema_spec.input_schema.get("required", [])
         for req in req_params:
             if req not in arguments:
-                raise ToolValidationError(f"Missing required parameter '{req}' for tool '{manifest.tool_name}'.")
+                raise ToolValidationError(
+                    f"Missing required parameter '{req}' for tool '{manifest.tool_name}'."
+                )
 
         return True

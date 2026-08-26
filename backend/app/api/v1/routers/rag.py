@@ -1,4 +1,5 @@
 from typing import Any
+
 from fastapi import APIRouter, HTTPException, status
 
 from app.rag.contracts import (
@@ -25,7 +26,11 @@ async def add_document(payload: RAGDocumentPayload) -> dict[str, Any]:
     try:
         doc = await _rag_manager.add_document(payload)
         return success_response(
-            data={"document_id": doc.document_id, "title": doc.title, "status": str(doc.status)},
+            data={
+                "document_id": doc.document_id,
+                "title": doc.title,
+                "status": str(doc.status),
+            },
             message=f"Document '{doc.title}' added to knowledge repository.",
         )
     except Exception as exc:
@@ -41,7 +46,15 @@ async def list_documents() -> dict[str, Any]:
     """Returns list of all documents."""
     docs = await _rag_manager.list_documents()
     return success_response(
-        data=[{"document_id": d.document_id, "title": d.title, "status": str(d.status), "mime_type": d.mime_type} for d in docs],
+        data=[
+            {
+                "document_id": d.document_id,
+                "title": d.title,
+                "status": str(d.status),
+                "mime_type": d.mime_type,
+            }
+            for d in docs
+        ],
         message="Knowledge documents retrieved.",
     )
 
@@ -55,7 +68,9 @@ async def get_document_by_id(document_id: str) -> dict[str, Any]:
     """Retrieves document details by ID."""
     doc = await _rag_manager.get_document(document_id)
     if not doc:
-        raise HTTPException(status_code=404, detail=f"Document '{document_id}' not found.")
+        raise HTTPException(
+            status_code=404, detail=f"Document '{document_id}' not found."
+        )
     return success_response(
         data={
             "document_id": doc.document_id,
@@ -78,7 +93,9 @@ async def delete_document(document_id: str) -> dict[str, Any]:
     """Deletes document and vectors."""
     deleted = await _rag_manager.delete_document(document_id)
     if not deleted:
-        raise HTTPException(status_code=404, detail=f"Document '{document_id}' not found.")
+        raise HTTPException(
+            status_code=404, detail=f"Document '{document_id}' not found."
+        )
     return success_response(
         data={"document_id": document_id, "deleted": True},
         message=f"Document '{document_id}' deleted successfully.",
@@ -138,7 +155,9 @@ async def answer_rag_query(payload: RAGQueryPayload) -> dict[str, Any]:
         )
     except Exception as exc:
         print(f"DEBUG RAG QUERY ERROR: {exc!r}")
-        raise HTTPException(status_code=500, detail=f"RAG query execution failed: {exc}")
+        raise HTTPException(
+            status_code=500, detail=f"RAG query execution failed: {exc}"
+        )
 
 
 @router.get(

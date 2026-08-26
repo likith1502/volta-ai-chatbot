@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
+
 from pydantic import BaseModel
 
-from app.streaming.stream_message import StreamMessage
 from app.streaming.heartbeat import StreamHeartbeat
+from app.streaming.stream_message import StreamMessage
 
 
 class AdapterCapabilities(BaseModel):

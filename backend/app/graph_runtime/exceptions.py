@@ -1,8 +1,9 @@
 from typing import Optional
-from app.core.exceptions import AppException
+
+from app.core.exceptions import AppError
 
 
-class GraphRuntimeException(AppException):
+class GraphRuntimeError(AppError):
     """Base exception for Graph Runtime errors."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -10,7 +11,7 @@ class GraphRuntimeException(AppException):
         self.code = "GRAPH_RUNTIME_ERROR"
 
 
-class GraphNodeNotFoundError(GraphRuntimeException):
+class GraphNodeNotFoundError(GraphRuntimeError):
     """Raised when a target graph node is missing."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -19,7 +20,7 @@ class GraphNodeNotFoundError(GraphRuntimeException):
         self.status_code = 404
 
 
-class GraphPlanningError(GraphRuntimeException):
+class GraphPlanningError(GraphRuntimeError):
     """Raised when graph execution plan generation fails."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -28,7 +29,7 @@ class GraphPlanningError(GraphRuntimeException):
         self.status_code = 400
 
 
-class GraphSchedulingError(GraphRuntimeException):
+class GraphSchedulingError(GraphRuntimeError):
     """Raised when graph node scheduling fails."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -37,7 +38,7 @@ class GraphSchedulingError(GraphRuntimeException):
         self.status_code = 500
 
 
-class GraphExecutionInterruptedError(GraphRuntimeException):
+class GraphExecutionInterruptedError(GraphRuntimeError):
     """Raised when execution is interrupted by HITL or pause command."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:

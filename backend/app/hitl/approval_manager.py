@@ -1,15 +1,16 @@
-import time
 import uuid
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 from app.hitl.approval_constraints import ApprovalConstraints
 from app.hitl.approval_history import ApprovalHistory
 from app.hitl.approval_metadata import ApprovalMetadata
 from app.hitl.approval_request import ApprovalRequest
-from app.hitl.approval_result import ApprovalResult
 from app.hitl.approval_status import ApprovalDecision, ApprovalStatus, HumanRole
-from app.hitl.exceptions import ApprovalAlreadyResolvedException, ApprovalNotFoundException
+from app.hitl.exceptions import (
+    ApprovalAlreadyResolvedError,
+    ApprovalNotFoundError,
+)
 
 
 class ApprovalManager:
@@ -57,7 +58,9 @@ class ApprovalManager:
     def get_request(self, approval_id: uuid.UUID) -> ApprovalRequest:
         """Retrieves an ApprovalRequest by ID."""
         if approval_id not in self._requests:
-            raise ApprovalNotFoundException(f"Approval request '{approval_id}' not found.")
+            raise ApprovalNotFoundError(
+                f"Approval request '{approval_id}' not found."
+            )
         return self._requests[approval_id]
 
     def _ensure_active(self, req: ApprovalRequest) -> None:
@@ -70,7 +73,7 @@ class ApprovalManager:
             ApprovalStatus.COMPLETED,
         }
         if req.status in resolved_statuses:
-            raise ApprovalAlreadyResolvedException(
+            raise ApprovalAlreadyResolvedError(
                 f"Approval request '{req.approval_id}' is already resolved with status '{req.status.value}'."
             )
 
@@ -98,7 +101,9 @@ class ApprovalManager:
         self._requests[approval_id] = updated
         return updated
 
-    def approve(self, approval_id: uuid.UUID, reviewer: str, comments: Optional[str] = None) -> ApprovalRequest:
+    def approve(
+        self, approval_id: uuid.UUID, reviewer: str, comments: Optional[str] = None
+    ) -> ApprovalRequest:
         """Approves an approval request."""
         existing = self.get_request(approval_id)
         self._ensure_active(existing)
@@ -129,7 +134,9 @@ class ApprovalManager:
         )
         return updated
 
-    def reject(self, approval_id: uuid.UUID, reviewer: str, reason: Optional[str] = None) -> ApprovalRequest:
+    def reject(
+        self, approval_id: uuid.UUID, reviewer: str, reason: Optional[str] = None
+    ) -> ApprovalRequest:
         """Rejects an approval request."""
         existing = self.get_request(approval_id)
         self._ensure_active(existing)
@@ -160,7 +167,9 @@ class ApprovalManager:
         )
         return updated
 
-    def escalate(self, approval_id: uuid.UUID, reviewer: str, reason: Optional[str] = None) -> ApprovalRequest:
+    def escalate(
+        self, approval_id: uuid.UUID, reviewer: str, reason: Optional[str] = None
+    ) -> ApprovalRequest:
         """Escalates an approval request to higher governance."""
         existing = self.get_request(approval_id)
         self._ensure_active(existing)
@@ -215,7 +224,9 @@ class ApprovalManager:
         self._requests[approval_id] = updated
         return updated
 
-    def cancel(self, approval_id: uuid.UUID, reason: Optional[str] = None) -> ApprovalRequest:
+    def cancel(
+        self, approval_id: uuid.UUID, reason: Optional[str] = None
+    ) -> ApprovalRequest:
         """Cancels an approval request."""
         existing = self.get_request(approval_id)
         self._ensure_active(existing)

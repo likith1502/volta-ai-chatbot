@@ -1,5 +1,6 @@
 import logging
 from typing import Any
+
 from app.rag.chunk import Chunk
 from app.rag.chunk_strategy import ChunkStrategy
 
@@ -78,5 +79,7 @@ class DocumentChunker:
                         )
                     )
 
-        logger.info(f"DocumentChunker split document '{document_id}' into {len(chunks)} chunks using strategy '{strategy.value}'")
+        logger.info(
+            f"DocumentChunker split document '{document_id}' into {len(chunks)} chunks using strategy '{strategy.value}'"
+        )
         return chunks

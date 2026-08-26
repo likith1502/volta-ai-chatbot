@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from app.checkpoints.checkpoint import Checkpoint
-from app.checkpoints.exceptions import CheckpointNotFoundException
+from app.checkpoints.exceptions import CheckpointNotFoundError
 
 
 class CheckpointStore(ABC):
@@ -51,14 +51,14 @@ class InMemoryCheckpointStore(CheckpointStore):
 
     def load(self, checkpoint_id: uuid.UUID) -> Checkpoint:
         if checkpoint_id not in self._store:
-            raise CheckpointNotFoundException(
+            raise CheckpointNotFoundError(
                 f"Checkpoint with ID '{checkpoint_id}' not found in store."
             )
         return self._store[checkpoint_id]
 
     def delete(self, checkpoint_id: uuid.UUID) -> None:
         if checkpoint_id not in self._store:
-            raise CheckpointNotFoundException(
+            raise CheckpointNotFoundError(
                 f"Checkpoint with ID '{checkpoint_id}' not found in store."
             )
         del self._store[checkpoint_id]

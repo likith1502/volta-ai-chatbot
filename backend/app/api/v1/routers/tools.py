@@ -1,5 +1,6 @@
-from typing import Any, Optional
-from fastapi import APIRouter, HTTPException, Query, status
+from typing import Any
+
+from fastapi import APIRouter, HTTPException, status
 
 from app.tools.chain import ToolChain
 from app.tools.contracts import ToolExecutePayload, ToolValidatePayload
@@ -88,7 +89,7 @@ async def get_tool_details(tool_name: str) -> dict[str, Any]:
             data=manifest.model_dump(),
             message=f"Tool '{tool_name}' details retrieved",
         )
-    except Exception as exc:
+    except Exception:
         raise HTTPException(status_code=404, detail=f"Tool '{tool_name}' not found.")
 
 

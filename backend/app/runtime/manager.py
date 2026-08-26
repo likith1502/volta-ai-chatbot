@@ -10,7 +10,6 @@ from app.runtime.config import RuntimeConfig
 from app.runtime.context import RuntimeContext
 from app.runtime.contracts import RuntimeRequest, RuntimeResponse
 from app.runtime.exceptions import (
-    ProviderConfigurationError,
     ProviderNotFoundError,
     RuntimeExecutionError,
     RuntimeRetryExhaustedError,
@@ -25,7 +24,6 @@ from app.runtime.middleware.logging_middleware import LoggingMiddleware
 from app.runtime.middleware.metrics_middleware import MetricsMiddleware
 from app.runtime.middleware.validation_middleware import ValidationMiddleware
 from app.runtime.model_registry import ModelRegistry
-from app.runtime.providers.gemini_provider import GeminiProvider
 from app.runtime.providers.mock_provider import MockProvider
 from app.runtime.registry import RuntimeRegistry
 from app.runtime.result import RuntimeResult
@@ -54,7 +52,9 @@ class RuntimeManager:
         if not self.registry.exists("mock"):
             self.registry.register(MockProvider(latency_ms=10.0))
         if not self.registry.exists("gemini"):
-            self.registry.register_factory("gemini", lambda: RuntimeFactory.create_provider("gemini"))
+            self.registry.register_factory(
+                "gemini", lambda: RuntimeFactory.create_provider("gemini")
+            )
 
         self.health_manager = RuntimeHealthManager(self.registry)
 
@@ -89,7 +89,9 @@ class RuntimeManager:
             current_fn = handler
             current_mw = middleware
 
-            async def _mw_wrapper(r: RuntimeRequest, mw=current_mw, fn=current_fn) -> RuntimeResult:
+            async def _mw_wrapper(
+                r: RuntimeRequest, mw=current_mw, fn=current_fn
+            ) -> RuntimeResult:
                 return await mw.process(r, fn)
 
             handler = _mw_wrapper
@@ -101,7 +103,9 @@ class RuntimeManager:
         runtime_id = uuid.uuid4()
 
         # Determine target provider & model
-        requested_provider = (request.provider or self.config.default_provider).lower().strip()
+        requested_provider = (
+            (request.provider or self.config.default_provider).lower().strip()
+        )
         requested_model = request.model or self.config.default_model
 
         context = RuntimeContext(
@@ -114,36 +118,55 @@ class RuntimeManager:
         )
 
         metrics = RuntimeMetrics()
-        await self._emit_event("started", {"runtime_id": str(runtime_id), "provider": requested_provider})
+        await self._emit_event(
+            "started", {"runtime_id": str(runtime_id), "provider": requested_provider}
+        )
 
         # 1. Prompt Preparation
-        await self._emit_event("prompt_prepared", {"runtime_id": str(runtime_id), "message_count": len(request.messages)})
+        await self._emit_event(
+            "prompt_prepared",
+            {"runtime_id": str(runtime_id), "message_count": len(request.messages)},
+        )
 
         # 2. Provider Selection & Fallback
         provider = self.registry.get(requested_provider)
         if not provider:
             if self.config.demo_mode or requested_provider != "mock":
-                logger.warning(f"Provider '{requested_provider}' unavailable. Falling back to MockProvider in demo mode.")
+                logger.warning(
+                    f"Provider '{requested_provider}' unavailable. Falling back to MockProvider in demo mode."
+                )
                 provider = self.registry.lookup("mock")
                 context.provider = "mock"
                 context.metadata["fallback_from"] = requested_provider
             else:
-                raise ProviderNotFoundError(f"Provider '{requested_provider}' not registered.")
+                raise ProviderNotFoundError(
+                    f"Provider '{requested_provider}' not registered."
+                )
 
-        await self._emit_event("provider_selected", {"runtime_id": str(runtime_id), "provider": provider.name})
+        await self._emit_event(
+            "provider_selected",
+            {"runtime_id": str(runtime_id), "provider": provider.name},
+        )
 
         # 3. Provider Initialization
         try:
             await provider.initialize()
-            await self._emit_event("provider_initialized", {"runtime_id": str(runtime_id), "provider": provider.name})
+            await self._emit_event(
+                "provider_initialized",
+                {"runtime_id": str(runtime_id), "provider": provider.name},
+            )
         except Exception as exc:
             if self.config.demo_mode and provider.name != "mock":
-                logger.warning(f"Failed to initialize '{provider.name}'. Falling back to MockProvider: {exc}")
+                logger.warning(
+                    f"Failed to initialize '{provider.name}'. Falling back to MockProvider: {exc}"
+                )
                 provider = self.registry.lookup("mock")
                 await provider.initialize()
                 context.provider = "mock"
             else:
-                raise RuntimeExecutionError(f"Failed to initialize provider '{provider.name}': {exc}")
+                raise RuntimeExecutionError(
+                    f"Failed to initialize provider '{provider.name}': {exc}"
+                )
 
         # 4. Request Dispatch with Retries & Timeout
         max_retries = self.config.max_retries
@@ -154,33 +177,50 @@ class RuntimeManager:
         for attempt in range(max_retries + 1):
             try:
                 metrics.retries_attempted = attempt
-                await self._emit_event("request_sent", {"runtime_id": str(runtime_id), "attempt": attempt + 1})
+                await self._emit_event(
+                    "request_sent",
+                    {"runtime_id": str(runtime_id), "attempt": attempt + 1},
+                )
 
                 prov_start = time.perf_counter()
-                
+
                 # Execute generate with timeout
                 response = await asyncio.wait_for(
                     provider.generate(request),
                     timeout=timeout_sec,
                 )
-                
+
                 metrics.provider_time_ms = (time.perf_counter() - prov_start) * 1000.0
-                await self._emit_event("response_received", {"runtime_id": str(runtime_id), "response_id": str(response.response_id)})
+                await self._emit_event(
+                    "response_received",
+                    {
+                        "runtime_id": str(runtime_id),
+                        "response_id": str(response.response_id),
+                    },
+                )
                 break
             except asyncio.TimeoutError:
-                last_exception = RuntimeTimeoutError(f"Provider '{provider.name}' timed out after {timeout_sec}s.")
-                logger.warning(f"Runtime attempt {attempt + 1} timed out for provider '{provider.name}'.")
+                last_exception = RuntimeTimeoutError(
+                    f"Provider '{provider.name}' timed out after {timeout_sec}s."
+                )
+                logger.warning(
+                    f"Runtime attempt {attempt + 1} timed out for provider '{provider.name}'."
+                )
             except Exception as exc:
                 last_exception = exc
-                logger.warning(f"Runtime attempt {attempt + 1} failed for provider '{provider.name}': {exc}")
+                logger.warning(
+                    f"Runtime attempt {attempt + 1} failed for provider '{provider.name}': {exc}"
+                )
 
             if attempt < max_retries:
-                await asyncio.sleep(0.1 * (2 ** attempt))
+                await asyncio.sleep(0.1 * (2**attempt))
 
         if not response:
             error_msg = f"Runtime execution failed after {max_retries + 1} attempts. Last error: {last_exception}"
-            await self._emit_event("failed", {"runtime_id": str(runtime_id), "error": error_msg})
-            
+            await self._emit_event(
+                "failed", {"runtime_id": str(runtime_id), "error": error_msg}
+            )
+
             result_fail = RuntimeResult(
                 response=None,
                 metrics=metrics,
@@ -195,7 +235,13 @@ class RuntimeManager:
         await self._emit_event("response_normalized", {"runtime_id": str(runtime_id)})
         metrics.tokens = response.token_usage
         metrics.estimated_cost_usd = response.token_usage.estimated_cost_usd
-        await self._emit_event("tokens_calculated", {"runtime_id": str(runtime_id), "total_tokens": metrics.tokens.total_tokens})
+        await self._emit_event(
+            "tokens_calculated",
+            {
+                "runtime_id": str(runtime_id),
+                "total_tokens": metrics.tokens.total_tokens,
+            },
+        )
 
         # Calculate wall clock latency
         metrics.latency_ms = (time.perf_counter() - start_time) * 1000.0
@@ -212,6 +258,9 @@ class RuntimeManager:
 
         # Save result to execution store
         await self.execution_store.save(result_success)
-        await self._emit_event("completed", {"runtime_id": str(runtime_id), "latency_ms": metrics.latency_ms})
+        await self._emit_event(
+            "completed",
+            {"runtime_id": str(runtime_id), "latency_ms": metrics.latency_ms},
+        )
 
         return result_success

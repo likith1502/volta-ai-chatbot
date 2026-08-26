@@ -1,10 +1,10 @@
 from app.execution.dispatcher import ExecutionDispatcher
 from app.execution.exceptions import (
-    ExecutionCancelledException,
-    ExecutionException,
-    ExecutionStrategyException,
-    ExecutionTimeoutException,
-    ExecutionValidationException,
+    ExecutionCancelledError,
+    ExecutionError,
+    ExecutionStrategyError,
+    ExecutionTimeoutError,
+    ExecutionValidationError,
 )
 from app.execution.execution_context import ExecutionContext
 from app.execution.execution_metrics import ExecutionMetrics
@@ -30,9 +30,9 @@ __all__ = [
     "ExecutionStrategy",
     "SequentialStrategy",
     "ExecutionResult",
-    "ExecutionException",
-    "ExecutionTimeoutException",
-    "ExecutionCancelledException",
-    "ExecutionValidationException",
-    "ExecutionStrategyException",
+    "ExecutionError",
+    "ExecutionTimeoutError",
+    "ExecutionCancelledError",
+    "ExecutionValidationError",
+    "ExecutionStrategyError",
 ]

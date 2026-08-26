@@ -1,5 +1,6 @@
 from enum import Enum
-from pydantic import BaseModel, Field
+
+from pydantic import BaseModel
 
 
 class IntegrationCapability(str, Enum):

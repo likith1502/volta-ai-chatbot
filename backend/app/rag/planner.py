@@ -1,5 +1,6 @@
 import logging
 from typing import Any, Optional
+
 from app.rag.plan import RetrievalPlan
 
 logger = logging.getLogger("app.rag.planner")
@@ -23,5 +24,7 @@ class RetrievalPlanner:
             reranker=reranker,
             filters=filters or {},
         )
-        logger.info(f"RetrievalPlanner generated plan '{plan.plan_id}' using strategy '{strategy}' and top_k={top_k}")
+        logger.info(
+            f"RetrievalPlanner generated plan '{plan.plan_id}' using strategy '{strategy}' and top_k={top_k}"
+        )
         return plan

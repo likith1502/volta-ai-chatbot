@@ -1,4 +1,5 @@
 from typing import Optional
+
 from app.rag.chunk import Chunk
 from app.rag.document import Document
 from app.rag.repository import DocumentRepository
@@ -24,7 +25,9 @@ class InMemoryDocumentRepository(DocumentRepository):
         if document_id in self._documents:
             del self._documents[document_id]
             # remove associated chunks
-            to_del = [cid for cid, c in self._chunks.items() if c.document_id == document_id]
+            to_del = [
+                cid for cid, c in self._chunks.items() if c.document_id == document_id
+            ]
             for cid in to_del:
                 del self._chunks[cid]
             return True

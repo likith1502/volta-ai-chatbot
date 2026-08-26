@@ -7,5 +7,7 @@ class GraphRuntimeValidator:
 
     def validate_plan(self, plan: GraphExecutionPlan) -> bool:
         if not plan or not plan.execution_order:
-            raise GraphPlanningError("GraphExecutionPlan must contain at least one execution node.")
+            raise GraphPlanningError(
+                "GraphExecutionPlan must contain at least one execution node."
+            )
         return True

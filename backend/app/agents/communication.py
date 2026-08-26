@@ -1,5 +1,6 @@
 import logging
 from typing import Optional
+
 from app.agents.mailbox import AgentMailbox
 from app.agents.message import AgentMessage
 from app.events.event import WorkflowEvent
@@ -41,7 +42,9 @@ class CommunicationManager:
         except Exception:
             pass
 
-    async def broadcast(self, sender_id: str, content: str, recipient_ids: list[str]) -> None:
+    async def broadcast(
+        self, sender_id: str, content: str, recipient_ids: list[str]
+    ) -> None:
         for recipient_id in recipient_ids:
             msg = AgentMessage(
                 sender_agent_id=sender_id,

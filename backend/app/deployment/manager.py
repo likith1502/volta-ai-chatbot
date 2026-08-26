@@ -20,7 +20,6 @@ import uuid
 from typing import Any, Optional
 
 from app.deployment.analytics import DeploymentAnalyticsEngine
-from app.deployment.backup import BackupManager
 from app.deployment.config import DeploymentConfig
 from app.deployment.contracts import (
     DeploymentDeployPayload,
@@ -30,21 +29,23 @@ from app.deployment.contracts import (
     DeploymentValidatePayload,
 )
 from app.deployment.deployment import Deployment, DeploymentStatus
-from app.deployment.environment import EnvironmentManager
 from app.deployment.events import DeploymentEvent, DeploymentEventBus
 from app.deployment.factory import DeploymentFactory
-from app.deployment.health import DeploymentHealthLevel, DeploymentHealthManager, PlatformHealthSummary
+from app.deployment.health import (
+    DeploymentHealthManager,
+    PlatformHealthSummary,
+)
 from app.deployment.hooks import DeploymentHooks
-from app.deployment.lifecycle import DeploymentLifecycleManager, DeploymentLifecycleState
+from app.deployment.lifecycle import (
+    DeploymentLifecycleManager,
+    DeploymentLifecycleState,
+)
 from app.deployment.metrics import DeploymentMetricsCollector
-from app.deployment.recovery import RecoveryManager
 from app.deployment.registry import DeploymentRegistry
-from app.deployment.release import ReleaseManager
-from app.deployment.rollback import RollbackManager, RollbackSnapshot
-from app.deployment.scaling import HorizontalScaling, ScalingEvent
+from app.deployment.rollback import RollbackSnapshot
+from app.deployment.scaling import ScalingEvent
 from app.deployment.statistics import DeploymentStatistics
-from app.deployment.strategy import DeploymentStrategy, create_strategy, DeploymentStrategyType
-from app.deployment.validator import DeploymentValidationReport, DeploymentValidator
+from app.deployment.validator import DeploymentValidationReport
 
 logger = logging.getLogger("app.deployment.manager")
 
@@ -95,18 +96,22 @@ class DeploymentManager:
     # Validation
     # -------------------------------------------------------------------------
 
-    async def validate(self, payload: DeploymentValidatePayload) -> DeploymentValidationReport:
+    async def validate(
+        self, payload: DeploymentValidatePayload
+    ) -> DeploymentValidationReport:
         """Validate a deployment before executing."""
         logger.info("Validating deployment '%s'", payload.deployment_id)
         report = self.validator.validate(payload.deployment_id)
         self.statistics.validations_run += 1
         if report.all_passed:
             self.statistics.validations_passed += 1
-        self.event_bus.emit(DeploymentEvent(
-            event_type="validation_completed",
-            deployment_id=payload.deployment_id,
-            payload={"all_passed": report.all_passed},
-        ))
+        self.event_bus.emit(
+            DeploymentEvent(
+                event_type="validation_completed",
+                deployment_id=payload.deployment_id,
+                payload={"all_passed": report.all_passed},
+            )
+        )
         return report
 
     # -------------------------------------------------------------------------
@@ -115,12 +120,16 @@ class DeploymentManager:
 
     async def deploy(self, payload: DeploymentDeployPayload) -> Deployment:
         """Execute a deployment using the specified strategy."""
-        logger.info("Deploying '%s' with strategy '%s'", payload.deployment_id, payload.strategy)
+        logger.info(
+            "Deploying '%s' with strategy '%s'", payload.deployment_id, payload.strategy
+        )
 
         # Validate first
         validation = self.validator.validate(payload.deployment_id)
         if not validation.all_passed:
-            raise ValueError(f"Deployment validation failed for '{payload.deployment_id}'")
+            raise ValueError(
+                f"Deployment validation failed for '{payload.deployment_id}'"
+            )
 
         # Create deployment record
         deployment = Deployment(
@@ -153,11 +162,13 @@ class DeploymentManager:
         )
         self.rollback_manager.capture_snapshot(snap)
 
-        self.event_bus.emit(DeploymentEvent(
-            event_type="deploy_completed",
-            deployment_id=deployment.deployment_id,
-            payload={"strategy": payload.strategy, "image_tag": payload.image_tag},
-        ))
+        self.event_bus.emit(
+            DeploymentEvent(
+                event_type="deploy_completed",
+                deployment_id=deployment.deployment_id,
+                payload={"strategy": payload.strategy, "image_tag": payload.image_tag},
+            )
+        )
         return deployment
 
     # -------------------------------------------------------------------------
@@ -177,11 +188,13 @@ class DeploymentManager:
         result = await self.rollback_manager.execute_rollback(rollback_id)
         self.statistics.rollbacks_triggered += 1
         self.registry.update_status(payload.deployment_id, DeploymentStatus.ROLLEDBACK)
-        self.event_bus.emit(DeploymentEvent(
-            event_type="rollback_completed",
-            deployment_id=payload.deployment_id,
-            payload=result,
-        ))
+        self.event_bus.emit(
+            DeploymentEvent(
+                event_type="rollback_completed",
+                deployment_id=payload.deployment_id,
+                payload=result,
+            )
+        )
         return result
 
     # -------------------------------------------------------------------------
@@ -200,11 +213,17 @@ class DeploymentManager:
         if d:
             d.replica_count = payload.target_replicas
         self.statistics.scaling_events += 1
-        self.event_bus.emit(DeploymentEvent(
-            event_type="scale_completed",
-            deployment_id=payload.deployment_id,
-            payload={"from": current, "to": payload.target_replicas, "reason": payload.reason},
-        ))
+        self.event_bus.emit(
+            DeploymentEvent(
+                event_type="scale_completed",
+                deployment_id=payload.deployment_id,
+                payload={
+                    "from": current,
+                    "to": payload.target_replicas,
+                    "reason": payload.reason,
+                },
+            )
+        )
         return event
 
     # -------------------------------------------------------------------------
@@ -215,7 +234,9 @@ class DeploymentManager:
         """Return aggregated platform health."""
         return await self.health_manager.check_platform_health()
 
-    async def get_deployment_status(self, deployment_id: str) -> DeploymentStatusResponse:
+    async def get_deployment_status(
+        self, deployment_id: str
+    ) -> DeploymentStatusResponse:
         """Return deployment status DTO."""
         d = self.registry.get(deployment_id)
         health = await self.health_manager.check_deployment_health(deployment_id)
@@ -244,4 +265,5 @@ class DeploymentManager:
             rollbacks=self.statistics.rollbacks_triggered,
         )
         from dataclasses import asdict
+
         return asdict(analytics)

@@ -15,7 +15,9 @@ class DeploymentAnalyticsEngine:
         lead_time_hours: float = 2.0,
     ) -> DeploymentAnalytics:
         if total_deployments > 0:
-            self._analytics.change_failure_rate_pct = (failed_deployments / total_deployments) * 100
+            self._analytics.change_failure_rate_pct = (
+                failed_deployments / total_deployments
+            ) * 100
             self._analytics.rollback_rate_pct = (rollbacks / total_deployments) * 100
         self._analytics.lead_time_for_changes_hours = lead_time_hours
         return self._analytics

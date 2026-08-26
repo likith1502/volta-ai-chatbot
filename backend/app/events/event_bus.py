@@ -14,7 +14,7 @@ from app.events.event_types import EventPriority
 class WorkflowEventBus:
     """
     In-memory synchronous & async-compatible event bus.
-    
+
     Delivery Guarantee Invariant (ADR 028):
     The Event Bus guarantees at-most-once in-memory delivery. It does NOT provide persistence,
     retries, acknowledgements, ordering across processes, or durability.
@@ -31,7 +31,11 @@ class WorkflowEventBus:
 
     def subscribe(
         self,
-        listener: Union[WorkflowEventListener, Type[WorkflowEventListener], Callable[[], WorkflowEventListener]],
+        listener: Union[
+            WorkflowEventListener,
+            Type[WorkflowEventListener],
+            Callable[[], WorkflowEventListener],
+        ],
         listener_id: Optional[str] = None,
         filter: Optional[WorkflowEventFilter] = None,
         priority: Optional[EventPriority] = None,
@@ -76,7 +80,9 @@ class WorkflowEventBus:
 
         return result
 
-    async def publish_batch(self, events: List[WorkflowEvent]) -> List[WorkflowEventResult]:
+    async def publish_batch(
+        self, events: List[WorkflowEvent]
+    ) -> List[WorkflowEventResult]:
         """Publishes a batch of WorkflowEvent instances sequentially to matching subscribers."""
         results = []
         for event in events:

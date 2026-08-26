@@ -16,6 +16,7 @@ class DeploymentStrategyType(str, Enum):
 @dataclass
 class DeploymentStrategyConfig:
     """Strategy configuration parameters."""
+
     max_surge: int = 1
     max_unavailable: int = 0
     canary_weight_pct: int = 10
@@ -35,7 +36,9 @@ class DeploymentStrategy(ABC):
         self.config = config or DeploymentStrategyConfig()
 
     @abstractmethod
-    async def execute(self, deployment_id: str, replicas: int, image_tag: str) -> dict[str, Any]:
+    async def execute(
+        self, deployment_id: str, replicas: int, image_tag: str
+    ) -> dict[str, Any]:
         """Execute deployment strategy. Returns execution summary."""
         ...
 
@@ -60,7 +63,9 @@ class BlueGreenDeployment(DeploymentStrategy):
 
     strategy_type = DeploymentStrategyType.BLUE_GREEN
 
-    async def execute(self, deployment_id: str, replicas: int, image_tag: str) -> dict[str, Any]:
+    async def execute(
+        self, deployment_id: str, replicas: int, image_tag: str
+    ) -> dict[str, Any]:
         return {
             "strategy": "blue_green",
             "deployment_id": deployment_id,
@@ -80,7 +85,9 @@ class RollingDeployment(DeploymentStrategy):
 
     strategy_type = DeploymentStrategyType.ROLLING
 
-    async def execute(self, deployment_id: str, replicas: int, image_tag: str) -> dict[str, Any]:
+    async def execute(
+        self, deployment_id: str, replicas: int, image_tag: str
+    ) -> dict[str, Any]:
         return {
             "strategy": "rolling",
             "deployment_id": deployment_id,
@@ -100,7 +107,9 @@ class CanaryDeployment(DeploymentStrategy):
 
     strategy_type = DeploymentStrategyType.CANARY
 
-    async def execute(self, deployment_id: str, replicas: int, image_tag: str) -> dict[str, Any]:
+    async def execute(
+        self, deployment_id: str, replicas: int, image_tag: str
+    ) -> dict[str, Any]:
         return {
             "strategy": "canary",
             "deployment_id": deployment_id,
@@ -121,7 +130,9 @@ class RecreateDeployment(DeploymentStrategy):
 
     strategy_type = DeploymentStrategyType.RECREATE
 
-    async def execute(self, deployment_id: str, replicas: int, image_tag: str) -> dict[str, Any]:
+    async def execute(
+        self, deployment_id: str, replicas: int, image_tag: str
+    ) -> dict[str, Any]:
         return {
             "strategy": "recreate",
             "deployment_id": deployment_id,
@@ -135,7 +146,10 @@ class RecreateDeployment(DeploymentStrategy):
         return True
 
 
-def create_strategy(strategy_type: DeploymentStrategyType, config: DeploymentStrategyConfig | None = None) -> DeploymentStrategy:
+def create_strategy(
+    strategy_type: DeploymentStrategyType,
+    config: DeploymentStrategyConfig | None = None,
+) -> DeploymentStrategy:
     """Factory for creating deployment strategies."""
     registry: dict[DeploymentStrategyType, type[DeploymentStrategy]] = {
         DeploymentStrategyType.BLUE_GREEN: BlueGreenDeployment,

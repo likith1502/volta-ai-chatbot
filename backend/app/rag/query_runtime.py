@@ -1,6 +1,7 @@
-import time
 import logging
+import time
 from typing import Optional
+
 from app.rag.budget import RetrievalBudget
 from app.rag.cache import CacheProvider, InMemoryCacheProvider
 from app.rag.context import RAGContext
@@ -35,7 +36,9 @@ class QueryRuntime:
 
         self.rewriter = QueryRewriter()
         self.planner = RetrievalPlanner()
-        self.retriever = DocumentRetriever(document_repository, vector_repository, self.embedding_registry)
+        self.retriever = DocumentRetriever(
+            document_repository, vector_repository, self.embedding_registry
+        )
         self.reranker = DocumentReranker()
         self.context_builder = RAGContextBuilder(document_repository)
 
@@ -48,7 +51,6 @@ class QueryRuntime:
         budget: Optional[RetrievalBudget] = None,
     ) -> tuple[RAGContext, RetrievalTrace, RetrievalExplanation]:
         """Executes query pipeline and returns assembled RAGContext, RetrievalTrace, and RetrievalExplanation."""
-        t0 = time.perf_counter()
         trace = RetrievalTrace(query=query)
         b_limit = budget or RetrievalBudget()
 
@@ -67,7 +69,9 @@ class QueryRuntime:
 
         # 2. Plan
         t_pl = time.perf_counter()
-        plan = self.planner.create_plan(clean_query, strategy=strategy, top_k=top_k, reranker=reranker)
+        plan = self.planner.create_plan(
+            clean_query, strategy=strategy, top_k=top_k, reranker=reranker
+        )
         dt_pl = (time.perf_counter() - t_pl) * 1000.0
         trace.add_step("retrieval_plan", dt_pl, plan.model_dump())
 
@@ -79,22 +83,32 @@ class QueryRuntime:
 
         # 4. Rerank
         t_rr = time.perf_counter()
-        ranked_chunks = self.reranker.rerank(clean_query, retrieved_chunks, strategy=reranker)
+        ranked_chunks = self.reranker.rerank(
+            clean_query, retrieved_chunks, strategy=reranker
+        )
         dt_rr = (time.perf_counter() - t_rr) * 1000.0
-        trace.add_step("rerank", dt_rr, {"strategy": reranker, "chunks_ranked": len(ranked_chunks)})
+        trace.add_step(
+            "rerank", dt_rr, {"strategy": reranker, "chunks_ranked": len(ranked_chunks)}
+        )
 
         # 5. Build Context & Citations
         t_ctx = time.perf_counter()
-        context = self.context_builder.build_context(clean_query, ranked_chunks, b_limit)
+        context = self.context_builder.build_context(
+            clean_query, ranked_chunks, b_limit
+        )
         dt_ctx = (time.perf_counter() - t_ctx) * 1000.0
-        trace.add_step("context_assembly", dt_ctx, {"citations_count": len(context.citations)})
+        trace.add_step(
+            "context_assembly", dt_ctx, {"citations_count": len(context.citations)}
+        )
 
         explanation = RetrievalExplanation(
             query=query,
             selected_chunk_ids=[c.chunk_id for c in context.citations],
             reranker=reranker,
             reason=f"Top-{len(context.citations)} similarity search via '{strategy}' and '{reranker}' reranking.",
-            average_score=round(sum(context.scores) / len(context.scores), 4) if context.scores else 1.0,
+            average_score=round(sum(context.scores) / len(context.scores), 4)
+            if context.scores
+            else 1.0,
         )
 
         result_tuple = (context, trace, explanation)

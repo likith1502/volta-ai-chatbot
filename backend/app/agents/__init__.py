@@ -29,7 +29,7 @@ from app.agents.exceptions import (
     AgentDelegationError,
     AgentNotFoundError,
     AgentPermissionDeniedError,
-    AgentRuntimeException,
+    AgentRuntimeError,
     AgentTaskError,
 )
 from app.agents.execution import AgentExecution
@@ -148,7 +148,7 @@ __all__ = [
     "AgentTrace",
     "AgentTraceStep",
     "AgentVersion",
-    "AgentRuntimeException",
+    "AgentRuntimeError",
     "AgentNotFoundError",
     "AgentDelegationError",
     "AgentTaskError",

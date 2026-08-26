@@ -1,4 +1,5 @@
 from typing import Optional
+
 from pydantic import BaseModel, Field
 
 
@@ -13,6 +14,8 @@ class PromptProfile(BaseModel):
     top_p: float = Field(default=0.95, ge=0.0, le=1.0)
     top_k: int = Field(default=40, ge=1)
     max_tokens: int = Field(default=1000, ge=1)
-    response_format: str = Field(default="text", description="'text', 'json', 'markdown'")
+    response_format: str = Field(
+        default="text", description="'text', 'json', 'markdown'"
+    )
     stop_sequences: list[str] = Field(default_factory=list)
     description: Optional[str] = None

@@ -1,5 +1,6 @@
 import logging
 from typing import Optional
+
 from app.rag.job import IngestionJob
 from app.rag.job_status import JobStatus
 
@@ -21,7 +22,14 @@ class JobManager:
     def get_job(self, job_id: str) -> Optional[IngestionJob]:
         return self._jobs.get(job_id)
 
-    def update_job_status(self, job_id: str, status: JobStatus, chunks: int = 0, embeddings: int = 0, error: Optional[str] = None) -> None:
+    def update_job_status(
+        self,
+        job_id: str,
+        status: JobStatus,
+        chunks: int = 0,
+        embeddings: int = 0,
+        error: Optional[str] = None,
+    ) -> None:
         job = self.get_job(job_id)
         if job:
             job.status = status

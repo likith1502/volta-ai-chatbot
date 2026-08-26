@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from app.prompt.contracts import PromptRequest, PromptResponse
 from app.prompt.result import PromptResult
 

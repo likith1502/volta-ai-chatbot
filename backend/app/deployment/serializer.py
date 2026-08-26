@@ -1,8 +1,8 @@
 """Deployment serializer — JSON serialization helpers."""
 
 import json
-from typing import Any
 from dataclasses import asdict, is_dataclass
+from typing import Any
 
 
 class DeploymentSerializer:

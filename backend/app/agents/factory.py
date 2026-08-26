@@ -1,6 +1,6 @@
-import uuid
 import logging
 from typing import Optional
+
 from app.agents.agent import Agent
 from app.agents.definition import AgentDefinition
 from app.agents.identity import AgentIdentity
@@ -17,9 +17,15 @@ class AgentFactory:
     """Factory creating specialized AgentDefinitions, worker instances, template teams, and agent clones."""
 
     @staticmethod
-    def create_worker(name: str, role: AgentRole = AgentRole.SUPPORT, persona: Optional[AgentPersona] = None) -> Agent:
+    def create_worker(
+        name: str,
+        role: AgentRole = AgentRole.SUPPORT,
+        persona: Optional[AgentPersona] = None,
+    ) -> Agent:
         identity = AgentIdentity(name=name)
-        definition = AgentDefinition(identity=identity, role=role, persona=persona or AgentPersona())
+        definition = AgentDefinition(
+            identity=identity, role=role, persona=persona or AgentPersona()
+        )
         instance = AgentInstance(definition_id=definition.definition_id)
         return Agent(definition=definition, instance=instance)
 

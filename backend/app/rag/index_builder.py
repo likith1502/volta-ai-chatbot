@@ -1,4 +1,5 @@
 import logging
+
 from app.rag.chunk import EmbeddedChunk
 from app.rag.index import DocumentIndex
 from app.rag.vector_repository import VectorRepository
@@ -15,5 +16,7 @@ class IndexBuilder:
     async def build_index(self, embeddings: list[EmbeddedChunk]) -> DocumentIndex:
         await self.vector_repository.upsert(embeddings)
         cnt = await self.vector_repository.count()
-        logger.info(f"IndexBuilder upserted {len(embeddings)} vectors into index. Total vectors: {cnt}")
+        logger.info(
+            f"IndexBuilder upserted {len(embeddings)} vectors into index. Total vectors: {cnt}"
+        )
         return DocumentIndex(total_vectors=cnt, total_chunks=cnt)

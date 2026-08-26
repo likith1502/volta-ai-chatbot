@@ -1,4 +1,4 @@
-from app.integrations.exceptions import IntegrationException
+from app.integrations.exceptions import IntegrationError
 from app.integrations.manifest import PluginManifest
 
 
@@ -8,7 +8,7 @@ class IntegrationValidator:
     @staticmethod
     def validate_manifest(manifest: PluginManifest) -> bool:
         if not manifest.id.strip():
-            raise IntegrationException("Plugin Manifest ID cannot be empty.")
+            raise IntegrationError("Plugin Manifest ID cannot be empty.")
         if not manifest.name.strip():
-            raise IntegrationException("Plugin Manifest Name cannot be empty.")
+            raise IntegrationError("Plugin Manifest Name cannot be empty.")
         return True

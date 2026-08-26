@@ -1,5 +1,6 @@
 import time
 from typing import Awaitable, Callable
+
 from app.prompt.contracts import PromptRequest
 from app.prompt.middleware.base import PromptMiddleware
 from app.prompt.result import PromptResult

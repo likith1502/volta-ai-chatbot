@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+
 from app.rag.repository import DocumentRepository
 from app.rag.vector_repository import VectorRepository
 
@@ -20,7 +21,11 @@ class RAGHealthStatus(BaseModel):
 
 
 class RAGHealthManager:
-    def __init__(self, document_repository: DocumentRepository, vector_repository: VectorRepository) -> None:
+    def __init__(
+        self,
+        document_repository: DocumentRepository,
+        vector_repository: VectorRepository,
+    ) -> None:
         self.doc_repo = document_repository
         self.vec_repo = vector_repository
 

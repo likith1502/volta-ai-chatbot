@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+
 from pydantic import BaseModel, Field
 
 from app.events.event_types import EventPriority

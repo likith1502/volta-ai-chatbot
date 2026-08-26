@@ -1,4 +1,5 @@
 from typing import List, Optional, Union
+
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -7,7 +8,9 @@ class Settings(BaseSettings):
     # Application Config
     APP_NAME: str = "VOLTA AI Chatbot"
     APP_VERSION: str = "0.1.0"
-    APP_DESCRIPTION: str = "AI-powered messaging chatbot and voice agent backend for VOLTA"
+    APP_DESCRIPTION: str = (
+        "AI-powered messaging chatbot and voice agent backend for VOLTA"
+    )
     ENVIRONMENT: str = "development"
     DEBUG: bool = True
     HOST: str = "127.0.0.1"

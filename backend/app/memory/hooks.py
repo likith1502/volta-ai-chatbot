@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from app.memory.context import MemoryContext
 from app.memory.contracts import MemoryRequest
 from app.memory.memory import Memory

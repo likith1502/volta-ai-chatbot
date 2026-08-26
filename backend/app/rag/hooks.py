@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from app.rag.context import RAGContext
 from app.rag.document import Document
 

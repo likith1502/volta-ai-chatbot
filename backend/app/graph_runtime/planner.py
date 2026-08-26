@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Optional
+from typing import Optional
 
 from app.graph_runtime.execution_plan import GraphExecutionPlan
 from app.graph_runtime.planner_result import PlannerResult
@@ -11,10 +11,20 @@ logger = logging.getLogger("app.graph_runtime.planner")
 class GraphPlanner:
     """Evaluates graph structure, generates execution DAG plans, dependency ordering, and conditional routes."""
 
-    def plan_execution(self, workflow_id: str, initial_node: str = "START", policy: Optional[GraphRuntimePolicy] = None) -> GraphExecutionPlan:
+    def plan_execution(
+        self,
+        workflow_id: str,
+        initial_node: str = "START",
+        policy: Optional[GraphRuntimePolicy] = None,
+    ) -> GraphExecutionPlan:
         """Generates a GraphExecutionPlan for a workflow."""
         nodes = [initial_node, "input_node", "llm_node", "tool_node", "END"]
-        parallel_groups = [[initial_node], ["input_node"], ["llm_node", "tool_node"], ["END"]]
+        parallel_groups = [
+            [initial_node],
+            ["input_node"],
+            ["llm_node", "tool_node"],
+            ["END"],
+        ]
         branches = {"llm_node": "tool_node", "tool_node": "END"}
 
         return GraphExecutionPlan(

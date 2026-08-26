@@ -1,4 +1,5 @@
 from typing import Any, Optional
+
 from fastapi import APIRouter, HTTPException, Query, status
 
 from app.integrations.capabilities import IntegrationCapability
@@ -20,7 +21,9 @@ _integration_manager = IntegrationManager()
     status_code=status.HTTP_200_OK,
     summary="List Registered Integration Providers",
 )
-async def list_providers(category: Optional[str] = Query(default=None)) -> dict[str, Any]:
+async def list_providers(
+    category: Optional[str] = Query(default=None),
+) -> dict[str, Any]:
     """Lists registered production integration adapters."""
     cap = IntegrationCapability(category) if category else None
     providers = _integration_manager.list_providers(cap)
@@ -49,7 +52,9 @@ async def get_provider_by_id(provider_id: str) -> dict[str, Any]:
     """Retrieves provider configuration & manifest details."""
     p = _integration_manager.get_provider(provider_id)
     if not p:
-        raise HTTPException(status_code=404, detail=f"Provider '{provider_id}' not found.")
+        raise HTTPException(
+            status_code=404, detail=f"Provider '{provider_id}' not found."
+        )
     return success_response(
         data={
             "provider_id": p.provider_id,
@@ -68,16 +73,24 @@ async def get_provider_by_id(provider_id: str) -> dict[str, Any]:
     status_code=status.HTTP_200_OK,
     summary="Register Integration Provider",
 )
-async def register_provider(payload: IntegrationProviderRegisterPayload) -> dict[str, Any]:
+async def register_provider(
+    payload: IntegrationProviderRegisterPayload,
+) -> dict[str, Any]:
     """Registers a new integration provider adapter."""
     try:
         adapter = await _integration_manager.register_provider(payload)
         return success_response(
-            data={"provider_id": adapter.provider_id, "name": adapter.name, "category": adapter.category.value},
+            data={
+                "provider_id": adapter.provider_id,
+                "name": adapter.name,
+                "category": adapter.category.value,
+            },
             message=f"Provider '{payload.provider_id}' registered successfully.",
         )
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Provider registration failed: {exc}")
+        raise HTTPException(
+            status_code=500, detail=f"Provider registration failed: {exc}"
+        )
 
 
 @router.post(
@@ -94,7 +107,9 @@ async def configure_provider(payload: IntegrationConfigurePayload) -> dict[str, 
             message=f"Provider '{payload.provider_id}' configured.",
         )
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Provider configuration failed: {exc}")
+        raise HTTPException(
+            status_code=500, detail=f"Provider configuration failed: {exc}"
+        )
 
 
 @router.post(

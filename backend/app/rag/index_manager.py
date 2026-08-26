@@ -1,6 +1,7 @@
 import logging
 from enum import Enum
 from typing import Optional
+
 from app.rag.chunk import EmbeddedChunk
 from app.rag.index import DocumentIndex
 from app.rag.index_builder import IndexBuilder
@@ -26,7 +27,12 @@ class IndexManager:
         self.builder = IndexBuilder(vector_repository)
         self.current_index = DocumentIndex()
 
-    async def update_index(self, embeddings: list[EmbeddedChunk], mode: IndexingMode = IndexingMode.INCREMENTAL, document_id: Optional[str] = None) -> DocumentIndex:
+    async def update_index(
+        self,
+        embeddings: list[EmbeddedChunk],
+        mode: IndexingMode = IndexingMode.INCREMENTAL,
+        document_id: Optional[str] = None,
+    ) -> DocumentIndex:
         if mode == IndexingMode.SINGLE_DOCUMENT and document_id:
             await self.vector_repository.delete(document_id)
 
@@ -34,5 +40,7 @@ class IndexManager:
         cnt = await self.vector_repository.count()
         self.current_index.total_vectors = cnt
         self.current_index.total_chunks = cnt
-        logger.info(f"IndexManager updated index in '{mode.value}' mode. Total vectors: {cnt}")
+        logger.info(
+            f"IndexManager updated index in '{mode.value}' mode. Total vectors: {cnt}"
+        )
         return self.current_index

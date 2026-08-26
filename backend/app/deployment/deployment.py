@@ -2,11 +2,13 @@
 
 from enum import Enum
 from typing import Any, Optional
+
 from pydantic import BaseModel, Field
 
 
 class DeploymentStatus(str, Enum):
     """Operational status of a deployment record."""
+
     UNKNOWN = "unknown"
     ACTIVE = "active"
     INACTIVE = "inactive"

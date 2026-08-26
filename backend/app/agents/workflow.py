@@ -1,5 +1,7 @@
 import uuid
+
 from pydantic import BaseModel, Field
+
 from app.agents.execution_mode import ExecutionMode
 
 
@@ -11,5 +13,11 @@ class MultiAgentWorkflow(BaseModel):
     team_id: str
     execution_mode: ExecutionMode = ExecutionMode.SUPERVISED
     step_sequence: list[str] = Field(
-        default_factory=lambda: ["planner_agent", "research_agent", "tool_agent", "reviewer_agent", "supervisor_agent"]
+        default_factory=lambda: [
+            "planner_agent",
+            "research_agent",
+            "tool_agent",
+            "reviewer_agent",
+            "supervisor_agent",
+        ]
     )

@@ -1,6 +1,7 @@
 import uuid
 from abc import ABC, abstractmethod
 from typing import Optional
+
 from app.memory.memory import Memory
 from app.memory.status import MemoryStatus
 

@@ -1,4 +1,5 @@
 from typing import Optional
+
 from app.rag.embedding_provider import EmbeddingProvider, MockEmbeddingProvider
 
 

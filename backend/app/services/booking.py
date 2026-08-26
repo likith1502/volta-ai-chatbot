@@ -3,7 +3,12 @@ from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.exceptions.domain import BookingNotFoundException, InvalidBookingStatusException, RecommendationExpiredException, RecommendationNotFoundException
+from app.exceptions.domain import (
+    BookingNotFoundError,
+    InvalidBookingStatusError,
+    RecommendationExpiredError,
+    RecommendationNotFoundError,
+)
 from app.models.booking import Booking
 from app.models.enums import BookingStatus, NotificationType, RecommendationStatus
 from app.models.notification import Notification
@@ -33,13 +38,19 @@ class BookingService(BaseService):
         """Orchestrates creating a ride booking from an active AI recommendation payload."""
         recommendation = await self.recommendation_repo.get_by_id(recommendation_id)
         if not recommendation:
-            raise RecommendationNotFoundException(f"Recommendation with ID '{recommendation_id}' not found.")
+            raise RecommendationNotFoundError(
+                f"Recommendation with ID '{recommendation_id}' not found."
+            )
 
         if recommendation.status == RecommendationStatus.EXPIRED:
-            raise RecommendationExpiredException("Cannot create booking from an expired recommendation.")
+            raise RecommendationExpiredError(
+                "Cannot create booking from an expired recommendation."
+            )
 
         if recommendation.status != RecommendationStatus.PENDING:
-            raise InvalidBookingStatusException(f"Recommendation status is '{recommendation.status}', must be PENDING.")
+            raise InvalidBookingStatusError(
+                f"Recommendation status is '{recommendation.status}', must be PENDING."
+            )
 
         ref_code = f"BK-{uuid.uuid4().hex[:8].upper()}"
 
@@ -58,7 +69,9 @@ class BookingService(BaseService):
             {"status": RecommendationStatus.ACCEPTED},
         )
 
-        conversation = await self.conversation_repo.get_by_id(recommendation.conversation_id)
+        conversation = await self.conversation_repo.get_by_id(
+            recommendation.conversation_id
+        )
         if conversation and conversation.user_id:
             await self.notification_repo.create(
                 {
@@ -78,24 +91,26 @@ class BookingService(BaseService):
         """Retrieves a booking reservation by unique reference code."""
         booking = await self.booking_repo.get_by_reference(booking_reference)
         if not booking:
-            raise BookingNotFoundException(f"Booking with reference '{booking_reference}' not found.")
+            raise BookingNotFoundError(
+                f"Booking with reference '{booking_reference}' not found."
+            )
         return booking
 
     async def cancel_booking(self, booking_id: uuid.UUID) -> Booking:
         """Cancels an active booking reservation."""
         booking = await self.booking_repo.get_by_id(booking_id)
         if not booking:
-            raise BookingNotFoundException(f"Booking with ID '{booking_id}' not found.")
+            raise BookingNotFoundError(f"Booking with ID '{booking_id}' not found.")
 
         if booking.booking_status == BookingStatus.CANCELLED:
-            raise InvalidBookingStatusException("Booking is already cancelled.")
+            raise InvalidBookingStatusError("Booking is already cancelled.")
 
         cancelled = await self.booking_repo.update(
             booking_id,
             {"booking_status": BookingStatus.CANCELLED},
         )
         if not cancelled:
-            raise BookingNotFoundException(f"Booking with ID '{booking_id}' not found.")
+            raise BookingNotFoundError(f"Booking with ID '{booking_id}' not found.")
 
         await self.commit()
         return cancelled

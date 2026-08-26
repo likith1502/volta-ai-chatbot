@@ -20,10 +20,10 @@ class MemoryAnalyticsManager:
         self.assemblies = 0
         self.total_assembly_ms = 0.0
 
-    def record_creation() -> None:
+    def record_creation(self) -> None:
         self.creations += 1
 
-    def record_search() -> None:
+    def record_search(self) -> None:
         self.searches += 1
 
     def record_assembly(self, duration_ms: float) -> None:
@@ -31,7 +31,9 @@ class MemoryAnalyticsManager:
         self.total_assembly_ms += duration_ms
 
     def get_report(self) -> MemoryAnalyticsReport:
-        avg_lat = (self.total_assembly_ms / self.assemblies) if self.assemblies > 0 else 0.0
+        avg_lat = (
+            (self.total_assembly_ms / self.assemblies) if self.assemblies > 0 else 0.0
+        )
         return MemoryAnalyticsReport(
             total_creations=self.creations,
             total_searches=self.searches,

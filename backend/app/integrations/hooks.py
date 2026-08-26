@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from app.integrations.provider import IntegrationProvider
 
 
@@ -10,5 +11,7 @@ class BeforeProviderConnectHook(ABC):
 
 class AfterProviderFailoverHook(ABC):
     @abstractmethod
-    async def after_failover(self, category: str, active_provider: IntegrationProvider) -> None:
+    async def after_failover(
+        self, category: str, active_provider: IntegrationProvider
+    ) -> None:
         pass

@@ -1,5 +1,6 @@
 import time
 from typing import Awaitable, Callable, Optional
+
 from app.prompt.contracts import PromptRequest
 from app.prompt.exceptions import PromptSecurityViolationError
 from app.prompt.middleware.base import PromptMiddleware
@@ -21,7 +22,9 @@ class SecurityMiddleware(PromptMiddleware):
         t0 = time.perf_counter()
         for k, v in request.variables.items():
             if not self.policy.validate_variable_name(k):
-                raise PromptSecurityViolationError(f"Restricted variable name '{k}' is forbidden by security policy.")
+                raise PromptSecurityViolationError(
+                    f"Restricted variable name '{k}' is forbidden by security policy."
+                )
             if isinstance(v, str):
                 violation = self.policy.detect_injection(v)
                 if violation:

@@ -2,7 +2,6 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any
 
 
 @dataclass
@@ -17,13 +16,19 @@ class MetricsProvider(ABC):
     """Abstract metrics provider."""
 
     @abstractmethod
-    def record_counter(self, name: str, value: float = 1.0, labels: dict[str, str] | None = None) -> None: ...
+    def record_counter(
+        self, name: str, value: float = 1.0, labels: dict[str, str] | None = None
+    ) -> None: ...
 
     @abstractmethod
-    def record_gauge(self, name: str, value: float, labels: dict[str, str] | None = None) -> None: ...
+    def record_gauge(
+        self, name: str, value: float, labels: dict[str, str] | None = None
+    ) -> None: ...
 
     @abstractmethod
-    def record_histogram(self, name: str, value: float, labels: dict[str, str] | None = None) -> None: ...
+    def record_histogram(
+        self, name: str, value: float, labels: dict[str, str] | None = None
+    ) -> None: ...
 
     @abstractmethod
     def get_all_metrics(self) -> list[MetricPoint]: ...
@@ -38,14 +43,26 @@ class PrometheusMetricsProvider(MetricsProvider):
     def __init__(self) -> None:
         self._metrics: list[MetricPoint] = []
 
-    def record_counter(self, name: str, value: float = 1.0, labels: dict[str, str] | None = None) -> None:
-        self._metrics.append(MetricPoint(name=f"counter_{name}", value=value, labels=labels or {}))
+    def record_counter(
+        self, name: str, value: float = 1.0, labels: dict[str, str] | None = None
+    ) -> None:
+        self._metrics.append(
+            MetricPoint(name=f"counter_{name}", value=value, labels=labels or {})
+        )
 
-    def record_gauge(self, name: str, value: float, labels: dict[str, str] | None = None) -> None:
-        self._metrics.append(MetricPoint(name=f"gauge_{name}", value=value, labels=labels or {}))
+    def record_gauge(
+        self, name: str, value: float, labels: dict[str, str] | None = None
+    ) -> None:
+        self._metrics.append(
+            MetricPoint(name=f"gauge_{name}", value=value, labels=labels or {})
+        )
 
-    def record_histogram(self, name: str, value: float, labels: dict[str, str] | None = None) -> None:
-        self._metrics.append(MetricPoint(name=f"histogram_{name}", value=value, labels=labels or {}))
+    def record_histogram(
+        self, name: str, value: float, labels: dict[str, str] | None = None
+    ) -> None:
+        self._metrics.append(
+            MetricPoint(name=f"histogram_{name}", value=value, labels=labels or {})
+        )
 
     def get_all_metrics(self) -> list[MetricPoint]:
         return list(self._metrics)
@@ -54,5 +71,5 @@ class PrometheusMetricsProvider(MetricsProvider):
         lines = []
         for m in self._metrics:
             label_str = ",".join(f'{k}="{v}"' for k, v in m.labels.items())
-            lines.append(f'{m.name}{{{label_str}}} {m.value}')
+            lines.append(f"{m.name}{{{label_str}}} {m.value}")
         return "\n".join(lines)

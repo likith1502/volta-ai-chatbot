@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import time
 import uuid
@@ -14,7 +13,7 @@ from app.memory.context_builder import MemoryContextBuilder
 from app.memory.contracts import MemoryRequest, MemorySearchResult
 from app.memory.exceptions import MemoryNotFoundError, MemoryValidationError
 from app.memory.health import MemoryHealthManager
-from app.memory.lifecycle import MemoryLifecycleManager, MemoryLifecycleState
+from app.memory.lifecycle import MemoryLifecycleManager
 from app.memory.memory import Memory
 from app.memory.metadata import MemoryMetadata
 from app.memory.metrics import MemoryMetrics
@@ -24,7 +23,12 @@ from app.memory.scoring import MemoryScorer
 from app.memory.selector import MemorySelector
 from app.memory.statistics import MemoryStatistics
 from app.memory.status import MemoryStatus
-from app.memory.strategy import ContextAssemblyStrategy, HybridStrategy, ImportanceStrategy, RecentStrategy, SlidingWindowStrategy
+from app.memory.strategy import (
+    HybridStrategy,
+    ImportanceStrategy,
+    RecentStrategy,
+    SlidingWindowStrategy,
+)
 from app.memory.token_estimator import MemoryTokenEstimator
 
 logger = logging.getLogger("app.memory.manager")
@@ -70,7 +74,9 @@ class MemoryManager:
 
         expires_at = None
         if request.ttl_seconds:
-            expires_at = datetime.fromtimestamp(time.time() + request.ttl_seconds, tz=timezone.utc)
+            expires_at = datetime.fromtimestamp(
+                time.time() + request.ttl_seconds, tz=timezone.utc
+            )
 
         metadata = MemoryMetadata(
             tags=request.tags,
@@ -92,11 +98,16 @@ class MemoryManager:
         await repo.save(memory)
         self.metrics.memory_count += 1
 
-        await self._emit_event("created", {
-            "memory_id": str(memory.memory_id),
-            "conversation_id": str(memory.conversation_id) if memory.conversation_id else None,
-            "memory_type": memory.memory_type.value,
-        })
+        await self._emit_event(
+            "created",
+            {
+                "memory_id": str(memory.memory_id),
+                "conversation_id": str(memory.conversation_id)
+                if memory.conversation_id
+                else None,
+                "memory_type": memory.memory_type.value,
+            },
+        )
         return memory
 
     async def get_memory(self, memory_id: uuid.UUID) -> Memory:
@@ -162,7 +173,11 @@ class MemoryManager:
             all_mems = await repo.list_all(limit=200)
 
         # Filter active or pinned memories
-        active_mems = [m for m in all_mems if m.status in (MemoryStatus.ACTIVE, MemoryStatus.PINNED)]
+        active_mems = [
+            m
+            for m in all_mems
+            if m.status in (MemoryStatus.ACTIVE, MemoryStatus.PINNED)
+        ]
 
         # Keyword filtering if query is provided
         if query and query.strip():
@@ -196,7 +211,12 @@ class MemoryManager:
         else:
             memories = await repo.list_all(limit=200)
 
-        active_memories = [m for m in memories if m.status in (MemoryStatus.ACTIVE, MemoryStatus.PINNED) and not m.is_expired]
+        active_memories = [
+            m
+            for m in memories
+            if m.status in (MemoryStatus.ACTIVE, MemoryStatus.PINNED)
+            and not m.is_expired
+        ]
 
         # Choose strategy
         strat_lower = strategy.lower().strip()
@@ -216,11 +236,14 @@ class MemoryManager:
         dt = (time.perf_counter() - t0) * 1000.0
         self.metrics.assembly_latency_ms = dt
 
-        await self._emit_event("context_built", {
-            "context_id": str(context.context_id),
-            "conversation_id": str(conversation_id) if conversation_id else None,
-            "total_memories": context.total_memories_count,
-        })
+        await self._emit_event(
+            "context_built",
+            {
+                "context_id": str(context.context_id),
+                "conversation_id": str(conversation_id) if conversation_id else None,
+                "total_memories": context.total_memories_count,
+            },
+        )
         return context
 
     async def cleanup_expired(self) -> int:
@@ -246,10 +269,16 @@ class MemoryManager:
         active = [m for m in all_mems if m.status == MemoryStatus.ACTIVE]
         pinned = [m for m in all_mems if m.status == MemoryStatus.PINNED]
         archived = [m for m in all_mems if m.status == MemoryStatus.ARCHIVED]
-        expired = [m for m in all_mems if m.status == MemoryStatus.EXPIRED or m.is_expired]
+        expired = [
+            m for m in all_mems if m.status == MemoryStatus.EXPIRED or m.is_expired
+        ]
 
-        avg_imp = (sum(m.importance for m in all_mems) / len(all_mems)) if all_mems else 0.0
-        tot_tokens = sum(MemoryTokenEstimator.estimate_memory_tokens(m) for m in all_mems)
+        avg_imp = (
+            (sum(m.importance for m in all_mems) / len(all_mems)) if all_mems else 0.0
+        )
+        tot_tokens = sum(
+            MemoryTokenEstimator.estimate_memory_tokens(m) for m in all_mems
+        )
 
         return MemoryStatistics(
             total_memories=len(all_mems),

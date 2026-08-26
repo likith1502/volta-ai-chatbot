@@ -1,7 +1,5 @@
 import logging
-import time
-import uuid
-from typing import Any, Optional
+from typing import Optional
 
 from app.agents.agent import Agent
 from app.agents.analytics import AgentAnalyticsManager
@@ -13,17 +11,16 @@ from app.agents.contracts import (
     AgentMessagePayload,
     AgentRegisterPayload,
     AgentTaskPayload,
-    TeamCreatePayload,
 )
 from app.agents.definition import AgentDefinition
 from app.agents.delegator import DelegationManager
 from app.agents.exceptions import AgentNotFoundError
 from app.agents.execution import AgentExecution
 from app.agents.factory import AgentFactory
-from app.agents.health import AgentHealthManager, AgentHealthStatus
+from app.agents.health import AgentHealthManager
 from app.agents.identity import AgentIdentity
 from app.agents.message import AgentMessage
-from app.agents.permissions import AgentPermission, AgentPermissionSet
+from app.agents.permissions import AgentPermission
 from app.agents.persona import AgentPersona
 from app.agents.registry import AgentRegistry
 from app.agents.role import AgentRole
@@ -32,7 +29,6 @@ from app.agents.statistics import AgentStatistics
 from app.agents.supervisor import SupervisorAgent
 from app.agents.task import AgentTask, TaskResult
 from app.agents.task_queue import TaskQueue
-from app.agents.team import AgentTeam
 from app.agents.team_manager import TeamManager
 from app.events.event_bus import WorkflowEventBus
 from app.memory.manager import MemoryManager
@@ -92,10 +88,14 @@ class AgentRuntimeManager:
             sup = SupervisorAgent()
             self.registry.register_agent(sup)
 
-            worker1 = AgentFactory.create_worker("Ride Discovery Agent", role=AgentRole.RESEARCH)
+            worker1 = AgentFactory.create_worker(
+                "Ride Discovery Agent", role=AgentRole.RESEARCH
+            )
             self.registry.register_agent(worker1)
 
-            worker2 = AgentFactory.create_worker("Booking Tool Agent", role=AgentRole.TOOL)
+            worker2 = AgentFactory.create_worker(
+                "Booking Tool Agent", role=AgentRole.TOOL
+            )
             self.registry.register_agent(worker2)
 
             self.team_manager.create_team(
@@ -107,7 +107,9 @@ class AgentRuntimeManager:
     async def register_agent(self, payload: AgentRegisterPayload) -> Agent:
         """Registers a new agent instance from payload specs."""
         identity = AgentIdentity(name=payload.name)
-        persona = AgentPersona(communication_style=payload.communication_style, tone=payload.tone)
+        persona = AgentPersona(
+            communication_style=payload.communication_style, tone=payload.tone
+        )
         role = AgentRole(payload.role)
         definition = AgentDefinition(identity=identity, role=role, persona=persona)
         if role == AgentRole.SUPERVISOR:
@@ -172,7 +174,9 @@ class AgentRuntimeManager:
 
     async def enqueue_task(self, payload: AgentTaskPayload) -> AgentTask:
         """Enqueues task into priority TaskQueue."""
-        task = AgentTask(title=payload.title, priority=payload.priority, inputs=payload.inputs)
+        task = AgentTask(
+            title=payload.title, priority=payload.priority, inputs=payload.inputs
+        )
         self.task_queue.enqueue(task)
         return task
 

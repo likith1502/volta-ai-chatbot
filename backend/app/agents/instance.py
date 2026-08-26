@@ -1,7 +1,9 @@
 import uuid
 from typing import Optional
+
 from pydantic import BaseModel, Field
-from app.agents.lifecycle import AgentLifecycleManager, AgentLifecycleState
+
+from app.agents.lifecycle import AgentLifecycleManager
 from app.agents.state import AgentState
 from app.agents.status import AgentStatus
 

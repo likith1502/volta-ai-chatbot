@@ -1,7 +1,7 @@
-import math
 import hashlib
+import math
 from abc import ABC, abstractmethod
-from typing import Any
+
 from app.rag.chunk import Chunk, EmbeddedChunk
 
 
@@ -30,7 +30,9 @@ class EmbeddingProvider(ABC):
 class MockEmbeddingProvider(EmbeddingProvider):
     """Reference provider generating deterministic normalized pseudo-random vector embeddings."""
 
-    def __init__(self, provider_id: str = "mock-embedder-v1", dimension: int = 1536) -> None:
+    def __init__(
+        self, provider_id: str = "mock-embedder-v1", dimension: int = 1536
+    ) -> None:
         self._provider_id = provider_id
         self._dimension = dimension
 

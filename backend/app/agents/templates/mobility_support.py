@@ -2,7 +2,6 @@ from app.agents.definition import AgentDefinition
 from app.agents.identity import AgentIdentity
 from app.agents.persona import AgentPersona
 from app.agents.role import AgentRole
-from app.agents.team import AgentTeam
 
 
 def create_mobility_support_team_spec() -> dict:
@@ -12,7 +11,9 @@ def create_mobility_support_team_spec() -> dict:
         "supervisor": AgentDefinition(
             identity=AgentIdentity(name="Mobility Supervisor Agent"),
             role=AgentRole.SUPERVISOR,
-            persona=AgentPersona(tone="authoritative", communication_style="structured"),
+            persona=AgentPersona(
+                tone="authoritative", communication_style="structured"
+            ),
         ),
         "workers": [
             AgentDefinition(

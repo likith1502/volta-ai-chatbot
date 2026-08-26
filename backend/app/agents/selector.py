@@ -1,4 +1,5 @@
 from typing import Optional
+
 from app.agents.agent import Agent
 from app.agents.role import AgentRole
 

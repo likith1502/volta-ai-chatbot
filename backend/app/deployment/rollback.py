@@ -9,6 +9,7 @@ from typing import Any, Optional
 @dataclass
 class RollbackSnapshot:
     """A point-in-time snapshot of a running deployment."""
+
     snapshot_id: str
     deployment_id: str
     version: str
@@ -22,6 +23,7 @@ class RollbackSnapshot:
 @dataclass
 class RestorePoint:
     """A restore point derived from a rollback snapshot."""
+
     restore_id: str
     snapshot_id: str
     version: str
@@ -32,6 +34,7 @@ class RestorePoint:
 @dataclass
 class RollbackPlan:
     """Full plan for a deployment rollback."""
+
     rollback_id: str
     from_deployment_id: str
     to_snapshot_id: str
@@ -61,7 +64,9 @@ class RollbackManager:
         self._restore_points[rp.restore_id] = rp
         return snapshot.snapshot_id
 
-    def build_plan(self, deployment_id: str, snapshot_id: str, rollback_id: str) -> Optional[RollbackPlan]:
+    def build_plan(
+        self, deployment_id: str, snapshot_id: str, rollback_id: str
+    ) -> Optional[RollbackPlan]:
         """Build a rollback plan for a given deployment → snapshot pair."""
         snap = self._snapshots.get(snapshot_id)
         if not snap:

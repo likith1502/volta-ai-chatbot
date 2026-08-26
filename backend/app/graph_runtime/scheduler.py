@@ -10,7 +10,9 @@ logger = logging.getLogger("app.graph_runtime.scheduler")
 class GraphScheduler:
     """Schedules sequential, parallel, and conditional node execution steps for Graph Runtime."""
 
-    def schedule_next(self, plan: GraphExecutionPlan, cursor: GraphCursor) -> Optional[str]:
+    def schedule_next(
+        self, plan: GraphExecutionPlan, cursor: GraphCursor
+    ) -> Optional[str]:
         """Schedules the next node to execute based on plan and cursor location."""
         order = plan.execution_order
         if not cursor.current_node or cursor.current_node not in order:

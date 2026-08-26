@@ -35,7 +35,7 @@ from app.deployment.metrics import DeploymentMetricsCollector
 from app.deployment.events import DeploymentEvent, DeploymentEventBus
 from app.deployment.hooks import DeploymentHooks, DeploymentHookResult
 from app.deployment.exceptions import (
-    DeploymentException, DeploymentValidationError, RollbackError,
+    DeploymentError, DeploymentValidationError, RollbackError,
     ScalingError, BackupError, RecoveryError, ReleaseCompatibilityError,
     EnvironmentNotFoundError, DeploymentStrategyError,
 )
@@ -845,10 +845,10 @@ class TestDeploymentExceptions:
             BackupError, RecoveryError, ReleaseCompatibilityError,
             EnvironmentNotFoundError, DeploymentStrategyError,
         ]:
-            assert issubclass(exc_cls, DeploymentException)
+            assert issubclass(exc_cls, DeploymentError)
 
     def test_raise_and_catch(self):
-        with pytest.raises(DeploymentException):
+        with pytest.raises(DeploymentError):
             raise DeploymentValidationError("Validation failed")
 
 

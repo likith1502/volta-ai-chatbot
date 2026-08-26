@@ -1,4 +1,3 @@
-import json
 from app.tools.manifest import ToolManifest
 from app.tools.result import ToolResult
 

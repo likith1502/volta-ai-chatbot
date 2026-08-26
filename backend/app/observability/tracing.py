@@ -1,9 +1,9 @@
 """Distributed tracing provider — OpenTelemetry reference implementation."""
 
+import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any
-import uuid
 
 
 @dataclass

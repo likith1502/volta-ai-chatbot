@@ -1,4 +1,5 @@
 from typing import Any, Optional
+
 from pydantic import BaseModel, Field
 
 from app.prompt.context import PromptContext
@@ -15,7 +16,9 @@ class PromptResult(BaseModel):
     metrics: PromptMetrics = Field(default_factory=PromptMetrics)
     context: PromptContext
     trace: PromptTrace = Field(default_factory=PromptTrace)
-    execution_status: str = Field(default="COMPLETED", description="'COMPLETED', 'FAILED', 'DEGRADED'")
+    execution_status: str = Field(
+        default="COMPLETED", description="'COMPLETED', 'FAILED', 'DEGRADED'"
+    )
     warnings: list[str] = Field(default_factory=list)
     errors: list[str] = Field(default_factory=list)
     runtime_result: Optional[RuntimeResult] = None

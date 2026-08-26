@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional
+
 from app.integrations.capabilities import IntegrationCapability
 from app.integrations.health_level import HealthLevel
 from app.integrations.provider import IntegrationHealthReport, IntegrationProvider
@@ -10,10 +11,17 @@ class LLMAdapter(IntegrationProvider, ABC):
     """Abstract interface wrapping LLM model runtime providers."""
 
     def __init__(self, provider_id: str, name: str, priority: int = 10) -> None:
-        super().__init__(provider_id=provider_id, name=name, category=IntegrationCapability.LLM, priority=priority)
+        super().__init__(
+            provider_id=provider_id,
+            name=name,
+            category=IntegrationCapability.LLM,
+            priority=priority,
+        )
 
     @abstractmethod
-    async def generate_response(self, prompt: str, system_prompt: Optional[str] = None) -> str:
+    async def generate_response(
+        self, prompt: str, system_prompt: Optional[str] = None
+    ) -> str:
         pass
 
 
@@ -21,7 +29,9 @@ class GeminiLLMAdapter(LLMAdapter):
     """Reference LLM adapter wrapping Google Gemini SDK."""
 
     def __init__(self) -> None:
-        super().__init__(provider_id="llm.gemini", name="Google Gemini LLM Adapter", priority=10)
+        super().__init__(
+            provider_id="llm.gemini", name="Google Gemini LLM Adapter", priority=10
+        )
         self._status = IntegrationStatus.CONFIGURED
 
     async def initialize(self, context: Optional[Any] = None) -> None:
@@ -36,7 +46,9 @@ class GeminiLLMAdapter(LLMAdapter):
         self._status = IntegrationStatus.DISCONNECTED
         return True
 
-    async def generate_response(self, prompt: str, system_prompt: Optional[str] = None) -> str:
+    async def generate_response(
+        self, prompt: str, system_prompt: Optional[str] = None
+    ) -> str:
         return f"[Gemini LLM Response to '{prompt[:30]}...']"
 
     async def check_health(self) -> IntegrationHealthReport:

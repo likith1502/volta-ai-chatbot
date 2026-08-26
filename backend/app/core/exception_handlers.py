@@ -1,15 +1,16 @@
 import logging
+
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app.core.exceptions import AppException
+from app.core.exceptions import AppError
 
 logger = logging.getLogger("app.exceptions")
 
 
-def app_exception_handler(request: Request, exc: AppException) -> JSONResponse:
+def app_exception_handler(request: Request, exc: AppError) -> JSONResponse:
     return JSONResponse(
         status_code=exc.status_code,
         content={
@@ -66,7 +67,7 @@ def unhandled_exception_handler(request: Request, exc: Exception) -> JSONRespons
 
 
 def register_exception_handlers(app: FastAPI) -> None:
-    app.add_exception_handler(AppException, app_exception_handler)
+    app.add_exception_handler(AppError, app_exception_handler)
     app.add_exception_handler(StarletteHTTPException, http_exception_handler)
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
     app.add_exception_handler(Exception, unhandled_exception_handler)

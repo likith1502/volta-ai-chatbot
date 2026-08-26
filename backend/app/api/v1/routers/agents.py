@@ -1,5 +1,6 @@
-from typing import Any, Optional
-from fastapi import APIRouter, HTTPException, Query, status
+from typing import Any
+
+from fastapi import APIRouter, HTTPException, status
 
 from app.agents.contracts import (
     AgentDelegatePayload,
@@ -11,7 +12,9 @@ from app.agents.contracts import (
 from app.agents.manager import AgentRuntimeManager
 from app.utils.responses import success_response
 
-router = APIRouter(prefix="/agents", tags=["Enterprise Multi-Agent Orchestration Runtime"])
+router = APIRouter(
+    prefix="/agents", tags=["Enterprise Multi-Agent Orchestration Runtime"]
+)
 
 _agent_runtime_manager = AgentRuntimeManager()
 
@@ -26,7 +29,11 @@ async def register_agent(payload: AgentRegisterPayload) -> dict[str, Any]:
     try:
         agent = await _agent_runtime_manager.register_agent(payload)
         return success_response(
-            data={"agent_id": agent.agent_id, "name": agent.name, "role": str(agent.role)},
+            data={
+                "agent_id": agent.agent_id,
+                "name": agent.name,
+                "role": str(agent.role),
+            },
             message=f"Agent '{agent.name}' registered successfully.",
         )
     except Exception as exc:
@@ -113,7 +120,15 @@ async def list_agents() -> dict[str, Any]:
     """Returns list of all registered agents."""
     agents = await _agent_runtime_manager.list_agents()
     return success_response(
-        data=[{"agent_id": a.agent_id, "name": a.name, "role": str(a.role), "status": str(a.status)} for a in agents],
+        data=[
+            {
+                "agent_id": a.agent_id,
+                "name": a.name,
+                "role": str(a.role),
+                "status": str(a.status),
+            }
+            for a in agents
+        ],
         message="Registered agents retrieved.",
     )
 

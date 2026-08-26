@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from app.memory.compactor import MemoryCompactor
 from app.memory.context import MemoryContext
 from app.memory.memory import Memory
@@ -11,7 +12,9 @@ class ContextAssemblyStrategy(ABC):
     """Abstract Base Class defining context assembly strategy interface."""
 
     @abstractmethod
-    def assemble(self, memories: list[Memory], token_budget: int = 4000) -> MemoryContext:
+    def assemble(
+        self, memories: list[Memory], token_budget: int = 4000
+    ) -> MemoryContext:
         """Assembles list of Memory objects into MemoryContext within token budget."""
         pass
 
@@ -23,13 +26,25 @@ class HybridStrategy(ContextAssemblyStrategy):
         self.selector = MemorySelector()
         self.compactor = MemoryCompactor()
 
-    def assemble(self, memories: list[Memory], token_budget: int = 4000) -> MemoryContext:
+    def assemble(
+        self, memories: list[Memory], token_budget: int = 4000
+    ) -> MemoryContext:
         compacted = self.compactor.compact(memories, token_budget=token_budget)
         selected = self.selector.select(compacted, strategy="hybrid", top_k=50)
 
         sys_mems = [m for m in selected if m.memory_type == MemoryType.SYSTEM]
-        user_mems = [m for m in selected if m.memory_type in (MemoryType.USER, MemoryType.LONG_TERM, MemoryType.SEMANTIC)]
-        conv_mems = [m for m in selected if m.memory_type in (MemoryType.SHORT_TERM, MemoryType.EPISODIC, MemoryType.SESSION)]
+        user_mems = [
+            m
+            for m in selected
+            if m.memory_type
+            in (MemoryType.USER, MemoryType.LONG_TERM, MemoryType.SEMANTIC)
+        ]
+        conv_mems = [
+            m
+            for m in selected
+            if m.memory_type
+            in (MemoryType.SHORT_TERM, MemoryType.EPISODIC, MemoryType.SESSION)
+        ]
         work_mems = [m for m in selected if m.memory_type == MemoryType.WORKING]
 
         ctx = MemoryContext(
@@ -48,7 +63,9 @@ class HybridStrategy(ContextAssemblyStrategy):
 class RecentStrategy(ContextAssemblyStrategy):
     """Assembly strategy prioritizing recent short-term memories."""
 
-    def assemble(self, memories: list[Memory], token_budget: int = 4000) -> MemoryContext:
+    def assemble(
+        self, memories: list[Memory], token_budget: int = 4000
+    ) -> MemoryContext:
         sorted_mems = sorted(memories, key=lambda m: m.created_at, reverse=True)
         compacted = MemoryCompactor().compact(sorted_mems, token_budget=token_budget)
 
@@ -65,8 +82,12 @@ class RecentStrategy(ContextAssemblyStrategy):
 class ImportanceStrategy(ContextAssemblyStrategy):
     """Assembly strategy prioritizing high-importance and pinned memories."""
 
-    def assemble(self, memories: list[Memory], token_budget: int = 4000) -> MemoryContext:
-        sorted_mems = sorted(memories, key=lambda m: (m.is_pinned, m.importance), reverse=True)
+    def assemble(
+        self, memories: list[Memory], token_budget: int = 4000
+    ) -> MemoryContext:
+        sorted_mems = sorted(
+            memories, key=lambda m: (m.is_pinned, m.importance), reverse=True
+        )
         compacted = MemoryCompactor().compact(sorted_mems, token_budget=token_budget)
 
         ctx = MemoryContext(
@@ -82,7 +103,9 @@ class ImportanceStrategy(ContextAssemblyStrategy):
 class SlidingWindowStrategy(ContextAssemblyStrategy):
     """Assembly strategy maintaining a fixed sliding window of the last N turns."""
 
-    def assemble(self, memories: list[Memory], token_budget: int = 4000) -> MemoryContext:
+    def assemble(
+        self, memories: list[Memory], token_budget: int = 4000
+    ) -> MemoryContext:
         recent_window = sorted(memories, key=lambda m: m.created_at, reverse=True)[:20]
         compacted = MemoryCompactor().compact(recent_window, token_budget=token_budget)
 

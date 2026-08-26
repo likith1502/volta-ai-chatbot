@@ -1,5 +1,6 @@
 import logging
 from typing import Optional
+
 from app.agents.agent import Agent
 from app.agents.status import AgentStatus
 from app.agents.strategy import SchedulingStrategy
@@ -15,7 +16,11 @@ class TaskScheduler:
     def __init__(self, task_queue: Optional[TaskQueue] = None) -> None:
         self.task_queue = task_queue or TaskQueue()
 
-    def schedule_next(self, available_agents: list[Agent], strategy: SchedulingStrategy = SchedulingStrategy.PRIORITY_FIRST) -> Optional[tuple[AgentTask, Agent]]:
+    def schedule_next(
+        self,
+        available_agents: list[Agent],
+        strategy: SchedulingStrategy = SchedulingStrategy.PRIORITY_FIRST,
+    ) -> Optional[tuple[AgentTask, Agent]]:
         task = self.task_queue.dequeue()
         if not task:
             return None

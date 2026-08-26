@@ -17,8 +17,8 @@ from app.tools.events import (
     ToolValidatedEvent,
 )
 from app.tools.exceptions import (
+    ToolError,
     ToolExecutionError,
-    ToolException,
     ToolNotFoundError,
     ToolPermissionDeniedError,
     ToolPolicyViolationError,
@@ -98,7 +98,7 @@ __all__ = [
     "CalculatorTool",
     "DatetimeTool",
     "UUIDTool",
-    "ToolException",
+    "ToolError",
     "ToolNotFoundError",
     "ToolValidationError",
     "ToolExecutionError",

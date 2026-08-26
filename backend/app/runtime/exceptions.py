@@ -1,8 +1,9 @@
 from typing import Optional
-from app.core.exceptions import AppException
+
+from app.core.exceptions import AppError
 
 
-class RuntimeException(AppException):
+class RuntimeError(AppError):
     """Base exception for all Enterprise LLM Runtime Engine failures."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -10,7 +11,7 @@ class RuntimeException(AppException):
         self.code = "RUNTIME_ERROR"
 
 
-class ProviderNotFoundError(RuntimeException):
+class ProviderNotFoundError(RuntimeError):
     """Raised when a requested AI provider is not registered in RuntimeRegistry."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -19,7 +20,7 @@ class ProviderNotFoundError(RuntimeException):
         self.status_code = 444
 
 
-class ProviderInitializationError(RuntimeException):
+class ProviderInitializationError(RuntimeError):
     """Raised when an AI provider fails during initialization or SDK setup."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -28,7 +29,7 @@ class ProviderInitializationError(RuntimeException):
         self.status_code = 502
 
 
-class RuntimeExecutionError(RuntimeException):
+class RuntimeExecutionError(RuntimeError):
     """Raised during LLM generation failure."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -37,7 +38,7 @@ class RuntimeExecutionError(RuntimeException):
         self.status_code = 502
 
 
-class RuntimeTimeoutError(RuntimeException):
+class RuntimeTimeoutError(RuntimeError):
     """Raised when provider execution exceeds specified timeout."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -46,7 +47,7 @@ class RuntimeTimeoutError(RuntimeException):
         self.status_code = 504
 
 
-class RuntimeRetryExhaustedError(RuntimeException):
+class RuntimeRetryExhaustedError(RuntimeError):
     """Raised when max retry attempts are exhausted without successful provider response."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -55,7 +56,7 @@ class RuntimeRetryExhaustedError(RuntimeException):
         self.status_code = 504
 
 
-class ProviderHealthCheckError(RuntimeException):
+class ProviderHealthCheckError(RuntimeError):
     """Raised when a provider health check fails."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -64,7 +65,7 @@ class ProviderHealthCheckError(RuntimeException):
         self.status_code = 503
 
 
-class ProviderAuthenticationError(RuntimeException):
+class ProviderAuthenticationError(RuntimeError):
     """Raised when provider API key or credential authentication fails."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -73,7 +74,7 @@ class ProviderAuthenticationError(RuntimeException):
         self.status_code = 401
 
 
-class ProviderRateLimitError(RuntimeException):
+class ProviderRateLimitError(RuntimeError):
     """Raised when provider rate limits are exceeded (HTTP 429)."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -82,7 +83,7 @@ class ProviderRateLimitError(RuntimeException):
         self.status_code = 429
 
 
-class ProviderUnavailableError(RuntimeException):
+class ProviderUnavailableError(RuntimeError):
     """Raised when remote provider API endpoint is unreachable or returning 5xx errors."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:
@@ -91,7 +92,7 @@ class ProviderUnavailableError(RuntimeException):
         self.status_code = 503
 
 
-class ProviderConfigurationError(RuntimeException):
+class ProviderConfigurationError(RuntimeError):
     """Raised when invalid or missing provider configuration parameters are supplied."""
 
     def __init__(self, message: str, details: Optional[dict] = None) -> None:

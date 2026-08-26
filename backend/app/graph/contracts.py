@@ -72,7 +72,13 @@ class IGraphEdge(ABC):
 
     source_node: str
     target_node: str
-    edge_condition: Optional[Union[Callable[[ConversationState], bool], Callable[[ConversationState], Awaitable[bool]], str]]
+    edge_condition: Optional[
+        Union[
+            Callable[[ConversationState], bool],
+            Callable[[ConversationState], Awaitable[bool]],
+            str,
+        ]
+    ]
     priority: int
     metadata: dict[str, Any]
 
@@ -111,7 +117,7 @@ class IGraph(ABC):
 
     @abstractmethod
     def get_node(self, node_id: str) -> IGraphNode:
-        """Retrieves node by ID or raises NodeNotFoundException."""
+        """Retrieves node by ID or raises NodeNotFoundError."""
         pass
 
     @abstractmethod
@@ -144,7 +150,9 @@ class IGraphBuilder(ABC):
         pass
 
     @abstractmethod
-    def validate(self, options: Optional[GraphBuildOptions] = None) -> GraphValidationResult:
+    def validate(
+        self, options: Optional[GraphBuildOptions] = None
+    ) -> GraphValidationResult:
         """Validates graph structural rules and connectivity."""
         pass
 
@@ -158,7 +166,9 @@ class IGraphExecutor(ABC):
     """Abstract contract for executing graph workflows."""
 
     @abstractmethod
-    async def execute(self, graph: IGraph, initial_state: ConversationState) -> ExecutionResult:
+    async def execute(
+        self, graph: IGraph, initial_state: ConversationState
+    ) -> ExecutionResult:
         """Executes the graph starting from entry node to completion."""
         pass
 

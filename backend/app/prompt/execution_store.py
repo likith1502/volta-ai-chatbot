@@ -2,6 +2,7 @@ import uuid
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 from typing import Any, Optional
+
 from pydantic import BaseModel, Field
 
 from app.prompt.result import PromptResult

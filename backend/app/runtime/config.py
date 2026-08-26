@@ -1,5 +1,7 @@
 from typing import Optional
+
 from pydantic import BaseModel, Field
+
 from app.config.settings import settings
 
 
@@ -25,7 +27,9 @@ class GenerationConfig(BaseModel):
 class RuntimeConfig(BaseModel):
     """Enterprise LLM Runtime Engine composite configuration container."""
 
-    default_provider: str = Field(default_factory=lambda: settings.RUNTIME_DEFAULT_PROVIDER)
+    default_provider: str = Field(
+        default_factory=lambda: settings.RUNTIME_DEFAULT_PROVIDER
+    )
     default_model: str = Field(default_factory=lambda: settings.RUNTIME_DEFAULT_MODEL)
     timeout: float = Field(default_factory=lambda: settings.RUNTIME_TIMEOUT)
     max_retries: int = Field(default_factory=lambda: settings.RUNTIME_MAX_RETRIES)

@@ -1,5 +1,5 @@
 import json
-from typing import Any
+
 from app.prompt.result import PromptResult
 from app.prompt.templates.base_template import BasePromptTemplate
 

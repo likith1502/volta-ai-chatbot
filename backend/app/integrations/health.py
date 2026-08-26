@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+
 from app.integrations.health_level import HealthLevel
 from app.integrations.provider import IntegrationHealthReport
 from app.integrations.registry import IntegrationRegistry

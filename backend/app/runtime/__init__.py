@@ -1,7 +1,13 @@
 from app.runtime.base import RuntimeProvider
 from app.runtime.config import GenerationConfig, ProviderConfig, RuntimeConfig
 from app.runtime.context import RuntimeContext
-from app.runtime.contracts import ChatMessage, ProviderCapabilities, RuntimeRequest, RuntimeResponse, RuntimeTokenUsage
+from app.runtime.contracts import (
+    ChatMessage,
+    ProviderCapabilities,
+    RuntimeRequest,
+    RuntimeResponse,
+    RuntimeTokenUsage,
+)
 from app.runtime.exceptions import (
     ProviderAuthenticationError,
     ProviderConfigurationError,
@@ -10,8 +16,8 @@ from app.runtime.exceptions import (
     ProviderNotFoundError,
     ProviderRateLimitError,
     ProviderUnavailableError,
+    RuntimeError,
     RuntimeExecutionError,
-    RuntimeException,
     RuntimeRetryExhaustedError,
     RuntimeTimeoutError,
 )
@@ -50,7 +56,7 @@ __all__ = [
     "RuntimeExecutionStore",
     "InMemoryExecutionStore",
     "RuntimeManager",
-    "RuntimeException",
+    "RuntimeError",
     "ProviderNotFoundError",
     "ProviderInitializationError",
     "RuntimeExecutionError",

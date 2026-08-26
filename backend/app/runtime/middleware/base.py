@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Awaitable, Callable
+
 from app.runtime.contracts import RuntimeRequest
 from app.runtime.result import RuntimeResult
 

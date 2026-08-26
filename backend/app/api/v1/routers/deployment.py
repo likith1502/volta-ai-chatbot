@@ -12,17 +12,18 @@ Endpoints:
   GET  /api/v1/deployment/environment
 """
 
-from fastapi import APIRouter, HTTPException, Query
-from typing import Any, Optional
 from dataclasses import asdict
+from typing import Any
 
-from app.deployment.manager import DeploymentManager
+from fastapi import APIRouter, HTTPException, Query
+
 from app.deployment.contracts import (
-    DeploymentValidatePayload,
     DeploymentDeployPayload,
     DeploymentRollbackPayload,
     DeploymentScalePayload,
+    DeploymentValidatePayload,
 )
+from app.deployment.manager import DeploymentManager
 
 router = APIRouter(prefix="/deployment", tags=["Deployment (v7.8)"])
 
@@ -41,15 +42,17 @@ def _err(msg: str) -> dict:
 async def validate_deployment(payload: DeploymentValidatePayload) -> dict:
     try:
         report = await _manager.validate(payload)
-        return _ok({
-            "deployment_id": report.deployment_id,
-            "all_passed": report.all_passed,
-            "passed_count": report.passed_count,
-            "failed_count": report.failed_count,
-            "checks": [asdict(c) for c in report.checks],
-            "warnings": report.warnings,
-            "errors": report.errors,
-        })
+        return _ok(
+            {
+                "deployment_id": report.deployment_id,
+                "all_passed": report.all_passed,
+                "passed_count": report.passed_count,
+                "failed_count": report.failed_count,
+                "checks": [asdict(c) for c in report.checks],
+                "warnings": report.warnings,
+                "errors": report.errors,
+            }
+        )
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc))
 
@@ -78,6 +81,7 @@ async def rollback(payload: DeploymentRollbackPayload) -> dict:
 async def scale(payload: DeploymentScalePayload) -> dict:
     try:
         from dataclasses import asdict as _asdict
+
         event = await _manager.scale(payload)
         return _ok(_asdict(event))
     except Exception as exc:
@@ -96,16 +100,17 @@ async def get_status(deployment_id: str = Query(default="volta-platform-v7.8")) 
 @router.get("/health")
 async def get_health() -> dict:
     try:
-        from dataclasses import asdict as _asdict
         summary = await _manager.get_platform_health()
-        return _ok({
-            "overall_health": summary.overall_health.value,
-            "total_deployments": summary.total_deployments,
-            "healthy_deployments": summary.healthy_deployments,
-            "degraded_deployments": summary.degraded_deployments,
-            "failed_deployments": summary.failed_deployments,
-            "layer_status": summary.layer_status,
-        })
+        return _ok(
+            {
+                "overall_health": summary.overall_health.value,
+                "total_deployments": summary.total_deployments,
+                "healthy_deployments": summary.healthy_deployments,
+                "degraded_deployments": summary.degraded_deployments,
+                "failed_deployments": summary.failed_deployments,
+                "layer_status": summary.layer_status,
+            }
+        )
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
 
@@ -135,6 +140,7 @@ async def get_environment() -> dict:
         if not env:
             raise HTTPException(status_code=404, detail="No active environment.")
         from dataclasses import asdict as _asdict
+
         return _ok(_asdict(env))
     except HTTPException:
         raise

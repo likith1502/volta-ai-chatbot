@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+
 from app.agents.budget import AgentExecutionBudget
 from app.agents.permissions import AgentPermissionSet
 

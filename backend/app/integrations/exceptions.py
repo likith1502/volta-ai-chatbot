@@ -1,22 +1,22 @@
-class IntegrationException(Exception):
+class IntegrationError(Exception):
     """Base exception for all Enterprise Integration Platform errors."""
 
     pass
 
 
-class ProviderNotFoundError(IntegrationException):
+class ProviderNotFoundError(IntegrationError):
     """Raised when a requested provider ID is not registered."""
 
     pass
 
 
-class ConnectionFailedError(IntegrationException):
+class ConnectionFailedError(IntegrationError):
     """Raised when adapter connectivity check fails."""
 
     pass
 
 
-class SecretResolutionError(IntegrationException):
+class SecretResolutionError(IntegrationError):
     """Raised when secret provider fails to resolve a required credential."""
 
     pass

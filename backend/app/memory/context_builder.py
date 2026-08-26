@@ -1,5 +1,5 @@
-import uuid
 from typing import Any, Optional
+
 from app.memory.context import MemoryContext
 from app.memory.strategy import ContextAssemblyStrategy, HybridStrategy
 from app.prompt.contracts import PromptRequest
@@ -27,7 +27,9 @@ class MemoryVariableProvider(VariableProvider):
         vars_copy = request.variables.copy()
         if request.conversation_id:
             try:
-                ctx = await self.memory_manager.assemble_context(conversation_id=request.conversation_id)
+                ctx = await self.memory_manager.assemble_context(
+                    conversation_id=request.conversation_id
+                )
                 vars_copy["conversation_memory"] = ctx.format_as_text()
             except Exception:
                 vars_copy["conversation_memory"] = ""

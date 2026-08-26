@@ -1,11 +1,14 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional
-from pydantic import BaseModel, ConfigDict, Field
 
-from app.integrations.capabilities import CapabilityFeatureFlags, IntegrationCapability
+from pydantic import BaseModel, Field
+
+from app.integrations.capabilities import IntegrationCapability
 from app.integrations.context import IntegrationContext
 from app.integrations.health_level import HealthLevel
-from app.integrations.lifecycle import IntegrationLifecycleManager, IntegrationLifecycleState
+from app.integrations.lifecycle import (
+    IntegrationLifecycleManager,
+)
 from app.integrations.manifest import PluginManifest
 from app.integrations.status import IntegrationStatus
 
@@ -34,7 +37,13 @@ class IntegrationHealthReport(BaseModel):
 class IntegrationProvider(ABC):
     """Abstract interface for all enterprise integration adapters."""
 
-    def __init__(self, provider_id: str, name: str, category: IntegrationCapability, priority: int = 10) -> None:
+    def __init__(
+        self,
+        provider_id: str,
+        name: str,
+        category: IntegrationCapability,
+        priority: int = 10,
+    ) -> None:
         self._provider_id = provider_id
         self._name = name
         self._category = category

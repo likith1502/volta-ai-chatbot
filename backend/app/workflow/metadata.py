@@ -53,7 +53,9 @@ class WorkflowNodeConfig(BaseModel):
     """Runtime configuration control parameters for node execution."""
 
     timeout: float = 30.0
-    retry_policy: dict[str, Any] = Field(default_factory=lambda: {"max_retries": 3, "backoff": 1.5})
+    retry_policy: dict[str, Any] = Field(
+        default_factory=lambda: {"max_retries": 3, "backoff": 1.5}
+    )
     parallel: bool = False
     checkpoint: bool = False
     cache: bool = False

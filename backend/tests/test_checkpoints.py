@@ -3,29 +3,29 @@ import uuid
 import pytest
 from app.checkpoints import (
     Checkpoint,
-    CheckpointException,
+    CheckpointError,
     CheckpointFilter,
     CheckpointManager,
     CheckpointMetadata,
-    CheckpointNotFoundException,
+    CheckpointNotFoundError,
     CheckpointPolicy,
     CheckpointRegistry,
     CheckpointStatus,
-    CheckpointStoreException,
-    CheckpointValidationException,
+    CheckpointStoreError,
+    CheckpointValidationError,
     CheckpointValidationResult,
     CheckpointVersion,
     InMemoryCheckpointStore,
     ReplayAction,
     ReplayContext,
     ReplayEngine,
-    ReplayException,
+    ReplayError,
     ReplayHistory,
     ReplayMetrics,
     ReplayMode,
     ReplayResult,
-    ReplayStrategyException,
-    ReplayValidationException,
+    ReplayStrategyError,
+    ReplayValidationError,
     SequentialReplayStrategy,
 )
 from app.context.state import ConversationState
@@ -71,7 +71,7 @@ def test_in_memory_checkpoint_store() -> None:
     # Delete & NotFound
     store.delete(cp.checkpoint_id)
     assert store.exists(cp.checkpoint_id) is False
-    with pytest.raises(CheckpointNotFoundException):
+    with pytest.raises(CheckpointNotFoundError):
         store.load(cp.checkpoint_id)
 
     # Clear
@@ -151,9 +151,9 @@ async def test_replay_engine_flow_and_simulation() -> None:
 
 @pytest.mark.asyncio
 async def test_replay_engine_validation_exception() -> None:
-    """Verify ReplayEngine raises ReplayValidationException when replaying non-existent workflow."""
+    """Verify ReplayEngine raises ReplayValidationError when replaying non-existent workflow."""
     engine = ReplayEngine()
-    with pytest.raises(ReplayValidationException):
+    with pytest.raises(ReplayValidationError):
         await engine.replay("non_existent_wf")
 
 
@@ -170,7 +170,7 @@ def test_registry_crud_and_factory() -> None:
     store = registry.lookup("mem_store")
     assert isinstance(store, InMemoryCheckpointStore)
 
-    with pytest.raises(CheckpointStoreException):
+    with pytest.raises(CheckpointStoreError):
         registry.register_factory("mem_store", store_factory)
 
     registry.unregister("mem_store")
@@ -179,12 +179,12 @@ def test_registry_crud_and_factory() -> None:
 
 def test_exception_hierarchy() -> None:
     """Verify exception hierarchy inheritance."""
-    assert issubclass(CheckpointNotFoundException, CheckpointException)
-    assert issubclass(CheckpointValidationException, CheckpointException)
-    assert issubclass(CheckpointStoreException, CheckpointException)
-    assert issubclass(ReplayValidationException, ReplayException)
-    assert issubclass(ReplayStrategyException, ReplayException)
-    assert issubclass(ReplayException, CheckpointException)
+    assert issubclass(CheckpointNotFoundError, CheckpointError)
+    assert issubclass(CheckpointValidationError, CheckpointError)
+    assert issubclass(CheckpointStoreError, CheckpointError)
+    assert issubclass(ReplayValidationError, ReplayError)
+    assert issubclass(ReplayStrategyError, ReplayError)
+    assert issubclass(ReplayError, CheckpointError)
 
 
 def test_import_isolation_and_no_framework_leakage() -> None:

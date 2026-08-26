@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any
 
 
 class DeploymentHealthLevel(str, Enum):
@@ -17,6 +16,7 @@ class DeploymentHealthLevel(str, Enum):
 @dataclass
 class DeploymentHealthReport:
     """Operational health report for a running deployment."""
+
     deployment_id: str
     health_level: DeploymentHealthLevel = DeploymentHealthLevel.GREEN
     is_healthy: bool = True
@@ -45,6 +45,7 @@ class DeploymentHealthReport:
 @dataclass
 class PlatformHealthSummary:
     """Top-level summary across all deployment targets."""
+
     overall_health: DeploymentHealthLevel = DeploymentHealthLevel.GREEN
     total_deployments: int = 0
     healthy_deployments: int = 0
@@ -58,9 +59,18 @@ class DeploymentHealthManager:
     """Aggregates health reports from all deployment targets."""
 
     _LAYER_NAMES = [
-        "llm_runtime", "prompt_engine", "memory_runtime", "tool_runtime",
-        "graph_runtime", "agent_runtime", "rag_engine", "integration_platform",
-        "event_bus", "checkpoints", "streaming", "hitl",
+        "llm_runtime",
+        "prompt_engine",
+        "memory_runtime",
+        "tool_runtime",
+        "graph_runtime",
+        "agent_runtime",
+        "rag_engine",
+        "integration_platform",
+        "event_bus",
+        "checkpoints",
+        "streaming",
+        "hitl",
     ]
 
     def __init__(self) -> None:
@@ -69,7 +79,9 @@ class DeploymentHealthManager:
     def record_report(self, report: DeploymentHealthReport) -> None:
         self._reports[report.deployment_id] = report
 
-    async def check_deployment_health(self, deployment_id: str) -> DeploymentHealthReport:
+    async def check_deployment_health(
+        self, deployment_id: str
+    ) -> DeploymentHealthReport:
         """Check health of a specific deployment (returns a healthy baseline by default)."""
         existing = self._reports.get(deployment_id)
         if existing:
@@ -94,7 +106,12 @@ class DeploymentHealthManager:
 
         reports = list(self._reports.values())
         healthy = [r for r in reports if r.health_level == DeploymentHealthLevel.GREEN]
-        degraded = [r for r in reports if r.health_level in (DeploymentHealthLevel.YELLOW, DeploymentHealthLevel.ORANGE)]
+        degraded = [
+            r
+            for r in reports
+            if r.health_level
+            in (DeploymentHealthLevel.YELLOW, DeploymentHealthLevel.ORANGE)
+        ]
         failed = [r for r in reports if r.health_level == DeploymentHealthLevel.RED]
 
         if failed:

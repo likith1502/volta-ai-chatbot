@@ -1,5 +1,5 @@
-import time
 import logging
+import time
 from typing import Any, Optional
 
 from app.prompt.manager import PromptManager
@@ -74,7 +74,9 @@ class RAGManager:
             cache=self.cache,
         )
 
-        self.health_manager = RAGHealthManager(self.document_repository, self.vector_repository)
+        self.health_manager = RAGHealthManager(
+            self.document_repository, self.vector_repository
+        )
         self.analytics_manager = RAGAnalyticsManager()
         self.statistics = RAGStatistics()
 
@@ -99,7 +101,9 @@ class RAGManager:
 
     async def add_document(self, payload: RAGDocumentPayload) -> Document:
         """Adds a document to repository."""
-        doc = RAGFactory.create_document(title=payload.title, text=payload.raw_text, mime_type=payload.mime_type)
+        doc = RAGFactory.create_document(
+            title=payload.title, text=payload.raw_text, mime_type=payload.mime_type
+        )
         self.document_repository.save_document(doc)
         self.statistics.total_documents_ingested += 1
         return doc
@@ -118,7 +122,9 @@ class RAGManager:
         self.statistics.total_chunks_indexed += job.chunks_created
         return job
 
-    async def retrieve_context(self, payload: RAGRetrievePayload) -> tuple[RAGContext, RetrievalTrace, RetrievalExplanation]:
+    async def retrieve_context(
+        self, payload: RAGRetrievePayload
+    ) -> tuple[RAGContext, RetrievalTrace, RetrievalExplanation]:
         """Retrieves and reranks context for query."""
         t0 = time.perf_counter()
         context, trace, explanation = await self.query_runtime.execute_query(
@@ -128,13 +134,17 @@ class RAGManager:
             reranker=payload.reranker,
         )
         dt = (time.perf_counter() - t0) * 1000.0
-        self.analytics_manager.record_retrieval(duration_ms=dt, chunks_count=len(context.citations))
+        self.analytics_manager.record_retrieval(
+            duration_ms=dt, chunks_count=len(context.citations)
+        )
         self.statistics.total_queries_processed += 1
         return context, trace, explanation
 
     async def answer_query(self, payload: RAGQueryPayload) -> dict[str, Any]:
         """Executes RAG retrieval, context assembly, and delegates response generation to frozen RuntimeManager."""
-        context, trace, explanation = await self.query_runtime.execute_query(query=payload.query, top_k=payload.top_k)
+        context, trace, explanation = await self.query_runtime.execute_query(
+            query=payload.query, top_k=payload.top_k
+        )
 
         # Delegate generation to frozen RuntimeManager via public interface
         prompt_text = f"Context:\n{context.context_text}\n\nUser Question: {payload.query}\nAnswer accurately using only the provided context."
@@ -148,7 +158,11 @@ class RAGManager:
         )
         runtime_res = await self.runtime_manager.execute(req)
 
-        answer_text = runtime_res.response.content if runtime_res.response else "No response generated."
+        answer_text = (
+            runtime_res.response.content
+            if runtime_res.response
+            else "No response generated."
+        )
 
         return {
             "query": payload.query,

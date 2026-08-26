@@ -1,9 +1,10 @@
-import time
 import logging
-from typing import Any, Optional
+import time
+from typing import Optional
+
 from app.agents.agent import Agent
 from app.agents.context import AgentContext
-from app.agents.exceptions import AgentBudgetExhaustedError, AgentPermissionDeniedError
+from app.agents.exceptions import AgentBudgetExhaustedError
 from app.agents.lifecycle import AgentLifecycleState
 from app.agents.permissions import AgentPermission
 from app.agents.status import AgentStatus
@@ -36,7 +37,9 @@ class AgentExecution:
         self.runtime_manager = runtime_manager or RuntimeManager()
         self.event_bus = event_bus or WorkflowEventBus()
 
-    async def execute_turn(self, agent: Agent, task: AgentTask, context: AgentContext) -> TaskResult:
+    async def execute_turn(
+        self, agent: Agent, task: AgentTask, context: AgentContext
+    ) -> TaskResult:
         """Executes a single agent task turn."""
         t0 = time.perf_counter()
 
@@ -53,22 +56,29 @@ class AgentExecution:
 
         # 3. Publish start event
         try:
-            await self.event_bus.publish(WorkflowEvent(
-                event_name="agent_execution.started",
-                payload={"agent_id": agent.agent_id, "task_id": task.task_id},
-                source="agent_execution",
-            ))
+            await self.event_bus.publish(
+                WorkflowEvent(
+                    event_name="agent_execution.started",
+                    payload={"agent_id": agent.agent_id, "task_id": task.task_id},
+                    source="agent_execution",
+                )
+            )
         except Exception:
             pass
 
         # 4. Perform task logic via public managers
         # If tool execution requested and permitted
         tool_output = {}
-        if agent.has_permission(AgentPermission.CAN_EXECUTE_TOOLS) and "tool_name" in task.inputs:
+        if (
+            agent.has_permission(AgentPermission.CAN_EXECUTE_TOOLS)
+            and "tool_name" in task.inputs
+        ):
             tool_name = task.inputs["tool_name"]
             tool_args = task.inputs.get("tool_args", {})
             try:
-                res = await self.tool_manager.execute_tool(ToolExecutePayload(tool_name=tool_name, arguments=tool_args))
+                res = await self.tool_manager.execute_tool(
+                    ToolExecutePayload(tool_name=tool_name, arguments=tool_args)
+                )
                 tool_output = res.model_dump()
             except Exception as exc:
                 logger.warning(f"Tool execution failed: {exc}")
@@ -83,11 +93,17 @@ class AgentExecution:
 
         # Publish completion event
         try:
-            await self.event_bus.publish(WorkflowEvent(
-                event_name="agent_execution.completed",
-                payload={"agent_id": agent.agent_id, "task_id": task.task_id, "latency_ms": dt},
-                source="agent_execution",
-            ))
+            await self.event_bus.publish(
+                WorkflowEvent(
+                    event_name="agent_execution.completed",
+                    payload={
+                        "agent_id": agent.agent_id,
+                        "task_id": task.task_id,
+                        "latency_ms": dt,
+                    },
+                    source="agent_execution",
+                )
+            )
         except Exception:
             pass
 
@@ -95,6 +111,9 @@ class AgentExecution:
             task_id=task.task_id,
             assigned_agent_id=agent.agent_id,
             status=TaskStatus.COMPLETED,
-            output={"result": f"Agent '{agent.name}' executed task '{task.title}'", "tool_output": tool_output},
+            output={
+                "result": f"Agent '{agent.name}' executed task '{task.title}'",
+                "tool_output": tool_output,
+            },
             latency_ms=round(dt, 2),
         )

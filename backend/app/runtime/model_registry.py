@@ -1,5 +1,6 @@
 from typing import Optional
-from pydantic import BaseModel, Field
+
+from pydantic import BaseModel
 
 
 class ModelInfo(BaseModel):
@@ -74,5 +75,9 @@ class ModelRegistry:
     def list_models(self, provider: Optional[str] = None) -> list[ModelInfo]:
         """Returns all registered models, optionally filtered by provider_name."""
         if provider:
-            return [m for m in self._models.values() if m.provider_name.lower() == provider.lower()]
+            return [
+                m
+                for m in self._models.values()
+                if m.provider_name.lower() == provider.lower()
+            ]
         return list(self._models.values())

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Optional
+
 from app.rag.chunk import Chunk
 from app.rag.document import Document
 

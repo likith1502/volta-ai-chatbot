@@ -1,4 +1,5 @@
-from typing import Any, Optional
+from typing import Any
+
 from fastapi import APIRouter, HTTPException, Query, status
 
 from app.graph_runtime.contracts import (
@@ -91,11 +92,15 @@ async def cancel_graph_session(payload: GraphCancelPayload) -> dict[str, Any]:
     status_code=status.HTTP_200_OK,
     summary="Get Active Graph Session",
 )
-async def get_graph_session(session_id: str = Query(..., min_length=1)) -> dict[str, Any]:
+async def get_graph_session(
+    session_id: str = Query(..., min_length=1),
+) -> dict[str, Any]:
     """Retrieves graph runtime session state by ID."""
     session = await _graph_runtime_manager.get_session(session_id)
     if not session:
-        raise HTTPException(status_code=404, detail=f"Session '{session_id}' not found.")
+        raise HTTPException(
+            status_code=404, detail=f"Session '{session_id}' not found."
+        )
     return success_response(
         data=session.model_dump(),
         message=f"Session '{session_id}' retrieved.",

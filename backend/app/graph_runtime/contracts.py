@@ -1,9 +1,9 @@
 import uuid
 from typing import Any, Optional
+
 from pydantic import BaseModel, Field
 
 from app.graph_runtime.execution_result import GraphExecutionResult
-from app.graph_runtime.state import GraphRuntimeState
 
 
 class GraphExecutePayload(BaseModel):

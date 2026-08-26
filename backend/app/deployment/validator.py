@@ -9,6 +9,7 @@ from typing import Any
 @dataclass
 class ValidationCheck:
     """Individual runtime layer validation check result."""
+
     check_name: str
     passed: bool
     message: str = ""
@@ -18,6 +19,7 @@ class ValidationCheck:
 @dataclass
 class DeploymentValidationReport:
     """Aggregated result of all deployment validation checks."""
+
     deployment_id: str
     all_passed: bool
     checks: list[ValidationCheck] = field(default_factory=list)
@@ -82,7 +84,9 @@ class DeploymentValidator:
                 passed=False,
                 message=f"Unknown check: {check_name}",
             )
-        return ValidationCheck(check_name=check_name, passed=True, message=f"{check_name}: OK")
+        return ValidationCheck(
+            check_name=check_name, passed=True, message=f"{check_name}: OK"
+        )
 
     def validate_configuration(self, config: dict[str, Any]) -> bool:
         """Validate deployment configuration completeness."""

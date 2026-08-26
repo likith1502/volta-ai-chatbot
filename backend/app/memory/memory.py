@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Optional
+from typing import Optional
+
 from pydantic import BaseModel, Field
 
 from app.memory.metadata import MemoryMetadata
@@ -17,7 +18,9 @@ class Memory(BaseModel):
     memory_type: MemoryType = Field(default=MemoryType.SHORT_TERM)
     status: MemoryStatus = Field(default=MemoryStatus.ACTIVE)
     content: str = Field(..., min_length=1, description="Memory text payload")
-    importance: float = Field(default=0.5, ge=0.0, le=1.0, description="Importance score [0.0 - 1.0]")
+    importance: float = Field(
+        default=0.5, ge=0.0, le=1.0, description="Importance score [0.0 - 1.0]"
+    )
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     expires_at: Optional[datetime] = None
     metadata: MemoryMetadata = Field(default_factory=MemoryMetadata)

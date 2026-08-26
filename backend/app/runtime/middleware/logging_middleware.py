@@ -1,5 +1,6 @@
 import logging
 from typing import Awaitable, Callable
+
 from app.runtime.contracts import RuntimeRequest
 from app.runtime.middleware.base import RuntimeMiddleware
 from app.runtime.result import RuntimeResult
@@ -15,7 +16,9 @@ class LoggingMiddleware(RuntimeMiddleware):
         request: RuntimeRequest,
         call_next: Callable[[RuntimeRequest], Awaitable[RuntimeResult]],
     ) -> RuntimeResult:
-        logger.info(f"Starting runtime execution request '{request.request_id}' (Provider: {request.provider})")
+        logger.info(
+            f"Starting runtime execution request '{request.request_id}' (Provider: {request.provider})"
+        )
         result = await call_next(request)
         logger.info(
             f"Completed runtime execution request '{request.request_id}' "

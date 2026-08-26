@@ -1,8 +1,15 @@
 import asyncio
 import uuid
 from typing import AsyncIterator, Union
+
 from app.runtime.base import RuntimeProvider
-from app.runtime.contracts import ChatMessage, ProviderCapabilities, RuntimeRequest, RuntimeResponse, RuntimeTokenUsage
+from app.runtime.contracts import (
+    ChatMessage,
+    ProviderCapabilities,
+    RuntimeRequest,
+    RuntimeResponse,
+    RuntimeTokenUsage,
+)
 from app.streaming import StreamMessage
 
 
@@ -59,7 +66,9 @@ class MockProvider(RuntimeProvider):
             metadata={"simulated_latency_ms": self._latency_ms},
         )
 
-    async def generate_stream(self, request: RuntimeRequest) -> AsyncIterator[StreamMessage]:
+    async def generate_stream(
+        self, request: RuntimeRequest
+    ) -> AsyncIterator[StreamMessage]:
         if not self._initialized:
             await self.initialize()
 

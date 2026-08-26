@@ -1,7 +1,7 @@
 from typing import Optional
 
 from app.context.state import ConversationState
-from app.graph.contracts import IGraph, IGraphEdge
+from app.graph.contracts import IGraph
 
 
 class ExecutionScheduler:
@@ -22,7 +22,9 @@ class ExecutionScheduler:
             return None
 
         # Sort edges by priority (highest priority first)
-        sorted_edges = sorted(outgoing_edges, key=lambda e: getattr(e, "priority", 0), reverse=True)
+        sorted_edges = sorted(
+            outgoing_edges, key=lambda e: getattr(e, "priority", 0), reverse=True
+        )
 
         for edge in sorted_edges:
             is_satisfied = await edge.evaluate(state)

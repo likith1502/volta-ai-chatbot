@@ -1,5 +1,6 @@
 import logging
 from typing import Any, Optional
+
 from app.memory.manager import MemoryManager
 
 logger = logging.getLogger("app.agents.memory")
@@ -14,7 +15,9 @@ class AgentMemoryIntegration:
     async def get_agent_context(self, conversation_id: Any) -> list[dict[str, Any]]:
         """Retrieves conversational memory items via MemoryManager facade."""
         try:
-            items = await self.memory_manager.get_relevant_context(conversation_id=conversation_id, query="")
+            items = await self.memory_manager.get_relevant_context(
+                conversation_id=conversation_id, query=""
+            )
             return [i.model_dump() for i in items]
         except Exception as exc:
             logger.warning(f"Memory retrieval via MemoryManager failed: {exc}")

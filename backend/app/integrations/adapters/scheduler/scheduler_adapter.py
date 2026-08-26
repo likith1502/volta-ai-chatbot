@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Optional
+
 from app.integrations.capabilities import IntegrationCapability
 from app.integrations.health_level import HealthLevel
 from app.integrations.provider import IntegrationHealthReport, IntegrationProvider
@@ -10,7 +11,12 @@ class SchedulerAdapter(IntegrationProvider, ABC):
     """Abstract interface for cron & background task schedulers."""
 
     def __init__(self, provider_id: str, name: str, priority: int = 10) -> None:
-        super().__init__(provider_id=provider_id, name=name, category=IntegrationCapability.SCHEDULER, priority=priority)
+        super().__init__(
+            provider_id=provider_id,
+            name=name,
+            category=IntegrationCapability.SCHEDULER,
+            priority=priority,
+        )
 
     @abstractmethod
     async def schedule_job(self, cron_expr: str, func: Callable[..., Any]) -> str:
@@ -21,7 +27,11 @@ class CronSchedulerAdapter(SchedulerAdapter):
     """Reference scheduler adapter executing cron tasks."""
 
     def __init__(self) -> None:
-        super().__init__(provider_id="scheduler.cron", name="Cron Task Scheduler Adapter", priority=10)
+        super().__init__(
+            provider_id="scheduler.cron",
+            name="Cron Task Scheduler Adapter",
+            priority=10,
+        )
         self._jobs: dict[str, str] = {}
         self._status = IntegrationStatus.CONFIGURED
 

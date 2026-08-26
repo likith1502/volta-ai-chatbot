@@ -14,7 +14,9 @@ class RecommendationRepository(BaseRepository[Recommendation]):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(Recommendation, session)
 
-    async def get_active_recommendations(self, conversation_id: uuid.UUID) -> list[Recommendation]:
+    async def get_active_recommendations(
+        self, conversation_id: uuid.UUID
+    ) -> list[Recommendation]:
         """Retrieves all pending/active recommendations generated during a conversation session."""
         stmt = (
             select(Recommendation)

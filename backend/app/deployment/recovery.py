@@ -26,21 +26,24 @@ class RecoveryTrigger(str, Enum):
 @dataclass
 class RecoveryPlan:
     """Disaster recovery plan specifying procedures and targets."""
+
     plan_id: str
     name: str
-    rpo_minutes: int = 60        # Recovery Point Objective
-    rto_minutes: int = 30        # Recovery Time Objective
+    rpo_minutes: int = 60  # Recovery Point Objective
+    rto_minutes: int = 30  # Recovery Time Objective
     primary_region: str = "us-east-1"
     dr_region: str = "us-west-2"
-    recovery_steps: list[str] = field(default_factory=lambda: [
-        "assess_damage",
-        "activate_dr_environment",
-        "restore_from_latest_backup",
-        "verify_data_integrity",
-        "shift_traffic_to_dr",
-        "validate_platform_health",
-        "notify_stakeholders",
-    ])
+    recovery_steps: list[str] = field(
+        default_factory=lambda: [
+            "assess_damage",
+            "activate_dr_environment",
+            "restore_from_latest_backup",
+            "verify_data_integrity",
+            "shift_traffic_to_dr",
+            "validate_platform_health",
+            "notify_stakeholders",
+        ]
+    )
     auto_trigger_on_health_level: str = "red"
     notification_channels: list[str] = field(default_factory=lambda: ["email", "slack"])
     enabled: bool = True
@@ -49,6 +52,7 @@ class RecoveryPlan:
 @dataclass
 class RecoveryReport:
     """Report generated after disaster recovery execution."""
+
     report_id: str
     plan_id: str
     trigger: RecoveryTrigger

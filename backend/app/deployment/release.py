@@ -2,22 +2,31 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Any, Optional
-import re
 
 
 @dataclass
 class ReleaseManifest:
     """Full manifest for a platform release."""
+
     version: str
     release_name: str
     platform_version: str = "7.8.0"
-    runtime_layers: list[str] = field(default_factory=lambda: [
-        "v7.0-LLM-Runtime", "v7.1-Prompt", "v7.2-Memory", "v7.3-Tools",
-        "v7.4-Graph", "v7.5-Agents", "v7.6-RAG", "v7.7-Integrations",
-        "v7.8-Deployment",
-    ])
+    runtime_layers: list[str] = field(
+        default_factory=lambda: [
+            "v7.0-LLM-Runtime",
+            "v7.1-Prompt",
+            "v7.2-Memory",
+            "v7.3-Tools",
+            "v7.4-Graph",
+            "v7.5-Agents",
+            "v7.6-RAG",
+            "v7.7-Integrations",
+            "v7.8-Deployment",
+        ]
+    )
     migration_scripts: list[str] = field(default_factory=list)
     rollback_version: Optional[str] = None
     compatible_with: list[str] = field(default_factory=list)
@@ -29,6 +38,7 @@ class ReleaseManifest:
 @dataclass
 class RollbackMetadata:
     """Metadata for rollback targeting."""
+
     from_version: str
     to_version: str
     snapshot_id: str
@@ -81,9 +91,10 @@ class ReleaseManager:
     def is_valid_semver(self, version: str) -> bool:
         return bool(self._SEM_VER_RE.match(version))
 
-    def validate_compatibility(self, from_version: str, to_version: str) -> dict[str, Any]:
+    def validate_compatibility(
+        self, from_version: str, to_version: str
+    ) -> dict[str, Any]:
         """Validates compatibility between two releases. Returns compatibility report."""
-        from_m = self._releases.get(from_version)
         to_m = self._releases.get(to_version)
         breaking = to_m.breaking_changes if to_m else []
         return {
@@ -94,7 +105,9 @@ class ReleaseManager:
             "migration_scripts": to_m.migration_scripts if to_m else [],
         }
 
-    def build_rollback_metadata(self, from_version: str, to_version: str) -> RollbackMetadata:
+    def build_rollback_metadata(
+        self, from_version: str, to_version: str
+    ) -> RollbackMetadata:
         return RollbackMetadata(
             from_version=from_version,
             to_version=to_version,

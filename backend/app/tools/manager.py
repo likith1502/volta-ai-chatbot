@@ -1,27 +1,22 @@
-import asyncio
 import logging
 import time
-import uuid
-from typing import Any, Optional
+from typing import Optional
 
 from app.events.event import WorkflowEvent
 from app.events.event_bus import WorkflowEventBus
 from app.tools.analytics import ToolAnalyticsManager
-from app.tools.builtin import CalculatorTool, DatetimeTool, EchoTool, UUIDTool
-from app.tools.chain import ChainResult, ToolChain, ToolChainStep
+from app.tools.chain import ChainResult, ToolChain
 from app.tools.contracts import ToolExecutePayload
 from app.tools.discovery import ToolDiscoveryService
 from app.tools.dispatcher import ToolDispatcher
-from app.tools.exceptions import ToolNotFoundError, ToolValidationError
+from app.tools.exceptions import ToolNotFoundError
 from app.tools.executor import ToolExecutor
 from app.tools.factory import ToolFactory
 from app.tools.health import ToolHealthManager
 from app.tools.manifest import ToolManifest
 from app.tools.metrics import ToolMetrics
 from app.tools.pipeline import PipelineResult, ToolPipeline
-from app.tools.policy import ToolPolicy
 from app.tools.registry import ToolRegistry
-from app.tools.repository import ToolRepository
 from app.tools.request import ToolRequest
 from app.tools.result import ToolResult
 from app.tools.statistics import ToolStatistics
@@ -45,7 +40,9 @@ class ToolManager:
         self.validator = ToolValidator()
         self.executor = ToolExecutor()
         self.dispatcher = ToolDispatcher(executor=self.executor)
-        self.pipeline = ToolPipeline(validator=self.validator, dispatcher=self.dispatcher)
+        self.pipeline = ToolPipeline(
+            validator=self.validator, dispatcher=self.dispatcher
+        )
         self.health_manager = ToolHealthManager(self.registry)
         self.analytics_manager = ToolAnalyticsManager()
         self.metrics = ToolMetrics()
@@ -80,10 +77,13 @@ class ToolManager:
         """Registers a BaseTool instance."""
         await self._ensure_init()
         manifest = await self.registry.register(tool_instance)
-        await self._emit_event("registered", {
-            "tool_name": manifest.tool_name,
-            "version": manifest.version,
-        })
+        await self._emit_event(
+            "registered",
+            {
+                "tool_name": manifest.tool_name,
+                "version": manifest.version,
+            },
+        )
         return manifest
 
     async def get_manifest(self, name: str) -> ToolManifest:
@@ -103,10 +103,14 @@ class ToolManager:
         """Executes a single tool request."""
         await self._ensure_init()
         manifest = await self.get_manifest(payload.tool_name)
-        tool_instance = await self.registry.get_repository().get_by_name(payload.tool_name)
+        tool_instance = await self.registry.get_repository().get_by_name(
+            payload.tool_name
+        )
 
         if not tool_instance:
-            raise ToolNotFoundError(f"Tool instance for '{payload.tool_name}' not found.")
+            raise ToolNotFoundError(
+                f"Tool instance for '{payload.tool_name}' not found."
+            )
 
         req = ToolRequest(
             conversation_id=payload.conversation_id,
@@ -115,10 +119,13 @@ class ToolManager:
             arguments=payload.arguments,
         )
 
-        await self._emit_event("started", {
-            "tool_name": payload.tool_name,
-            "execution_id": str(req.execution_id),
-        })
+        await self._emit_event(
+            "started",
+            {
+                "tool_name": payload.tool_name,
+                "execution_id": str(req.execution_id),
+            },
+        )
 
         t0 = time.perf_counter()
         self.validator.validate(manifest, payload.arguments)
@@ -129,18 +136,24 @@ class ToolManager:
         self.metrics.total_tool_calls += 1
         if result.success:
             self.metrics.successful_calls += 1
-            await self._emit_event("completed", {
-                "tool_name": payload.tool_name,
-                "execution_id": str(req.execution_id),
-                "duration_ms": dt,
-            })
+            await self._emit_event(
+                "completed",
+                {
+                    "tool_name": payload.tool_name,
+                    "execution_id": str(req.execution_id),
+                    "duration_ms": dt,
+                },
+            )
         else:
             self.metrics.failed_calls += 1
-            await self._emit_event("failed", {
-                "tool_name": payload.tool_name,
-                "execution_id": str(req.execution_id),
-                "error": str(result.errors),
-            })
+            await self._emit_event(
+                "failed",
+                {
+                    "tool_name": payload.tool_name,
+                    "execution_id": str(req.execution_id),
+                    "error": str(result.errors),
+                },
+            )
 
         return result
 
@@ -148,7 +161,9 @@ class ToolManager:
         """Executes tool request through ToolPipeline."""
         await self._ensure_init()
         manifest = await self.get_manifest(payload.tool_name)
-        tool_instance = await self.registry.get_repository().get_by_name(payload.tool_name)
+        tool_instance = await self.registry.get_repository().get_by_name(
+            payload.tool_name
+        )
         req = ToolRequest(
             conversation_id=payload.conversation_id,
             execution_id=payload.execution_id,

@@ -1,6 +1,6 @@
 import uuid
-from datetime import datetime, timezone
 from typing import Any, Optional
+
 from pydantic import BaseModel, Field
 
 from app.runtime.contracts import ChatMessage
@@ -19,8 +19,13 @@ class PromptVariable(BaseModel):
 class PromptMessage(BaseModel):
     """Template message primitive representing a turn before rendering."""
 
-    role: str = Field(default="user", description="'system', 'user', 'assistant', 'tool'")
-    content_template: str = Field(..., description="Raw text template string containing {variable_name} placeholders")
+    role: str = Field(
+        default="user", description="'system', 'user', 'assistant', 'tool'"
+    )
+    content_template: str = Field(
+        ...,
+        description="Raw text template string containing {variable_name} placeholders",
+    )
     variables: list[PromptVariable] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
 

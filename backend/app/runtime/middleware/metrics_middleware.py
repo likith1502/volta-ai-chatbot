@@ -1,5 +1,6 @@
 import time
 from typing import Awaitable, Callable
+
 from app.runtime.contracts import RuntimeRequest
 from app.runtime.middleware.base import RuntimeMiddleware
 from app.runtime.result import RuntimeResult

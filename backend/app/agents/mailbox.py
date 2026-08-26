@@ -1,5 +1,6 @@
 import logging
 from typing import Optional
+
 from app.agents.message import AgentMessage
 
 logger = logging.getLogger("app.agents.mailbox")

@@ -10,7 +10,9 @@ class PromptCostEstimate(BaseModel):
     completion_tokens: int = Field(default=0, ge=0)
     total_tokens: int = Field(default=0, ge=0)
     estimated_request_cost_usd: float = Field(default=0.0, ge=0.0)
-    projected_monthly_cost_usd: float = Field(default=0.0, ge=0.0, description="Based on 10,000 monthly request turns")
+    projected_monthly_cost_usd: float = Field(
+        default=0.0, ge=0.0, description="Based on 10,000 monthly request turns"
+    )
 
 
 class PromptCostEstimator:
@@ -37,7 +39,9 @@ class PromptCostEstimator:
             input_rate = 0.0001
             output_rate = 0.0004
 
-        req_cost = ((prompt_tokens / 1000.0) * input_rate) + ((completion_tokens / 1000.0) * output_rate)
+        req_cost = ((prompt_tokens / 1000.0) * input_rate) + (
+            (completion_tokens / 1000.0) * output_rate
+        )
         monthly_cost = req_cost * 10000.0
 
         return PromptCostEstimate(

@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.exceptions.domain import NotificationNotFoundException, UserNotFoundException
+from app.exceptions.domain import NotificationNotFoundError, UserNotFoundError
 from app.models.enums import NotificationType
 from app.models.notification import Notification
 from app.repositories.base import BaseRepository
@@ -29,7 +29,7 @@ class NotificationService(BaseService):
         """Creates and persists a new user notification after validating user existence."""
         user = await self.user_repo.get_by_id(user_id)
         if not user:
-            raise UserNotFoundException(f"User with ID '{user_id}' not found.")
+            raise UserNotFoundError(f"User with ID '{user_id}' not found.")
 
         notification = await self.notification_repo.create(
             {
@@ -48,7 +48,9 @@ class NotificationService(BaseService):
         """Marks a notification as read and records the read timestamp."""
         notification = await self.notification_repo.get_by_id(notification_id)
         if not notification:
-            raise NotificationNotFoundException(f"Notification with ID '{notification_id}' not found.")
+            raise NotificationNotFoundError(
+                f"Notification with ID '{notification_id}' not found."
+            )
 
         updated = await self.notification_repo.update(
             notification_id,
@@ -58,7 +60,9 @@ class NotificationService(BaseService):
             },
         )
         if not updated:
-            raise NotificationNotFoundException(f"Notification with ID '{notification_id}' not found.")
+            raise NotificationNotFoundError(
+                f"Notification with ID '{notification_id}' not found."
+            )
 
         await self.commit()
         return updated

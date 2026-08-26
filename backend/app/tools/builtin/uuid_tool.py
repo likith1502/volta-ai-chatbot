@@ -1,4 +1,5 @@
 import uuid
+
 from app.tools.request import ToolRequest
 from app.tools.result import ToolResult
 from app.tools.tool import BaseTool
@@ -16,10 +17,8 @@ class UUIDTool(BaseTool):
             input_schema={"type": "object", "properties": {}},
             output_schema={
                 "type": "object",
-                "properties": {
-                    "uuid": {"type": "string"}
-                }
-            }
+                "properties": {"uuid": {"type": "string"}},
+            },
         )
 
     async def execute(self, request: ToolRequest) -> ToolResult:

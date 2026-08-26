@@ -1,6 +1,6 @@
 import logging
-from typing import Optional
-from app.rag.chunk import Chunk, EmbeddedChunk
+
+from app.rag.chunk import Chunk
 from app.rag.embedding_registry import EmbeddingRegistry
 from app.rag.plan import RetrievalPlan
 from app.rag.repository import DocumentRepository
@@ -38,5 +38,7 @@ class DocumentRetriever:
             if chk:
                 matched_chunks.append((chk, score))
 
-        logger.info(f"DocumentRetriever fetched {len(matched_chunks)} chunks for query '{plan.query}'")
+        logger.info(
+            f"DocumentRetriever fetched {len(matched_chunks)} chunks for query '{plan.query}'"
+        )
         return matched_chunks

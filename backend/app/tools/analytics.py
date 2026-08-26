@@ -19,7 +19,9 @@ class ToolAnalyticsManager:
         self.total_latency_ms = 0.0
         self.tool_counts: dict[str, int] = {}
 
-    def record_execution(self, tool_name: str, success: bool, latency_ms: float) -> None:
+    def record_execution(
+        self, tool_name: str, success: bool, latency_ms: float
+    ) -> None:
         self.executions += 1
         if success:
             self.successes += 1
@@ -27,8 +29,14 @@ class ToolAnalyticsManager:
         self.tool_counts[tool_name] = self.tool_counts.get(tool_name, 0) + 1
 
     def get_report(self) -> ToolAnalyticsReport:
-        top_tool = max(self.tool_counts, key=self.tool_counts.get) if self.tool_counts else "none"
-        avg_lat = (self.total_latency_ms / self.executions) if self.executions > 0 else 0.0
+        top_tool = (
+            max(self.tool_counts, key=self.tool_counts.get)
+            if self.tool_counts
+            else "none"
+        )
+        avg_lat = (
+            (self.total_latency_ms / self.executions) if self.executions > 0 else 0.0
+        )
         rate = (self.successes / self.executions) if self.executions > 0 else 1.0
 
         return ToolAnalyticsReport(

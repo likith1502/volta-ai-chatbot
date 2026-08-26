@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import Optional
+
 from app.deployment.deployment import Deployment, DeploymentStatus
 
 

@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+
 from app.agents.role import AgentRole
 
 
@@ -18,7 +19,9 @@ class AgentAnalyticsManager:
         self.total_duration_ms = 0.0
         self.role_counts: dict[str, int] = {}
 
-    def record_task_execution(self, duration_ms: float, success: bool, role: AgentRole) -> None:
+    def record_task_execution(
+        self, duration_ms: float, success: bool, role: AgentRole
+    ) -> None:
         self.executions += 1
         if success:
             self.successes += 1
@@ -27,8 +30,14 @@ class AgentAnalyticsManager:
         self.role_counts[r_str] = self.role_counts.get(r_str, 0) + 1
 
     def get_report(self) -> AgentAnalyticsReport:
-        top_role = max(self.role_counts, key=self.role_counts.get) if self.role_counts else "support"
-        avg_dur = (self.total_duration_ms / self.executions) if self.executions > 0 else 0.0
+        top_role = (
+            max(self.role_counts, key=self.role_counts.get)
+            if self.role_counts
+            else "support"
+        )
+        avg_dur = (
+            (self.total_duration_ms / self.executions) if self.executions > 0 else 0.0
+        )
         rate = (self.successes / self.executions) if self.executions > 0 else 1.0
 
         return AgentAnalyticsReport(

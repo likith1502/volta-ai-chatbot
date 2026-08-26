@@ -2,7 +2,7 @@ import time
 import uuid
 from typing import Any, Callable, Dict, List, Optional
 
-from app.streaming.exceptions import StreamChannelException
+from app.streaming.exceptions import StreamChannelError
 from app.streaming.stream_channel import StreamChannel
 from app.streaming.stream_dispatcher import StreamDispatcher
 from app.streaming.stream_history import StreamHistory
@@ -33,10 +33,14 @@ class StreamManager:
         self.metrics = StreamMetrics()
         self.history = StreamHistory()
 
-    def open_stream(self, channel_id: str, name: str, description: str = "") -> StreamChannel:
+    def open_stream(
+        self, channel_id: str, name: str, description: str = ""
+    ) -> StreamChannel:
         """Creates and opens a new StreamChannel."""
         if channel_id in self.channels:
-            raise StreamChannelException(f"StreamChannel '{channel_id}' is already open.")
+            raise StreamChannelError(
+                f"StreamChannel '{channel_id}' is already open."
+            )
         ch = StreamChannel(channel_id=channel_id, name=name, description=description)
         self.channels[channel_id] = ch
         self.statuses[channel_id] = StreamStatus.ACTIVE
@@ -45,19 +49,19 @@ class StreamManager:
     def close_stream(self, channel_id: str) -> None:
         """Closes a StreamChannel."""
         if channel_id not in self.channels:
-            raise StreamChannelException(f"StreamChannel '{channel_id}' not found.")
+            raise StreamChannelError(f"StreamChannel '{channel_id}' not found.")
         self.statuses[channel_id] = StreamStatus.CLOSED
 
     def pause(self, channel_id: str) -> None:
         """Pauses a StreamChannel."""
         if channel_id not in self.channels:
-            raise StreamChannelException(f"StreamChannel '{channel_id}' not found.")
+            raise StreamChannelError(f"StreamChannel '{channel_id}' not found.")
         self.statuses[channel_id] = StreamStatus.PAUSED
 
     def resume(self, channel_id: str) -> None:
         """Resumes a paused StreamChannel."""
         if channel_id not in self.channels:
-            raise StreamChannelException(f"StreamChannel '{channel_id}' not found.")
+            raise StreamChannelError(f"StreamChannel '{channel_id}' not found.")
         self.statuses[channel_id] = StreamStatus.ACTIVE
 
     def subscribe(
@@ -79,7 +83,9 @@ class StreamManager:
         )
         self.channels[channel_id].subscribers.append(subscriber_id)
         self.dispatcher.register_subscriber(channel_id, sub, callback)
-        self.metrics.subscribers = sum(len(ch.subscribers) for ch in self.channels.values())
+        self.metrics.subscribers = sum(
+            len(ch.subscribers) for ch in self.channels.values()
+        )
         return sub
 
     def unsubscribe(self, subscription_id: uuid.UUID) -> None:
@@ -90,11 +96,16 @@ class StreamManager:
         """Publishes a StreamMessage to the specified channel."""
         start_time = time.perf_counter()
         if channel_id not in self.channels:
-            raise StreamChannelException(f"StreamChannel '{channel_id}' not found.")
+            raise StreamChannelError(f"StreamChannel '{channel_id}' not found.")
 
         if self.statuses.get(channel_id) != StreamStatus.ACTIVE:
             self.metrics.record_dropped()
-            return StreamResult(success=False, delivered=0, skipped=1, warnings=[f"Channel '{channel_id}' is not ACTIVE."])
+            return StreamResult(
+                success=False,
+                delivered=0,
+                skipped=1,
+                warnings=[f"Channel '{channel_id}' is not ACTIVE."],
+            )
 
         ch = self.channels[channel_id]
         res = await self.dispatcher.dispatch(ch, message)
@@ -112,7 +123,9 @@ class StreamManager:
         )
         return res
 
-    async def publish_batch(self, channel_id: str, messages: List[StreamMessage]) -> StreamResult:
+    async def publish_batch(
+        self, channel_id: str, messages: List[StreamMessage]
+    ) -> StreamResult:
         """Publishes a batch of StreamMessages to the specified channel."""
         total_delivered = 0
         total_skipped = 0

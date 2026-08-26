@@ -34,7 +34,9 @@ class LinearBackoff(RetryPolicy):
 
 
 class ExponentialBackoff(RetryPolicy):
-    def __init__(self, max_attempts: int = 3, base_delay: float = 1.0, factor: float = 2.0) -> None:
+    def __init__(
+        self, max_attempts: int = 3, base_delay: float = 1.0, factor: float = 2.0
+    ) -> None:
         self.max_attempts = max_attempts
         self.base_delay = base_delay
         self.factor = factor
@@ -49,18 +51,20 @@ class ExponentialBackoff(RetryPolicy):
 class CircuitBreaker(RetryPolicy):
     """Circuit breaker pattern preventing cascading adapter failures."""
 
-    def __init__(self, failure_threshold: int = 5, recovery_time_seconds: float = 30.0) -> None:
+    def __init__(
+        self, failure_threshold: int = 5, recovery_time_seconds: float = 30.0
+    ) -> None:
         self.failure_threshold = failure_threshold
         self.recovery_time_seconds = recovery_time_seconds
         self.failure_count = 0
         self.is_open = False
 
-    def record_failure() -> None:
+    def record_failure(self) -> None:
         self.failure_count += 1
         if self.failure_count >= self.failure_threshold:
             self.is_open = True
 
-    def record_success() -> None:
+    def record_success(self) -> None:
         self.failure_count = 0
         self.is_open = False
 

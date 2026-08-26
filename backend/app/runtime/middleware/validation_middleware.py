@@ -1,4 +1,5 @@
 from typing import Awaitable, Callable
+
 from app.runtime.contracts import RuntimeRequest
 from app.runtime.exceptions import ProviderConfigurationError
 from app.runtime.middleware.base import RuntimeMiddleware
@@ -14,10 +15,14 @@ class ValidationMiddleware(RuntimeMiddleware):
         call_next: Callable[[RuntimeRequest], Awaitable[RuntimeResult]],
     ) -> RuntimeResult:
         if not request.messages:
-            raise ProviderConfigurationError("RuntimeRequest must contain at least one ChatMessage.")
+            raise ProviderConfigurationError(
+                "RuntimeRequest must contain at least one ChatMessage."
+            )
 
         for idx, msg in enumerate(request.messages):
             if not msg.content or not msg.content.strip():
-                raise ProviderConfigurationError(f"ChatMessage at index {idx} contains empty content payload.")
+                raise ProviderConfigurationError(
+                    f"ChatMessage at index {idx} contains empty content payload."
+                )
 
         return await call_next(request)

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Awaitable, Callable
+
 from app.prompt.contracts import PromptRequest
 from app.prompt.result import PromptResult
 
@@ -33,7 +34,9 @@ class PromptPipeline:
             current_fn = handler
             current_mw = middleware
 
-            async def _mw_wrapper(r: PromptRequest, mw=current_mw, fn=current_fn) -> PromptResult:
+            async def _mw_wrapper(
+                r: PromptRequest, mw=current_mw, fn=current_fn
+            ) -> PromptResult:
                 return await mw.process(r, fn)
 
             handler = _mw_wrapper

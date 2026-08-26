@@ -1,11 +1,11 @@
 import time
 import uuid
 from typing import Optional
+
 from pydantic import BaseModel, Field
 
 from app.tools.dispatcher import ToolDispatcher
 from app.tools.manifest import ToolManifest
-from app.tools.permission import ToolPermission
 from app.tools.policy import ToolPolicy
 from app.tools.request import ToolRequest
 from app.tools.result import ToolResult
@@ -31,7 +31,9 @@ class PipelineResult(BaseModel):
 class ToolPipeline:
     """Configurable pipeline executing: Validation -> Permission -> Policy -> Execution -> Analytics -> Events."""
 
-    def __init__(self, validator: ToolValidator = None, dispatcher: ToolDispatcher = None) -> None:
+    def __init__(
+        self, validator: ToolValidator = None, dispatcher: ToolDispatcher = None
+    ) -> None:
         self.validator = validator or ToolValidator()
         self.dispatcher = dispatcher or ToolDispatcher()
 
@@ -43,7 +45,14 @@ class ToolPipeline:
         policy: Optional[ToolPolicy] = None,
     ) -> PipelineResult:
         t0 = time.perf_counter()
-        steps = ["Validation", "Permission", "Policy", "Execution", "Analytics", "Events"]
+        steps = [
+            "Validation",
+            "Permission",
+            "Policy",
+            "Execution",
+            "Analytics",
+            "Events",
+        ]
         succ_steps = []
         fail_steps = []
 

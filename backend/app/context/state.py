@@ -181,7 +181,9 @@ class ConversationState(BaseModel):
         if "current_message" in kwargs:
             data["conversation"]["current_message"] = kwargs["current_message"]
         if "chat_history" in kwargs or "history" in kwargs:
-            data["conversation"]["history"] = kwargs.get("chat_history", kwargs.get("history"))
+            data["conversation"]["history"] = kwargs.get(
+                "chat_history", kwargs.get("history")
+            )
         if "workflow_step" in kwargs:
             data["runtime"]["workflow_step"] = kwargs["workflow_step"]
             if kwargs["workflow_step"] not in data["execution"]["executed_nodes"]:

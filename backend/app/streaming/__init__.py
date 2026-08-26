@@ -1,12 +1,12 @@
 from app.streaming.backpressure import BackpressurePolicy
 from app.streaming.exceptions import (
-    StreamAdapterException,
-    StreamChannelException,
-    StreamDispatcherException,
-    StreamException,
-    StreamSerializationException,
-    StreamSubscriptionException,
-    StreamValidationException,
+    StreamAdapterError,
+    StreamChannelError,
+    StreamDispatcherError,
+    StreamError,
+    StreamSerializationError,
+    StreamSubscriptionError,
+    StreamValidationError,
 )
 from app.streaming.heartbeat import StreamHeartbeat
 from app.streaming.stream_adapter import AdapterCapabilities, StreamAdapter
@@ -69,11 +69,11 @@ __all__ = [
     "ProtobufStreamSerializer",
     "StreamHeartbeat",
     "BackpressurePolicy",
-    "StreamException",
-    "StreamValidationException",
-    "StreamSerializationException",
-    "StreamDispatcherException",
-    "StreamAdapterException",
-    "StreamChannelException",
-    "StreamSubscriptionException",
+    "StreamError",
+    "StreamValidationError",
+    "StreamSerializationError",
+    "StreamDispatcherError",
+    "StreamAdapterError",
+    "StreamChannelError",
+    "StreamSubscriptionError",
 ]

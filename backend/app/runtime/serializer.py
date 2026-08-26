@@ -1,6 +1,7 @@
 import json
 from typing import Any
-from app.runtime.contracts import ChatMessage, RuntimeRequest, RuntimeResponse
+
+from app.runtime.contracts import ChatMessage
 from app.runtime.result import RuntimeResult
 
 

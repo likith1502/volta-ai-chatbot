@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Optional
+from typing import Optional
+
 from pydantic import BaseModel, Field
 
 from app.memory.memory import Memory

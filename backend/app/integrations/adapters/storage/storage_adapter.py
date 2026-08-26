@@ -1,6 +1,7 @@
 import os
 from abc import ABC, abstractmethod
 from typing import Any, Optional
+
 from app.integrations.capabilities import IntegrationCapability
 from app.integrations.health_level import HealthLevel
 from app.integrations.provider import IntegrationHealthReport, IntegrationProvider
@@ -11,10 +12,17 @@ class StorageAdapter(IntegrationProvider, ABC):
     """Abstract interface for object & file storage adapters."""
 
     def __init__(self, provider_id: str, name: str, priority: int = 10) -> None:
-        super().__init__(provider_id=provider_id, name=name, category=IntegrationCapability.STORAGE, priority=priority)
+        super().__init__(
+            provider_id=provider_id,
+            name=name,
+            category=IntegrationCapability.STORAGE,
+            priority=priority,
+        )
 
     @abstractmethod
-    async def upload(self, key: str, data: bytes, metadata: Optional[dict[str, Any]] = None) -> str:
+    async def upload(
+        self, key: str, data: bytes, metadata: Optional[dict[str, Any]] = None
+    ) -> str:
         pass
 
     @abstractmethod
@@ -33,8 +41,17 @@ class StorageAdapter(IntegrationProvider, ABC):
 class FilesystemStorageAdapter(StorageAdapter):
     """Reference storage adapter storing files on local filesystem."""
 
-    def __init__(self, root_dir: str = "./storage_data", provider_id: str = "storage.filesystem", priority: int = 10) -> None:
-        super().__init__(provider_id=provider_id, name="Filesystem Storage Adapter", priority=priority)
+    def __init__(
+        self,
+        root_dir: str = "./storage_data",
+        provider_id: str = "storage.filesystem",
+        priority: int = 10,
+    ) -> None:
+        super().__init__(
+            provider_id=provider_id,
+            name="Filesystem Storage Adapter",
+            priority=priority,
+        )
         self.root_dir = root_dir
         self._status = IntegrationStatus.CONFIGURED
 
@@ -51,7 +68,9 @@ class FilesystemStorageAdapter(StorageAdapter):
         self._status = IntegrationStatus.DISCONNECTED
         return True
 
-    async def upload(self, key: str, data: bytes, metadata: Optional[dict[str, Any]] = None) -> str:
+    async def upload(
+        self, key: str, data: bytes, metadata: Optional[dict[str, Any]] = None
+    ) -> str:
         fp = os.path.join(self.root_dir, key)
         os.makedirs(os.path.dirname(fp), exist_ok=True)
         with open(fp, "wb") as f:
@@ -99,4 +118,8 @@ class FilesystemSandboxAdapter(FilesystemStorageAdapter):
     """Sandbox execution mode of FilesystemStorageAdapter preventing write modifications outside temp path."""
 
     def __init__(self) -> None:
-        super().__init__(root_dir="./storage_sandbox", provider_id="storage.filesystem_sandbox", priority=5)
+        super().__init__(
+            root_dir="./storage_sandbox",
+            provider_id="storage.filesystem_sandbox",
+            priority=5,
+        )

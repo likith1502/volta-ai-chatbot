@@ -1,19 +1,14 @@
-import asyncio
 import logging
 import time
-import uuid
-from typing import Any, Optional
+from typing import Optional
 
 from app.events.event import WorkflowEvent
 from app.events.event_bus import WorkflowEventBus
 from app.graph_runtime.checkpoint import GraphCheckpointIntegration
-from app.graph_runtime.context import GraphRuntimeContext
-from app.graph_runtime.cursor import GraphCursor
 from app.graph_runtime.execution_plan import GraphExecutionPlan
 from app.graph_runtime.execution_result import GraphExecutionResult
 from app.graph_runtime.interrupt import GraphInterruptIntegration
 from app.graph_runtime.middleware import GraphRuntimePipeline
-from app.graph_runtime.node_context import NodeExecutionContext
 from app.graph_runtime.resolver import GraphResolver
 from app.graph_runtime.scheduler import GraphScheduler
 from app.graph_runtime.session import GraphRuntimeSession
@@ -52,22 +47,31 @@ class GraphRuntimeExecutor:
         self.checkpoint_integration = GraphCheckpointIntegration()
         self.interrupt_integration = GraphInterruptIntegration()
 
-    async def execute_plan(self, plan: GraphExecutionPlan, session: GraphRuntimeSession) -> GraphExecutionResult:
+    async def execute_plan(
+        self, plan: GraphExecutionPlan, session: GraphRuntimeSession
+    ) -> GraphExecutionResult:
         """Executes a GraphExecutionPlan step-by-step."""
         t0 = time.perf_counter()
         self.validator.validate_plan(plan)
-        trace = ExecutionTrace(workflow_id=plan.workflow_id, execution_id=session.session_id)
+        trace = ExecutionTrace(
+            workflow_id=plan.workflow_id, execution_id=session.session_id
+        )
 
         session.state = GraphRuntimeState.RUNNING
         visited = []
 
         # Emit start event
         try:
-            await self.event_bus.publish(WorkflowEvent(
-                event_name="graph_runtime.started",
-                payload={"workflow_id": plan.workflow_id, "session_id": str(session.session_id)},
-                source="graph_runtime_executor",
-            ))
+            await self.event_bus.publish(
+                WorkflowEvent(
+                    event_name="graph_runtime.started",
+                    payload={
+                        "workflow_id": plan.workflow_id,
+                        "session_id": str(session.session_id),
+                    },
+                    source="graph_runtime_executor",
+                )
+            )
         except Exception:
             pass
 
@@ -81,19 +85,28 @@ class GraphRuntimeExecutor:
             trace.add_step(node_id=node_id, action=action, latency_ms=dt_step)
 
             # Auto-checkpointing if enabled
-            if plan.policy.checkpoint_interval > 0 and len(visited) % plan.policy.checkpoint_interval == 0:
-                chk_id = await self.checkpoint_integration.create_snapshot(session)
+            if (
+                plan.policy.checkpoint_interval > 0
+                and len(visited) % plan.policy.checkpoint_interval == 0
+            ):
+                await self.checkpoint_integration.create_snapshot(session)
 
         session.state = GraphRuntimeState.COMPLETED
         dt_total = (time.perf_counter() - t0) * 1000.0
 
         # Emit completion event
         try:
-            await self.event_bus.publish(WorkflowEvent(
-                event_name="graph_runtime.completed",
-                payload={"workflow_id": plan.workflow_id, "session_id": str(session.session_id), "duration_ms": dt_total},
-                source="graph_runtime_executor",
-            ))
+            await self.event_bus.publish(
+                WorkflowEvent(
+                    event_name="graph_runtime.completed",
+                    payload={
+                        "workflow_id": plan.workflow_id,
+                        "session_id": str(session.session_id),
+                        "duration_ms": dt_total,
+                    },
+                    source="graph_runtime_executor",
+                )
+            )
         except Exception:
             pass
 
@@ -105,6 +118,9 @@ class GraphRuntimeExecutor:
             success=True,
             visited_nodes=visited,
             total_latency_ms=round(dt_total, 2),
-            final_output={"message": f"Graph '{plan.workflow_id}' executed successfully.", "nodes": visited},
+            final_output={
+                "message": f"Graph '{plan.workflow_id}' executed successfully.",
+                "nodes": visited,
+            },
             trace=trace,
         )

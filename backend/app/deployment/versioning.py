@@ -21,12 +21,20 @@ class SemVer:
         return f"{self.major}.{self.minor}.{self.patch}"
 
     def __lt__(self, other: "SemVer") -> bool:
-        return (self.major, self.minor, self.patch) < (other.major, other.minor, other.patch)
+        return (self.major, self.minor, self.patch) < (
+            other.major,
+            other.minor,
+            other.patch,
+        )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, SemVer):
             return False
-        return (self.major, self.minor, self.patch) == (other.major, other.minor, other.patch)
+        return (self.major, self.minor, self.patch) == (
+            other.major,
+            other.minor,
+            other.patch,
+        )
 
     def is_compatible_with(self, other: "SemVer") -> bool:
         """True if same major version."""

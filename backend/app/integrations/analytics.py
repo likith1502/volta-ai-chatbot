@@ -1,4 +1,3 @@
-from pydantic import BaseModel, Field
 from app.integrations.metrics import IntegrationMetrics
 
 
@@ -14,7 +13,11 @@ class IntegrationAnalyticsManager:
         self.total_latency_ms += latency_ms
 
     def get_metrics(self) -> IntegrationMetrics:
-        avg = (self.total_latency_ms / self.operations_count) if self.operations_count > 0 else 1.2
+        avg = (
+            (self.total_latency_ms / self.operations_count)
+            if self.operations_count > 0
+            else 1.2
+        )
         return IntegrationMetrics(
             active_adapters_count=8,
             failed_adapters_count=0,

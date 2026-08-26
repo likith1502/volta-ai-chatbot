@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional
+
 from app.integrations.capabilities import IntegrationCapability
 from app.integrations.health_level import HealthLevel
 from app.integrations.provider import IntegrationHealthReport, IntegrationProvider
@@ -10,7 +11,12 @@ class AuthAdapter(IntegrationProvider, ABC):
     """Abstract interface for authentication and authorization providers."""
 
     def __init__(self, provider_id: str, name: str, priority: int = 10) -> None:
-        super().__init__(provider_id=provider_id, name=name, category=IntegrationCapability.AUTH, priority=priority)
+        super().__init__(
+            provider_id=provider_id,
+            name=name,
+            category=IntegrationCapability.AUTH,
+            priority=priority,
+        )
 
     @abstractmethod
     async def authenticate_token(self, token: str) -> dict[str, Any]:
@@ -21,7 +27,9 @@ class JWTAuthAdapter(AuthAdapter):
     """Reference authentication adapter resolving JWT claims."""
 
     def __init__(self) -> None:
-        super().__init__(provider_id="auth.jwt", name="JWT Local Authentication Adapter", priority=10)
+        super().__init__(
+            provider_id="auth.jwt", name="JWT Local Authentication Adapter", priority=10
+        )
         self._status = IntegrationStatus.CONFIGURED
 
     async def initialize(self, context: Optional[Any] = None) -> None:

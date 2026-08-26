@@ -1,5 +1,6 @@
 import uuid
 from typing import Optional
+
 from app.memory.memory import Memory
 from app.memory.repository import MemoryRepository
 from app.memory.status import MemoryStatus
@@ -42,8 +43,10 @@ class InMemoryMemoryRepository(MemoryRepository):
         limit: int = 100,
     ) -> list[Memory]:
         matches = [
-            m for m in self._memories.values()
-            if m.conversation_id == conversation_id and (status is None or m.status == status)
+            m
+            for m in self._memories.values()
+            if m.conversation_id == conversation_id
+            and (status is None or m.status == status)
         ]
         matches.sort(key=lambda x: x.created_at, reverse=True)
         return matches[:limit]

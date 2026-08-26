@@ -1,5 +1,6 @@
 import re
 from typing import Any, Optional
+
 from app.prompt.contracts import PromptVariable
 
 
@@ -27,7 +28,9 @@ class PromptVariableStore:
         return set(re.findall(r"\{([a-zA-Z0-9_]+)\}", text))
 
     @staticmethod
-    def substitute(text: str, variables: dict[str, Any], defaults: Optional[dict[str, Any]] = None) -> str:
+    def substitute(
+        text: str, variables: dict[str, Any], defaults: Optional[dict[str, Any]] = None
+    ) -> str:
         """Substitutes variables into `{variable_name}` placeholders in text string."""
         defaults = defaults or {}
         placeholders = PromptVariableStore.extract_placeholders(text)

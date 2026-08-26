@@ -2,13 +2,13 @@ import sys
 import uuid
 import pytest
 from app.events import (
-    DuplicateEventException,
-    DuplicateListenerException,
-    EventDispatchException,
+    DuplicateEventError,
+    DuplicateListenerError,
+    EventDispatchError,
     EventEnvelope,
-    EventListenerNotFoundException,
+    EventListenerNotFoundError,
     EventPriority,
-    EventSerializationException,
+    EventSerializationError,
     EventSubscription,
     JSONEventSerializer,
     MessagePackEventSerializer,
@@ -17,7 +17,7 @@ from app.events import (
     WorkflowEventBus,
     WorkflowEventCategory,
     WorkflowEventDispatcher,
-    WorkflowEventException,
+    WorkflowEventError,
     WorkflowEventFilter,
     WorkflowEventListener,
     WorkflowEventMetadata,
@@ -217,23 +217,23 @@ def test_registry_crud_and_factory() -> None:
     sub = registry.lookup("lazy_l")
     assert sub.listener.listener_id == "lazy_l"
 
-    with pytest.raises(DuplicateListenerException):
+    with pytest.raises(DuplicateListenerError):
         registry.register_factory("lazy_l", factory)
 
     registry.unregister("lazy_l")
     assert registry.exists("lazy_l") is False
 
-    with pytest.raises(EventListenerNotFoundException):
+    with pytest.raises(EventListenerNotFoundError):
         registry.lookup("lazy_l")
 
 
 def test_exception_hierarchy() -> None:
     """Verify exception hierarchy inheritance."""
-    assert issubclass(DuplicateEventException, WorkflowEventException)
-    assert issubclass(DuplicateListenerException, WorkflowEventException)
-    assert issubclass(EventListenerNotFoundException, WorkflowEventException)
-    assert issubclass(EventDispatchException, WorkflowEventException)
-    assert issubclass(EventSerializationException, WorkflowEventException)
+    assert issubclass(DuplicateEventError, WorkflowEventError)
+    assert issubclass(DuplicateListenerError, WorkflowEventError)
+    assert issubclass(EventListenerNotFoundError, WorkflowEventError)
+    assert issubclass(EventDispatchError, WorkflowEventError)
+    assert issubclass(EventSerializationError, WorkflowEventError)
 
 
 def test_import_isolation_and_no_framework_leakage() -> None:

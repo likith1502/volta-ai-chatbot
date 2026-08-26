@@ -1,5 +1,5 @@
-import time
 from typing import Any, Optional
+
 from app.prompt.contracts import ChatMessage, PromptMessage, PromptResponse
 from app.prompt.variables import PromptVariableStore
 
@@ -20,7 +20,9 @@ class PromptRenderer:
 
         rendered_system_prompt: Optional[str] = None
         if system_instruction:
-            rendered_system_prompt = PromptVariableStore.substitute(system_instruction, variables)
+            rendered_system_prompt = PromptVariableStore.substitute(
+                system_instruction, variables
+            )
 
         for p_msg in messages:
             content = PromptVariableStore.substitute(p_msg.content_template, variables)

@@ -1,8 +1,7 @@
 import logging
-from typing import Any, Optional
-from pydantic import BaseModel, Field
+from typing import Optional
 
-from app.graph_runtime.state import GraphRuntimeState
+from pydantic import BaseModel
 
 logger = logging.getLogger("app.graph_runtime.interrupt")
 

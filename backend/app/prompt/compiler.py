@@ -18,8 +18,16 @@ class PromptCompiler:
         # Determine provider & model from request overrides, profile, or defaults
         provider = request.provider or (profile.provider if profile else None)
         model = request.model or (profile.model if profile else None)
-        temperature = request.temperature if request.temperature is not None else (profile.temperature if profile else None)
-        max_tokens = request.max_tokens if request.max_tokens is not None else (profile.max_tokens if profile else None)
+        temperature = (
+            request.temperature
+            if request.temperature is not None
+            else (profile.temperature if profile else None)
+        )
+        max_tokens = (
+            request.max_tokens
+            if request.max_tokens is not None
+            else (profile.max_tokens if profile else None)
+        )
 
         system_prompt = request.system_prompt_override or response.system_prompt
 

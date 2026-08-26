@@ -9,10 +9,14 @@ from app.integrations.contracts import (
     IntegrationResponse,
     IntegrationTestPayload,
 )
-from app.integrations.events import FailoverTriggeredEvent, ProviderFailedEvent, ProviderRegisteredEvent
+from app.integrations.events import (
+    FailoverTriggeredEvent,
+    ProviderFailedEvent,
+    ProviderRegisteredEvent,
+)
 from app.integrations.exceptions import (
     ConnectionFailedError,
-    IntegrationException,
+    IntegrationError,
     ProviderNotFoundError,
     SecretResolutionError,
 )
@@ -20,7 +24,10 @@ from app.integrations.factory import IntegrationFactory
 from app.integrations.health import AggregatedPlatformHealth, IntegrationHealthManager
 from app.integrations.health_level import HealthLevel
 from app.integrations.hooks import AfterProviderFailoverHook, BeforeProviderConnectHook
-from app.integrations.lifecycle import IntegrationLifecycleManager, IntegrationLifecycleState
+from app.integrations.lifecycle import (
+    IntegrationLifecycleManager,
+    IntegrationLifecycleState,
+)
 from app.integrations.manager import IntegrationManager
 from app.integrations.manifest import PluginManifest
 from app.integrations.metadata import IntegrationMetadata
@@ -29,7 +36,13 @@ from app.integrations.policy import IntegrationPolicy
 from app.integrations.provider import IntegrationHealthReport, IntegrationProvider
 from app.integrations.provider_config import ProviderConfig
 from app.integrations.registry import IntegrationRegistry
-from app.integrations.retry import CircuitBreaker, ExponentialBackoff, LinearBackoff, NoRetry, RetryPolicy
+from app.integrations.retry import (
+    CircuitBreaker,
+    ExponentialBackoff,
+    LinearBackoff,
+    NoRetry,
+    RetryPolicy,
+)
 from app.integrations.runtime_config import IntegrationRuntimeConfig
 from app.integrations.secrets import EnvSecretProvider, SecretProvider
 from app.integrations.serializer import IntegrationSerializer
@@ -79,7 +92,7 @@ __all__ = [
     "IntegrationSerializer",
     "IntegrationValidator",
     "IntegrationVersion",
-    "IntegrationException",
+    "IntegrationError",
     "ProviderNotFoundError",
     "ConnectionFailedError",
     "SecretResolutionError",

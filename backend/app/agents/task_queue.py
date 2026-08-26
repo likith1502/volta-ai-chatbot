@@ -1,5 +1,6 @@
 import logging
 from typing import Optional
+
 from app.agents.task import AgentTask, TaskStatus
 
 logger = logging.getLogger("app.agents.task_queue")

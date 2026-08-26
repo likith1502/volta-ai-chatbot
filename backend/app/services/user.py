@@ -3,7 +3,7 @@ from typing import Any, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.exceptions.domain import UserAlreadyExistsException, UserNotFoundException
+from app.exceptions.domain import UserAlreadyExistsError, UserNotFoundError
 from app.models.user import User
 from app.repositories.user import UserRepository
 from app.services.base import BaseService
@@ -26,7 +26,9 @@ class UserService(BaseService):
         """Creates and persists a new user account if the email is not already registered."""
         existing_user = await self.user_repo.get_by_email(email)
         if existing_user:
-            raise UserAlreadyExistsException(f"User with email '{email}' already exists.")
+            raise UserAlreadyExistsError(
+                f"User with email '{email}' already exists."
+            )
 
         user = await self.user_repo.create(
             {
@@ -40,20 +42,22 @@ class UserService(BaseService):
         return user
 
     async def get_user_by_id(self, user_id: uuid.UUID) -> User:
-        """Retrieves a user by primary key UUID or raises UserNotFoundException."""
+        """Retrieves a user by primary key UUID or raises UserNotFoundError."""
         user = await self.user_repo.get_by_id(user_id)
         if not user:
-            raise UserNotFoundException(f"User with ID '{user_id}' not found.")
+            raise UserNotFoundError(f"User with ID '{user_id}' not found.")
         return user
 
     async def get_user_by_email(self, email: str) -> User:
-        """Retrieves a user by unique email address or raises UserNotFoundException."""
+        """Retrieves a user by unique email address or raises UserNotFoundError."""
         user = await self.user_repo.get_by_email(email)
         if not user:
-            raise UserNotFoundException(f"User with email '{email}' not found.")
+            raise UserNotFoundError(f"User with email '{email}' not found.")
         return user
 
-    async def update_profile(self, user_id: uuid.UUID, attributes: dict[str, Any]) -> User:
+    async def update_profile(
+        self, user_id: uuid.UUID, attributes: dict[str, Any]
+    ) -> User:
         """Updates user profile attributes after validating email uniqueness if updated."""
         await self.get_user_by_id(user_id)
 
@@ -61,11 +65,13 @@ class UserService(BaseService):
             new_email = attributes["email"]
             existing = await self.user_repo.get_by_email(new_email)
             if existing and existing.id != user_id:
-                raise UserAlreadyExistsException(f"User with email '{new_email}' already exists.")
+                raise UserAlreadyExistsError(
+                    f"User with email '{new_email}' already exists."
+                )
 
         updated_user = await self.user_repo.update(user_id, attributes)
         if not updated_user:
-            raise UserNotFoundException(f"User with ID '{user_id}' not found.")
+            raise UserNotFoundError(f"User with ID '{user_id}' not found.")
         await self.commit()
         return updated_user
 
