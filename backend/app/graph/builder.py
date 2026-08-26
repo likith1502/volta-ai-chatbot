@@ -9,10 +9,9 @@ from app.graph.contracts import (
     IGraphNode,
 )
 from app.graph.exceptions import (
-    DuplicateEdgeException,
-    DuplicateNodeException,
-    GraphValidationException,
-    NodeNotFoundException,
+    DuplicateEdgeError,
+    DuplicateNodeError,
+    GraphValidationError,
 )
 from app.graph.graph import Graph
 
@@ -32,10 +31,10 @@ class GraphBuilder(IGraphBuilder):
     def add_node(self, node: IGraphNode) -> "GraphBuilder":
         """
         Registers a node in the graph builder.
-        Raises DuplicateNodeException if a node with the same node_id is already registered.
+        Raises DuplicateNodeError if a node with the same node_id is already registered.
         """
         if node.node_id in self._nodes:
-            raise DuplicateNodeException(
+            raise DuplicateNodeError(
                 f"Node with node_id '{node.node_id}' is already registered in GraphBuilder."
             )
         self._nodes[node.node_id] = node
@@ -44,7 +43,7 @@ class GraphBuilder(IGraphBuilder):
     def add_edge(self, edge: IGraphEdge) -> "GraphBuilder":
         """
         Registers a directed edge in the graph builder.
-        Raises DuplicateEdgeException if an identical edge (same source, target, and condition) exists.
+        Raises DuplicateEdgeError if an identical edge (same source, target, and condition) exists.
         """
         for existing in self._edges:
             if (
@@ -53,7 +52,7 @@ class GraphBuilder(IGraphBuilder):
                 and existing.edge_condition == edge.edge_condition
                 and existing.priority == edge.priority
             ):
-                raise DuplicateEdgeException(
+                raise DuplicateEdgeError(
                     f"Duplicate edge from '{edge.source_node}' to '{edge.target_node}' with same condition/priority."
                 )
 
@@ -74,7 +73,9 @@ class GraphBuilder(IGraphBuilder):
         self._metadata = metadata
         return self
 
-    def validate(self, options: Optional[GraphBuildOptions] = None) -> GraphValidationResult:
+    def validate(
+        self, options: Optional[GraphBuildOptions] = None
+    ) -> GraphValidationResult:
         """
         Validates graph structural rules:
         1. Checks that all edge source and target node IDs exist in registered nodes (no orphan edges).
@@ -88,20 +89,30 @@ class GraphBuilder(IGraphBuilder):
         # Validate orphan edge references
         for edge in self._edges:
             if edge.source_node not in self._nodes:
-                errors.append(f"Orphan edge detected: source node '{edge.source_node}' is not registered.")
+                errors.append(
+                    f"Orphan edge detected: source node '{edge.source_node}' is not registered."
+                )
             if edge.target_node not in self._nodes:
-                errors.append(f"Orphan edge detected: target node '{edge.target_node}' is not registered.")
+                errors.append(
+                    f"Orphan edge detected: target node '{edge.target_node}' is not registered."
+                )
 
         # Validate entry node
         if self._entry_node and self._entry_node not in self._nodes:
-            errors.append(f"Entry node '{self._entry_node}' is not registered in GraphBuilder.")
+            errors.append(
+                f"Entry node '{self._entry_node}' is not registered in GraphBuilder."
+            )
 
         if errors:
-            raise GraphValidationException(f"Graph validation failed: {'; '.join(errors)}")
+            raise GraphValidationError(
+                f"Graph validation failed: {'; '.join(errors)}"
+            )
 
         # Cycle detection if disallowed
         if not opts.allow_cycles and self._detect_cycles():
-            raise GraphValidationException("Cycle detected in graph while allow_cycles=False.")
+            raise GraphValidationError(
+                "Cycle detected in graph while allow_cycles=False."
+            )
 
         return GraphValidationResult(
             is_valid=True,

@@ -1,7 +1,7 @@
 from typing import Optional
 
 from app.ai.base import AIProvider
-from app.ai.exceptions import AIProviderException
+from app.ai.exceptions import AIProviderError
 from app.ai.providers.openai_provider import OpenAIProvider
 from app.config.settings import settings
 
@@ -17,4 +17,6 @@ class AIProviderFactory:
         if target_provider == "openai":
             return OpenAIProvider()
         else:
-            raise AIProviderException(f"Unsupported AI provider '{target_provider}'. Supported options: ['openai'].")
+            raise AIProviderError(
+                f"Unsupported AI provider '{target_provider}'. Supported options: ['openai']."
+            )

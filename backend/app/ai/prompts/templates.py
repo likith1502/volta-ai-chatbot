@@ -18,5 +18,11 @@ def build_context_prompt(user_message: str, memories: Sequence[Any] = ()) -> str
     if not memories:
         return user_message
 
-    memory_summary = "\n".join([f"- {m.memory_key}: {m.memory_value}" for m in memories if hasattr(m, "memory_key")])
+    memory_summary = "\n".join(
+        [
+            f"- {m.memory_key}: {m.memory_value}"
+            for m in memories
+            if hasattr(m, "memory_key")
+        ]
+    )
     return f"[User Context & Preferences]\n{memory_summary}\n\n[User Input]\n{user_message}"

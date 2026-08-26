@@ -6,7 +6,7 @@ from app.graph.node import BaseNode
 from app.workflow import (
     BaseWorkflowNode,
     DecisionNode,
-    DuplicateWorkflowNodeException,
+    DuplicateWorkflowNodeError,
     EndNode,
     EntityNode,
     IntentNode,
@@ -16,17 +16,17 @@ from app.workflow import (
     NodeExecutionContext,
     NodeExecutionConstraints,
     NodeResult,
-    RegistryException,
+    RegistryError,
     ResponseNode,
     StartNode,
     ToolNode,
     WorkflowNodeConfig,
-    WorkflowNodeException,
+    WorkflowNodeError,
     WorkflowNodeMetadata,
-    WorkflowNodeNotFoundException,
+    WorkflowNodeNotFoundError,
     WorkflowNodeRegistry,
     WorkflowNodeType,
-    WorkflowValidationException,
+    WorkflowValidationError,
 )
 
 
@@ -157,19 +157,19 @@ def test_registry_duplicate_and_not_found_exceptions() -> None:
     node = LLMNode(node_id="llm_test")
     registry.register(node)
 
-    # Duplicate without overwrite raises DuplicateWorkflowNodeException
-    with pytest.raises(DuplicateWorkflowNodeException):
+    # Duplicate without overwrite raises DuplicateWorkflowNodeError
+    with pytest.raises(DuplicateWorkflowNodeError):
         registry.register(node)
 
     # Duplicate with overwrite succeeds
     registry.register(node, overwrite=True)
 
-    # Unregister missing raises WorkflowNodeNotFoundException
-    with pytest.raises(WorkflowNodeNotFoundException):
+    # Unregister missing raises WorkflowNodeNotFoundError
+    with pytest.raises(WorkflowNodeNotFoundError):
         registry.unregister("non_existent_node")
 
-    # Lookup missing raises WorkflowNodeNotFoundException
-    with pytest.raises(WorkflowNodeNotFoundException):
+    # Lookup missing raises WorkflowNodeNotFoundError
+    with pytest.raises(WorkflowNodeNotFoundError):
         registry.lookup("non_existent_node")
 
 
@@ -204,10 +204,10 @@ def test_registry_discovery_methods() -> None:
 
 def test_exception_hierarchy() -> None:
     """Verify exception inheritance tree."""
-    assert issubclass(DuplicateWorkflowNodeException, WorkflowNodeException)
-    assert issubclass(WorkflowNodeNotFoundException, WorkflowNodeException)
-    assert issubclass(WorkflowValidationException, WorkflowNodeException)
-    assert issubclass(RegistryException, WorkflowNodeException)
+    assert issubclass(DuplicateWorkflowNodeError, WorkflowNodeError)
+    assert issubclass(WorkflowNodeNotFoundError, WorkflowNodeError)
+    assert issubclass(WorkflowValidationError, WorkflowNodeError)
+    assert issubclass(RegistryError, WorkflowNodeError)
 
 
 def test_import_isolation_and_no_framework_leakage() -> None:

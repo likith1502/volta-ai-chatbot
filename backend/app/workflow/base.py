@@ -7,8 +7,8 @@ from app.context.state import ConversationState
 from app.graph.node import BaseNode
 from app.workflow.metadata import (
     NodeCapability,
-    NodeExecutionContext,
     NodeExecutionConstraints,
+    NodeExecutionContext,
     WorkflowNodeConfig,
     WorkflowNodeMetadata,
 )
@@ -19,7 +19,7 @@ class BaseWorkflowNode(BaseNode, ABC):
     """
     Abstract Base Class for all reusable workflow nodes in the node library.
     Inherits from BaseNode to maintain 100% compatibility with Graph Orchestration Foundation.
-    
+
     Architectural Rules:
     1. Nodes are completely stateless. Runtime state belongs in ConversationState.
     2. Nodes produce no direct, irreversible external side-effects (DB writes, payments, emails).
@@ -33,7 +33,9 @@ class BaseWorkflowNode(BaseNode, ABC):
     node_metadata: WorkflowNodeMetadata = Field(default_factory=WorkflowNodeMetadata)
     config: WorkflowNodeConfig = Field(default_factory=WorkflowNodeConfig)
     capabilities: NodeCapability = Field(default_factory=NodeCapability)
-    constraints: NodeExecutionConstraints = Field(default_factory=NodeExecutionConstraints)
+    constraints: NodeExecutionConstraints = Field(
+        default_factory=NodeExecutionConstraints
+    )
 
     def model_post_init(self, __context: Any) -> None:
         super().model_post_init(__context)

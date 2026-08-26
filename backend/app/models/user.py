@@ -17,9 +17,15 @@ class User(UUIDMixin, TimestampMixin, SoftDeleteMixin, AuditMixin, Base):
     __tablename__ = "users"
 
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
-    email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
-    phone_number: Mapped[Optional[str]] = mapped_column(String(50), index=True, nullable=True)
-    preferred_language: Mapped[str] = mapped_column(String(10), default="en", nullable=False)
+    email: Mapped[str] = mapped_column(
+        String(255), unique=True, index=True, nullable=False
+    )
+    phone_number: Mapped[Optional[str]] = mapped_column(
+        String(50), index=True, nullable=True
+    )
+    preferred_language: Mapped[str] = mapped_column(
+        String(10), default="en", nullable=False
+    )
     profile_image_url: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 

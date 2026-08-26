@@ -1,0 +1,93 @@
+---
+# VOLTA Enterprise AI Platform — Kubernetes Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: volta-platform
+  namespace: volta
+  labels:
+    app: volta-platform
+    version: "7.8.0"
+    tier: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: volta-platform
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: volta-platform
+        version: "7.8.0"
+    spec:
+      serviceAccountName: volta-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: volta-api
+          image: ghcr.io/likith1502/volta-ai-chatbot:7.8.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+              name: http
+          env:
+            - name: ENVIRONMENT
+              value: "production"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: volta-secrets
+                  key: database-url
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: volta-secrets
+                  key: redis-url
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: volta-secrets
+                  key: gemini-api-key
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "2Gi"
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8000
+            initialDelaySeconds: 40
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: app-logs
+              mountPath: /app/logs
+            - name: app-config
+              mountPath: /app/config.env
+              subPath: config.env
+      volumes:
+        - name: app-logs
+          emptyDir: {}
+        - name: app-config
+          configMap:
+            name: volta-config
+      terminationGracePeriodSeconds: 30

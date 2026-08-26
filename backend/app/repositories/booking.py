@@ -12,7 +12,9 @@ class BookingRepository(BaseRepository[Booking]):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(Booking, session)
 
-    async def get_by_reference(self, booking_reference: str, include_deleted: bool = False) -> Booking | None:
+    async def get_by_reference(
+        self, booking_reference: str, include_deleted: bool = False
+    ) -> Booking | None:
         """Retrieves a booking by unique reference code."""
         stmt = select(Booking).where(Booking.booking_reference == booking_reference)
         stmt = self._apply_soft_delete_filter(stmt, include_deleted)

@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, String, Text, UUID, func
+from sqlalchemy import UUID, Boolean, DateTime, Enum, ForeignKey, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -31,7 +31,9 @@ class Notification(UUIDMixin, TimestampMixin, SoftDeleteMixin, AuditMixin, Base)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     body: Mapped[str] = mapped_column(Text, nullable=False)
     is_read: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    delivery_status: Mapped[str] = mapped_column(String(50), default="sent", nullable=False)
+    delivery_status: Mapped[str] = mapped_column(
+        String(50), default="sent", nullable=False
+    )
     sent_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),

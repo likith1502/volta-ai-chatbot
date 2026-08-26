@@ -1,8 +1,7 @@
 from typing import Callable, Union
 
-from app.graph.builder import GraphBuilder
 from app.graph.contracts import IGraph, IGraphBuilder, IGraphRegistry
-from app.graph.exceptions import RegistryException
+from app.graph.exceptions import RegistryError
 
 
 class GraphRegistry(IGraphRegistry):
@@ -12,7 +11,9 @@ class GraphRegistry(IGraphRegistry):
     """
 
     def __init__(self) -> None:
-        self._registry: dict[str, Union[IGraphBuilder, Callable[[], IGraphBuilder]]] = {}
+        self._registry: dict[
+            str, Union[IGraphBuilder, Callable[[], IGraphBuilder]]
+        ] = {}
 
     def register(
         self,
@@ -22,10 +23,10 @@ class GraphRegistry(IGraphRegistry):
     ) -> None:
         """
         Registers a graph builder or factory function under the specified template name.
-        Raises RegistryException if template name is already registered and overwrite is False.
+        Raises RegistryError if template name is already registered and overwrite is False.
         """
         if name in self._registry and not overwrite:
-            raise RegistryException(
+            raise RegistryError(
                 f"Graph template '{name}' is already registered in GraphRegistry."
             )
         self._registry[name] = builder_or_factory
@@ -34,10 +35,12 @@ class GraphRegistry(IGraphRegistry):
         """
         Retrieves and compiles a registered graph template by name.
         Lazy-evaluates factory functions if provided.
-        Raises RegistryException if template name is not registered.
+        Raises RegistryError if template name is not registered.
         """
         if name not in self._registry:
-            raise RegistryException(f"Graph template '{name}' is not registered in GraphRegistry.")
+            raise RegistryError(
+                f"Graph template '{name}' is not registered in GraphRegistry."
+            )
 
         item = self._registry[name]
 
@@ -51,7 +54,9 @@ class GraphRegistry(IGraphRegistry):
         elif isinstance(builder, IGraph):
             return builder
         else:
-            raise RegistryException(f"Registered item '{name}' did not produce a valid IGraph instance.")
+            raise RegistryError(
+                f"Registered item '{name}' did not produce a valid IGraph instance."
+            )
 
     def list_graphs(self) -> list[str]:
         """

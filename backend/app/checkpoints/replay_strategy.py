@@ -1,6 +1,6 @@
 import time
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import List
 
 from app.checkpoints.checkpoint import Checkpoint
 from app.checkpoints.replay_context import ReplayContext
@@ -62,7 +62,9 @@ class ReverseReplayStrategy(ReplayStrategy):
         sorted_cps = sorted(checkpoints, key=lambda c: c.timestamp, reverse=True)
         snapshots = [c.execution_snapshot for c in sorted_cps if c.execution_snapshot]
         final_state = sorted_cps[0].state_snapshot if sorted_cps else None
-        return ReplayResult(success=True, final_state=final_state, visited_snapshots=snapshots)
+        return ReplayResult(
+            success=True, final_state=final_state, visited_snapshots=snapshots
+        )
 
 
 class StepReplayStrategy(ReplayStrategy):
@@ -76,4 +78,6 @@ class StepReplayStrategy(ReplayStrategy):
         cp = checkpoints[0] if checkpoints else None
         snapshot = [cp.execution_snapshot] if cp and cp.execution_snapshot else []
         final_state = cp.state_snapshot if cp else None
-        return ReplayResult(success=True, final_state=final_state, visited_snapshots=snapshot)
+        return ReplayResult(
+            success=True, final_state=final_state, visited_snapshots=snapshot
+        )

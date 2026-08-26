@@ -4,10 +4,18 @@ This index lists all official Architecture Decision Records (ADRs) and technical
 
 ---
 
-## Architecture Decision Records & Guidelines (ADRs 001 – 035)
+## Architecture Decision Records & Guidelines (ADRs 001 – 053)
 
 | ADR ID | Title | Status | Date |
 | :--- | :--- | :---: | :---: |
+| **[ADR 052](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/052-enterprise-deployment.md)** | Enterprise Deployment Package Architecture (v7.8) | Accepted | 2026-08-07 |
+| **[ADR 053](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/053-operational-guidelines.md)** | Enterprise Operational Guidelines & Runbooks | Accepted | 2026-08-07 |
+| **[ADR 050](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/050-enterprise-production-integrations.md)** | Enterprise Integration Platform Architecture (v7.7) | Accepted | 2026-08-07 |
+| **[ADR 051](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/051-production-integration-guidelines.md)** | Production Integration Guidelines & Extension Standards | Accepted | 2026-08-07 |
+| **[ADR 048](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/048-enterprise-rag-engine.md)** | Enterprise RAG Engine Architecture (v7.6) | Accepted | 2026-08-07 |
+| **[ADR 049](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/049-enterprise-retrieval-guidelines.md)** | Enterprise Retrieval Guidelines & Extension Standards | Accepted | 2026-08-07 |
+| **[ADR 046](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/046-enterprise-multi-agent-runtime.md)** | Enterprise Multi-Agent Orchestration Runtime Architecture (v7.5) | Accepted | 2026-08-07 |
+| **[ADR 047](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/047-agent-engineering-guidelines.md)** | Agent Engineering Guidelines & Extension Standards | Accepted | 2026-08-07 |
 | **[ADR 001](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/001-fastapi-framework.md)** | FastAPI Core Framework & Pydantic Configuration | Accepted | 2026-08-03 |
 | **[ADR 002](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/002-project-structure.md)** | Backend Project Directory Structure Standardization | Accepted | 2026-08-03 |
 | **[ADR 003](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/003-api-versioning.md)** | API Versioning Strategy & Routing Standards | Accepted | 2026-08-03 |
@@ -43,3 +51,11 @@ This index lists all official Architecture Decision Records (ADRs) and technical
 | **[ADR 033](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/033-streaming-guidelines.md)** | Streaming & Real-Time Engineering Guidelines | Accepted | 2026-08-05 |
 | **[ADR 034](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/034-human-in-the-loop-foundation.md)** | Human-in-the-Loop (HITL) Foundation Architecture (v6.8) | Accepted | 2026-08-05 |
 | **[ADR 035](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/035-human-loop-guidelines.md)** | Human-in-the-Loop (HITL) Engineering Guidelines | Accepted | 2026-08-05 |
+| **[ADR 036](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/036-enterprise-llm-runtime-engine.md)** | Enterprise LLM Runtime Engine Architecture (v7.0) | Accepted | 2026-08-07 |
+| **[ADR 037](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/037-runtime-engineering-guidelines.md)** | Runtime Engineering Guidelines & Extension Standards | Accepted | 2026-08-07 |
+| **[ADR 038](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/038-prompt-execution-engine.md)** | Prompt Execution Engine Architecture (v7.1) | Accepted | 2026-08-07 |
+| **[ADR 039](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/039-prompt-engineering-guidelines.md)** | Prompt Engineering Guidelines & Extension Standards | Accepted | 2026-08-07 |
+| **[ADR 040](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/040-enterprise-memory-runtime.md)** | Enterprise Memory Runtime Architecture (v7.2) | Accepted | 2026-08-07 |
+| **[ADR 041](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/041-memory-engineering-guidelines.md)** | Memory Engineering Guidelines & Extension Standards | Accepted | 2026-08-07 |
+| **[ADR 042](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/042-enterprise-tool-runtime.md)** | Enterprise Tool Runtime Architecture (v7.3) | Accepted | 2026-08-07 |
+| **[ADR 043](file:///c:/Users/Likit/Desktop/Volta-AI-Chatbot/backend/docs/architecture/043-tool-engineering-guidelines.md)** | Tool Engineering Guidelines & Extension Standards | Accepted | 2026-08-07 |

@@ -16,15 +16,19 @@ from app.events.event_serializer import (
 )
 from app.events.event_status import WorkflowEventStatus
 from app.events.event_subscription import EventSubscription
-from app.events.event_types import EventPriority, WorkflowEventCategory, WorkflowEventType
+from app.events.event_types import (
+    EventPriority,
+    WorkflowEventCategory,
+    WorkflowEventType,
+)
 from app.events.exceptions import (
-    DuplicateEventException,
-    DuplicateListenerException,
-    EventDispatchException,
-    EventListenerNotFoundException,
-    EventSerializationException,
-    EventValidationException,
-    WorkflowEventException,
+    DuplicateEventError,
+    DuplicateListenerError,
+    EventDispatchError,
+    EventListenerNotFoundError,
+    EventSerializationError,
+    EventValidationError,
+    WorkflowEventError,
 )
 
 __all__ = [
@@ -47,11 +51,11 @@ __all__ = [
     "JSONEventSerializer",
     "MessagePackEventSerializer",
     "ProtobufEventSerializer",
-    "WorkflowEventException",
-    "DuplicateEventException",
-    "DuplicateListenerException",
-    "EventListenerNotFoundException",
-    "EventDispatchException",
-    "EventSerializationException",
-    "EventValidationException",
+    "WorkflowEventError",
+    "DuplicateEventError",
+    "DuplicateListenerError",
+    "EventListenerNotFoundError",
+    "EventDispatchError",
+    "EventSerializationError",
+    "EventValidationError",
 ]

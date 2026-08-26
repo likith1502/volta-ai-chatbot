@@ -1,7 +1,7 @@
 import uuid
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import Enum, Float, ForeignKey, Integer, JSON, String, UUID
+from sqlalchemy import JSON, UUID, Enum, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base

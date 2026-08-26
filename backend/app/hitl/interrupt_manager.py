@@ -36,7 +36,9 @@ class InterruptManager:
             "resumed": True,
         }
 
-    def cancel_execution(self, execution_id: uuid.UUID, reason: str = "") -> Dict[str, Any]:
+    def cancel_execution(
+        self, execution_id: uuid.UUID, reason: str = ""
+    ) -> Dict[str, Any]:
         """Signals execution cancellation contract."""
         return {
             "execution_id": str(execution_id),

@@ -10,13 +10,13 @@ from app.streaming import (
     OverflowStrategy,
     ProtobufStreamSerializer,
     StreamAdapter,
-    StreamAdapterException,
+    StreamAdapterError,
     StreamChannel,
-    StreamChannelException,
+    StreamChannelError,
     StreamContext,
     StreamDispatcher,
     StreamEnvelope,
-    StreamException,
+    StreamError,
     StreamFilter,
     StreamHeartbeat,
     StreamHistory,
@@ -28,7 +28,7 @@ from app.streaming import (
     StreamPriority,
     StreamRegistry,
     StreamResult,
-    StreamSerializationException,
+    StreamSerializationError,
     StreamStatus,
     StreamSubscription,
     StreamType,
@@ -220,9 +220,9 @@ def test_stream_registry() -> None:
 
 def test_exception_hierarchy() -> None:
     """Verify streaming exception hierarchy inheritance."""
-    assert issubclass(StreamChannelException, StreamException)
-    assert issubclass(StreamAdapterException, StreamException)
-    assert issubclass(StreamSerializationException, StreamException)
+    assert issubclass(StreamChannelError, StreamError)
+    assert issubclass(StreamAdapterError, StreamError)
+    assert issubclass(StreamSerializationError, StreamError)
 
 
 def test_import_isolation_and_no_framework_leakage() -> None:

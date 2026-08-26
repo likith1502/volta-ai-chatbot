@@ -4,7 +4,7 @@ from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.exceptions.domain import ConversationNotFoundException, UserNotFoundException
+from app.exceptions.domain import ConversationNotFoundError, UserNotFoundError
 from app.models.conversation import Conversation
 from app.models.enums import ConversationSource, ConversationStatus
 from app.repositories.conversation import ConversationRepository
@@ -30,7 +30,7 @@ class ConversationService(BaseService):
         """Creates a new active conversation session after verifying user existence."""
         user = await self.user_repo.get_by_id(user_id)
         if not user:
-            raise UserNotFoundException(f"User with ID '{user_id}' not found.")
+            raise UserNotFoundError(f"User with ID '{user_id}' not found.")
 
         existing = await self.conversation_repo.get_by_session_id(session_id)
         if existing:
@@ -49,21 +49,25 @@ class ConversationService(BaseService):
         return conversation
 
     async def get_conversation(self, conversation_id: uuid.UUID) -> Conversation:
-        """Retrieves a conversation session by UUID or raises ConversationNotFoundException."""
+        """Retrieves a conversation session by UUID or raises ConversationNotFoundError."""
         conversation = await self.conversation_repo.get_by_id(conversation_id)
         if not conversation:
-            raise ConversationNotFoundException(f"Conversation with ID '{conversation_id}' not found.")
+            raise ConversationNotFoundError(
+                f"Conversation with ID '{conversation_id}' not found."
+            )
         return conversation
 
     async def get_latest_active_conversation(self, user_id: uuid.UUID) -> Conversation:
         """Retrieves the latest active conversation session for a user."""
         user = await self.user_repo.get_by_id(user_id)
         if not user:
-            raise UserNotFoundException(f"User with ID '{user_id}' not found.")
+            raise UserNotFoundError(f"User with ID '{user_id}' not found.")
 
         conversation = await self.conversation_repo.get_latest_active(user_id)
         if not conversation:
-            raise ConversationNotFoundException(f"No active conversation session found for user '{user_id}'.")
+            raise ConversationNotFoundError(
+                f"No active conversation session found for user '{user_id}'."
+            )
         return conversation
 
     async def archive_conversation(self, conversation_id: uuid.UUID) -> Conversation:
@@ -78,6 +82,8 @@ class ConversationService(BaseService):
             },
         )
         if not archived:
-            raise ConversationNotFoundException(f"Conversation with ID '{conversation_id}' not found.")
+            raise ConversationNotFoundError(
+                f"Conversation with ID '{conversation_id}' not found."
+            )
         await self.commit()
         return archived

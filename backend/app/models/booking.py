@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import DateTime, Enum, ForeignKey, String, UUID, func
+from sqlalchemy import UUID, DateTime, Enum, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -35,7 +35,9 @@ class Booking(UUIDMixin, TimestampMixin, SoftDeleteMixin, AuditMixin, Base):
         default=BookingStatus.PENDING,
         nullable=False,
     )
-    provider: Mapped[str] = mapped_column(String(100), default="volta_fleet", nullable=False)
+    provider: Mapped[str] = mapped_column(
+        String(100), default="volta_fleet", nullable=False
+    )
     external_booking_id: Mapped[Optional[str]] = mapped_column(
         String(100),
         index=True,

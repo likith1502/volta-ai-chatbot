@@ -3,10 +3,10 @@ import pytest
 from app.context.state import ConversationState
 from app.context.types import ExecutionMode
 from app.execution import (
-    ExecutionCancelledException,
+    ExecutionCancelledError,
     ExecutionContext,
     ExecutionDispatcher,
-    ExecutionException,
+    ExecutionError,
     ExecutionMetrics,
     ExecutionPlanner,
     ExecutionPolicy,
@@ -15,9 +15,9 @@ from app.execution import (
     ExecutionSnapshot,
     ExecutionStatus,
     ExecutionStrategy,
-    ExecutionStrategyException,
-    ExecutionTimeoutException,
-    ExecutionValidationException,
+    ExecutionStrategyError,
+    ExecutionTimeoutError,
+    ExecutionValidationError,
     GraphExecutor,
     SequentialStrategy,
 )
@@ -106,13 +106,13 @@ async def test_mandatory_graph_validation_failure() -> None:
     invalid_graph = Graph(nodes={"start": start_node}, edges=[], entry_node="non_existent")
     executor = GraphExecutor()
 
-    with pytest.raises(ExecutionValidationException):
+    with pytest.raises(ExecutionValidationError):
         await executor.execute(invalid_graph, ConversationState())
 
 
 @pytest.mark.asyncio
 async def test_max_depth_protection() -> None:
-    """Verify depth protection limits graph traversal steps and raises ExecutionValidationException."""
+    """Verify depth protection limits graph traversal steps and raises ExecutionValidationError."""
     start_node = StartNode(node_id="start")
     end_node = EndNode(node_id="end")
 
@@ -127,7 +127,7 @@ async def test_max_depth_protection() -> None:
     policy = ExecutionPolicy(max_depth=1)
     executor = GraphExecutor(policy=policy)
 
-    with pytest.raises(ExecutionValidationException) as exc_info:
+    with pytest.raises(ExecutionValidationError) as exc_info:
         await executor.execute(graph, ConversationState())
 
     assert "Maximum graph traversal depth" in str(exc_info.value)
@@ -188,10 +188,10 @@ async def test_stop_on_error_policy() -> None:
 
 def test_exception_hierarchy() -> None:
     """Verify execution exception hierarchy inheritance."""
-    assert issubclass(ExecutionTimeoutException, ExecutionException)
-    assert issubclass(ExecutionCancelledException, ExecutionException)
-    assert issubclass(ExecutionValidationException, ExecutionException)
-    assert issubclass(ExecutionStrategyException, ExecutionException)
+    assert issubclass(ExecutionTimeoutError, ExecutionError)
+    assert issubclass(ExecutionCancelledError, ExecutionError)
+    assert issubclass(ExecutionValidationError, ExecutionError)
+    assert issubclass(ExecutionStrategyError, ExecutionError)
 
 
 def test_execution_planner_and_metrics() -> None:

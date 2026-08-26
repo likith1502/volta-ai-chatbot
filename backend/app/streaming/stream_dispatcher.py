@@ -26,7 +26,9 @@ class StreamDispatcher:
 
     def __init__(self) -> None:
         # channel_id -> list of (StreamSubscription, callback)
-        self._subscribers: Dict[str, List[Tuple[StreamSubscription, Callable[[StreamMessage], Any]]]] = {}
+        self._subscribers: Dict[
+            str, List[Tuple[StreamSubscription, Callable[[StreamMessage], Any]]]
+        ] = {}
 
     def register_subscriber(
         self,
@@ -43,10 +45,14 @@ class StreamDispatcher:
         """Unregisters subscriber by subscription_id across all channels."""
         for channel_id in list(self._subscribers.keys()):
             self._subscribers[channel_id] = [
-                (sub, cb) for sub, cb in self._subscribers[channel_id] if sub.subscription_id != subscription_id
+                (sub, cb)
+                for sub, cb in self._subscribers[channel_id]
+                if sub.subscription_id != subscription_id
             ]
 
-    async def dispatch(self, channel: StreamChannel, message: StreamMessage) -> StreamResult:
+    async def dispatch(
+        self, channel: StreamChannel, message: StreamMessage
+    ) -> StreamResult:
         """
         Dispatches a StreamMessage to all active channel subscribers ordered by priority.
         Isolates failures so an exception in one callback does not break other subscribers.

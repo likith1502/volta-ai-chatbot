@@ -6,7 +6,11 @@ from pydantic import BaseModel, Field
 
 from app.events.event import WorkflowEvent
 from app.events.event_status import WorkflowEventStatus
-from app.events.event_types import EventPriority, WorkflowEventCategory, WorkflowEventType
+from app.events.event_types import (
+    EventPriority,
+    WorkflowEventCategory,
+    WorkflowEventType,
+)
 
 PRIORITY_WEIGHTS = {
     EventPriority.LOW: 1,

@@ -1,6 +1,6 @@
 from typing import Optional
 
-from app.ai.exceptions import AIProviderException
+from app.ai.exceptions import AIProviderError
 from app.ai.memory.base import MemoryStrategy
 from app.ai.memory.recent import RecentConversationStrategy
 from app.config.settings import settings
@@ -17,4 +17,6 @@ class MemoryStrategyFactory:
         if target_name == "recent":
             return RecentConversationStrategy()
         else:
-            raise AIProviderException(f"Unsupported memory strategy '{target_name}'. Supported options: ['recent'].")
+            raise AIProviderError(
+                f"Unsupported memory strategy '{target_name}'. Supported options: ['recent']."
+            )

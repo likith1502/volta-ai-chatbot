@@ -1,18 +1,23 @@
 from typing import Callable, List, Optional, Type, Union
 
 from app.hitl.approval_policy import ApprovalPolicy
-from app.hitl.exceptions import ApprovalRegistryException, ApprovalNotFoundException
+from app.hitl.exceptions import ApprovalNotFoundError, ApprovalRegistryError
 
 
 class ApprovalRegistry:
     """Registry for managing approval policies, handlers, and factory instantiations."""
 
     def __init__(self) -> None:
-        self._policies: dict[str, Union[ApprovalPolicy, Type[ApprovalPolicy], Callable[[], ApprovalPolicy]]] = {}
+        self._policies: dict[
+            str,
+            Union[ApprovalPolicy, Type[ApprovalPolicy], Callable[[], ApprovalPolicy]],
+        ] = {}
 
     def register(
         self,
-        policy: Union[ApprovalPolicy, Type[ApprovalPolicy], Callable[[], ApprovalPolicy]],
+        policy: Union[
+            ApprovalPolicy, Type[ApprovalPolicy], Callable[[], ApprovalPolicy]
+        ],
         policy_id: Optional[str] = None,
         overwrite: bool = False,
     ) -> None:
@@ -29,7 +34,9 @@ class ApprovalRegistry:
                 target_id = str(policy)
 
         if target_id in self._policies and not overwrite:
-            raise ApprovalRegistryException(f"Approval policy '{target_id}' is already registered.")
+            raise ApprovalRegistryError(
+                f"Approval policy '{target_id}' is already registered."
+            )
 
         self._policies[target_id] = policy
 
@@ -45,7 +52,7 @@ class ApprovalRegistry:
     def unregister(self, policy_id: str) -> None:
         """Unregisters a policy by ID."""
         if policy_id not in self._policies:
-            raise ApprovalNotFoundException(f"Approval policy '{policy_id}' not found.")
+            raise ApprovalNotFoundError(f"Approval policy '{policy_id}' not found.")
         del self._policies[policy_id]
 
     def exists(self, policy_id: str) -> bool:
@@ -55,7 +62,7 @@ class ApprovalRegistry:
     def lookup(self, policy_id: str) -> ApprovalPolicy:
         """Retrieves and instantiates an ApprovalPolicy by ID."""
         if policy_id not in self._policies:
-            raise ApprovalNotFoundException(f"Approval policy '{policy_id}' not found.")
+            raise ApprovalNotFoundError(f"Approval policy '{policy_id}' not found.")
         target = self._policies[policy_id]
 
         if isinstance(target, ApprovalPolicy):
@@ -66,8 +73,12 @@ class ApprovalRegistry:
             res = target()
             if isinstance(res, ApprovalPolicy):
                 return res
-            raise ApprovalRegistryException(f"Factory for policy '{policy_id}' did not return ApprovalPolicy.")
-        raise ApprovalRegistryException(f"Invalid registration type for policy '{policy_id}'.")
+            raise ApprovalRegistryError(
+                f"Factory for policy '{policy_id}' did not return ApprovalPolicy."
+            )
+        raise ApprovalRegistryError(
+            f"Invalid registration type for policy '{policy_id}'."
+        )
 
     def list(self) -> List[str]:
         """Lists IDs of registered policies."""

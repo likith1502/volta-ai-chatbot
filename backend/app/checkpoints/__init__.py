@@ -9,13 +9,13 @@ from app.checkpoints.checkpoint_store import CheckpointStore, InMemoryCheckpoint
 from app.checkpoints.checkpoint_validation import CheckpointValidationResult
 from app.checkpoints.checkpoint_version import CheckpointVersion
 from app.checkpoints.exceptions import (
-    CheckpointException,
-    CheckpointNotFoundException,
-    CheckpointStoreException,
-    CheckpointValidationException,
-    ReplayException,
-    ReplayStrategyException,
-    ReplayValidationException,
+    CheckpointError,
+    CheckpointNotFoundError,
+    CheckpointStoreError,
+    CheckpointValidationError,
+    ReplayError,
+    ReplayStrategyError,
+    ReplayValidationError,
 )
 from app.checkpoints.replay_context import ReplayContext
 from app.checkpoints.replay_engine import ReplayEngine
@@ -53,11 +53,11 @@ __all__ = [
     "ReverseReplayStrategy",
     "StepReplayStrategy",
     "ReplayEngine",
-    "CheckpointException",
-    "CheckpointNotFoundException",
-    "CheckpointValidationException",
-    "CheckpointStoreException",
-    "ReplayException",
-    "ReplayValidationException",
-    "ReplayStrategyException",
+    "CheckpointError",
+    "CheckpointNotFoundError",
+    "CheckpointValidationError",
+    "CheckpointStoreError",
+    "ReplayError",
+    "ReplayValidationError",
+    "ReplayStrategyError",
 ]

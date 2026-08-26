@@ -29,7 +29,9 @@ class ConversationRepository(BaseRepository[Conversation]):
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_by_session_id(self, session_id: str, include_deleted: bool = False) -> Conversation | None:
+    async def get_by_session_id(
+        self, session_id: str, include_deleted: bool = False
+    ) -> Conversation | None:
         """Retrieves a conversation by external session ID."""
         stmt = select(Conversation).where(Conversation.session_id == session_id)
         stmt = self._apply_soft_delete_filter(stmt, include_deleted)

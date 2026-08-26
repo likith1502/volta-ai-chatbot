@@ -19,7 +19,9 @@ class ConversationStateManager(ABC):
         pass
 
     @abstractmethod
-    async def load_state(self, conversation_id: uuid.UUID | str) -> Optional[ConversationState]:
+    async def load_state(
+        self, conversation_id: uuid.UUID | str
+    ) -> Optional[ConversationState]:
         """Retrieves active conversation state by conversation ID or returns None if omitted."""
         pass
 

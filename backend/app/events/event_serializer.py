@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Union
 
 from app.events.event import WorkflowEvent
-from app.events.exceptions import EventSerializationException
+from app.events.exceptions import EventSerializationError
 
 
 class WorkflowEventSerializer(ABC):
@@ -26,7 +26,9 @@ class JSONEventSerializer(WorkflowEventSerializer):
         try:
             return event.model_dump_json()
         except Exception as exc:
-            raise EventSerializationException(f"JSON serialization failed: {exc}") from exc
+            raise EventSerializationError(
+                f"JSON serialization failed: {exc}"
+            ) from exc
 
     def deserialize(self, data: Union[str, bytes]) -> WorkflowEvent:
         try:
@@ -34,7 +36,9 @@ class JSONEventSerializer(WorkflowEventSerializer):
                 data = data.decode("utf-8")
             return WorkflowEvent.model_validate_json(data)
         except Exception as exc:
-            raise EventSerializationException(f"JSON deserialization failed: {exc}") from exc
+            raise EventSerializationError(
+                f"JSON deserialization failed: {exc}"
+            ) from exc
 
 
 class MessagePackEventSerializer(WorkflowEventSerializer):

@@ -53,21 +53,27 @@ class CheckpointManager:
         if self.policy.validation_required:
             val_res = self.validate_checkpoint(checkpoint_id)
             if not val_res.is_valid:
-                raise ValueError(f"Cannot restore invalid checkpoint '{checkpoint_id}': {val_res.errors}")
+                raise ValueError(
+                    f"Cannot restore invalid checkpoint '{checkpoint_id}': {val_res.errors}"
+                )
         return cp.state_snapshot
 
     def delete_checkpoint(self, checkpoint_id: uuid.UUID) -> None:
         """Removes checkpoint by ID."""
         self.store.delete(checkpoint_id)
 
-    def list_checkpoints(self, filter: Optional[CheckpointFilter] = None) -> List[Checkpoint]:
+    def list_checkpoints(
+        self, filter: Optional[CheckpointFilter] = None
+    ) -> List[Checkpoint]:
         """Lists checkpoints matching filter criteria."""
         all_checkpoints = self.store.list()
         if filter is None:
             return all_checkpoints
         return [cp for cp in all_checkpoints if filter.matches(cp)]
 
-    def validate_checkpoint(self, checkpoint_id: uuid.UUID) -> CheckpointValidationResult:
+    def validate_checkpoint(
+        self, checkpoint_id: uuid.UUID
+    ) -> CheckpointValidationResult:
         """Validates checkpoint structural integrity and returns CheckpointValidationResult."""
         try:
             cp = self.store.load(checkpoint_id)

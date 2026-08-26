@@ -5,7 +5,7 @@ import pytest
 from app.checkpoints.checkpoint_manager import CheckpointManager
 from app.context.state import ConversationState
 from app.hitl import (
-    ApprovalAlreadyResolvedException,
+    ApprovalAlreadyResolvedError,
     ApprovalCapabilities,
     ApprovalConstraints,
     ApprovalContext,
@@ -14,21 +14,21 @@ from app.hitl import (
     ApprovalHistory,
     ApprovalManager,
     ApprovalMetadata,
-    ApprovalNotFoundException,
+    ApprovalNotFoundError,
     ApprovalPolicy,
     ApprovalPriority,
     ApprovalRegistry,
-    ApprovalRegistryException,
+    ApprovalRegistryError,
     ApprovalRequest,
     ApprovalResult,
     ApprovalSnapshot,
     ApprovalStatus,
-    GovernanceException,
+    GovernanceError,
     GovernancePolicy,
-    HumanLoopException,
+    HumanLoopError,
     HumanRole,
     InterruptManager,
-    ResumeException,
+    ResumeError,
     ResumeManager,
 )
 
@@ -94,8 +94,8 @@ def test_approval_manager_lifecycle() -> None:
     assert approved_req.status == ApprovalStatus.APPROVED
     assert approved_req.decision == ApprovalDecision.APPROVE
 
-    # Reject resolved request raises ApprovalAlreadyResolvedException
-    with pytest.raises(ApprovalAlreadyResolvedException):
+    # Reject resolved request raises ApprovalAlreadyResolvedError
+    with pytest.raises(ApprovalAlreadyResolvedError):
         mgr.reject(req.approval_id, reviewer="bob")
 
     # Complete
@@ -115,8 +115,8 @@ def test_governance_policy_and_separation_of_duties() -> None:
     # Distinct reviewer passes
     assert gov.validate_decision(requester="alice", reviewer="bob") is True
 
-    # Same requester and reviewer raises GovernanceException
-    with pytest.raises(GovernanceException):
+    # Same requester and reviewer raises GovernanceError
+    with pytest.raises(GovernanceError):
         gov.validate_decision(requester="alice", reviewer="alice")
 
 
@@ -136,9 +136,9 @@ def test_resume_manager_and_checkpoint_integration() -> None:
     restored_state = resumer.resume_from_approval(req.approval_id)
     assert restored_state.metadata.state_id == state.metadata.state_id
 
-    # Resume unapproved request raises ResumeException
+    # Resume unapproved request raises ResumeError
     unapproved_req = app_mgr.create_request("wf_resume", "g_resume", "n_2", checkpoint_id=cp.checkpoint_id)
-    with pytest.raises(ResumeException):
+    with pytest.raises(ResumeError):
         resumer.resume_from_approval(unapproved_req.approval_id)
 
 
@@ -180,10 +180,10 @@ def test_approval_registry() -> None:
 
 def test_exception_hierarchy() -> None:
     """Verify HITL exception hierarchy inheritance."""
-    assert issubclass(ApprovalNotFoundException, HumanLoopException)
-    assert issubclass(ApprovalAlreadyResolvedException, HumanLoopException)
-    assert issubclass(GovernanceException, HumanLoopException)
-    assert issubclass(ResumeException, HumanLoopException)
+    assert issubclass(ApprovalNotFoundError, HumanLoopError)
+    assert issubclass(ApprovalAlreadyResolvedError, HumanLoopError)
+    assert issubclass(GovernanceError, HumanLoopError)
+    assert issubclass(ResumeError, HumanLoopError)
 
 
 def test_expanded_import_isolation_and_no_framework_leakage() -> None:

@@ -3,15 +3,15 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from app.exceptions.domain import (
-    BookingNotFoundException,
-    ConversationClosedException,
-    ConversationNotFoundException,
-    InvalidBookingStatusException,
-    NotificationNotFoundException,
-    RecommendationExpiredException,
-    RecommendationNotFoundException,
-    UserAlreadyExistsException,
-    UserNotFoundException,
+    BookingNotFoundError,
+    ConversationClosedError,
+    ConversationNotFoundError,
+    InvalidBookingStatusError,
+    NotificationNotFoundError,
+    RecommendationExpiredError,
+    RecommendationNotFoundError,
+    UserAlreadyExistsError,
+    UserNotFoundError,
 )
 from app.models.booking import Booking
 from app.models.conversation import Conversation
@@ -45,7 +45,7 @@ async def test_user_service_workflows():
 
     # 2. Duplicate Email Error
     service.user_repo.get_by_email = AsyncMock(return_value=mock_user)
-    with pytest.raises(UserAlreadyExistsException):
+    with pytest.raises(UserAlreadyExistsError):
         await service.create_user(full_name="Duplicate User", email=email)
 
     # 3. Get User By ID (Found & Not Found)
@@ -54,7 +54,7 @@ async def test_user_service_workflows():
     assert fetched == mock_user
 
     service.user_repo.get_by_id = AsyncMock(return_value=None)
-    with pytest.raises(UserNotFoundException):
+    with pytest.raises(UserNotFoundError):
         await service.get_user_by_id(uuid.uuid4())
 
     # 4. Deactivate User
@@ -122,7 +122,7 @@ async def test_recommendation_service_workflows():
     mock_closed_conv = Conversation(id=conv_id, status=ConversationStatus.ARCHIVED)
     service.conversation_repo.get_by_id = AsyncMock(return_value=mock_closed_conv)
 
-    with pytest.raises(ConversationClosedException):
+    with pytest.raises(ConversationClosedError):
         await service.create_recommendation(
             conversation_id=conv_id,
             recommendation_type="ride",
@@ -166,7 +166,7 @@ async def test_booking_service_transaction_orchestration():
     # 2. Expired Recommendation Error
     mock_expired_rec = Recommendation(id=rec_id, status=RecommendationStatus.EXPIRED)
     service.recommendation_repo.get_by_id = AsyncMock(return_value=mock_expired_rec)
-    with pytest.raises(RecommendationExpiredException):
+    with pytest.raises(RecommendationExpiredError):
         await service.create_booking_from_recommendation(rec_id)
 
     # 3. Cancel Booking

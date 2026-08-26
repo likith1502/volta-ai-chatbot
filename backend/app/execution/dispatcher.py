@@ -4,7 +4,6 @@ from app.context.state import ConversationState
 from app.execution.execution_context import ExecutionContext
 from app.execution.execution_snapshot import ExecutionSnapshot
 from app.graph.contracts import IGraph
-from app.workflow.base import BaseWorkflowNode
 from app.workflow.metadata import NodeExecutionContext, NodeResult
 
 
@@ -47,7 +46,9 @@ class ExecutionDispatcher:
             node_error = exc
             if hasattr(node, "on_error"):
                 try:
-                    current_state = await node.on_error(current_state, exc, node_exec_ctx)
+                    current_state = await node.on_error(
+                        current_state, exc, node_exec_ctx
+                    )
                 except Exception:
                     pass
 
@@ -55,7 +56,10 @@ class ExecutionDispatcher:
         node_res = NodeResult(
             state=current_state,
             execution_time=0.0,
-            metadata={"node_id": node_id, "node_type": getattr(node, "node_type", "custom")},
+            metadata={
+                "node_id": node_id,
+                "node_type": getattr(node, "node_type", "custom"),
+            },
         )
         snapshot = ExecutionSnapshot(
             node_id=node_id,

@@ -1,7 +1,13 @@
-from typing import Any, Optional
+from typing import Optional
 
-from app.graph.contracts import GraphMetadata, GraphValidationResult, IGraph, IGraphEdge, IGraphNode
-from app.graph.exceptions import NodeNotFoundException, GraphValidationException
+from app.graph.contracts import (
+    GraphMetadata,
+    GraphValidationResult,
+    IGraph,
+    IGraphEdge,
+    IGraphNode,
+)
+from app.graph.exceptions import GraphValidationError, NodeNotFoundError
 
 
 class Graph(IGraph):
@@ -23,7 +29,9 @@ class Graph(IGraph):
         self._metadata: GraphMetadata = metadata or GraphMetadata()
 
         # Pre-index adjacency list for fast outgoing edge lookup
-        self._adjacency: dict[str, list[IGraphEdge]] = {node_id: [] for node_id in self._nodes}
+        self._adjacency: dict[str, list[IGraphEdge]] = {
+            node_id: [] for node_id in self._nodes
+        }
         for edge in self._edges:
             if edge.source_node in self._adjacency:
                 self._adjacency[edge.source_node].append(edge)
@@ -55,20 +63,20 @@ class Graph(IGraph):
     def get_node(self, node_id: str) -> IGraphNode:
         """
         Retrieves node by ID.
-        Raises NodeNotFoundException if node ID is not present in graph.
+        Raises NodeNotFoundError if node ID is not present in graph.
         """
         if node_id not in self._nodes:
-            raise NodeNotFoundException(f"Node '{node_id}' not found in Graph.")
+            raise NodeNotFoundError(f"Node '{node_id}' not found in Graph.")
         return self._nodes[node_id]
 
     def get_outgoing_edges(self, node_id: str) -> list[IGraphEdge]:
         """
         Retrieves all directed outgoing edges originating from specified node ID,
         ordered by priority descending.
-        Raises NodeNotFoundException if node ID is not present in graph.
+        Raises NodeNotFoundError if node ID is not present in graph.
         """
         if node_id not in self._nodes:
-            raise NodeNotFoundException(f"Node '{node_id}' not found in Graph.")
+            raise NodeNotFoundError(f"Node '{node_id}' not found in Graph.")
         return list(self._adjacency.get(node_id, []))
 
     def validate(self) -> GraphValidationResult:
@@ -80,15 +88,23 @@ class Graph(IGraph):
 
         for edge in self._edges:
             if edge.source_node not in self._nodes:
-                errors.append(f"Edge source node '{edge.source_node}' does not exist in Graph nodes.")
+                errors.append(
+                    f"Edge source node '{edge.source_node}' does not exist in Graph nodes."
+                )
             if edge.target_node not in self._nodes:
-                errors.append(f"Edge target node '{edge.target_node}' does not exist in Graph nodes.")
+                errors.append(
+                    f"Edge target node '{edge.target_node}' does not exist in Graph nodes."
+                )
 
         if self._entry_node and self._entry_node not in self._nodes:
-            errors.append(f"Entry node '{self._entry_node}' does not exist in Graph nodes.")
+            errors.append(
+                f"Entry node '{self._entry_node}' does not exist in Graph nodes."
+            )
 
         if errors:
-            raise GraphValidationException(f"Graph validation failed: {'; '.join(errors)}")
+            raise GraphValidationError(
+                f"Graph validation failed: {'; '.join(errors)}"
+            )
 
         return GraphValidationResult(
             is_valid=True,

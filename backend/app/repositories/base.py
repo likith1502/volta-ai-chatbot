@@ -16,7 +16,9 @@ class BaseRepository(Generic[T]):
         self.model_class = model_class
         self.session = session
 
-    def _apply_soft_delete_filter(self, stmt: Select, include_deleted: bool = False) -> Select:
+    def _apply_soft_delete_filter(
+        self, stmt: Select, include_deleted: bool = False
+    ) -> Select:
         """Centralized query helper to apply soft-delete filtering if applicable."""
         if not include_deleted and hasattr(self.model_class, "is_deleted"):
             return stmt.where(self.model_class.is_deleted == False)  # noqa: E712
@@ -67,7 +69,11 @@ class BaseRepository(Generic[T]):
         instance = await self.get_by_id(id, include_deleted=True)
         if not instance:
             return False
-        if not hard and hasattr(instance, "soft_delete") and callable(getattr(instance, "soft_delete")):
+        if (
+            not hard
+            and hasattr(instance, "soft_delete")
+            and callable(getattr(instance, "soft_delete"))
+        ):
             instance.soft_delete()
         else:
             await self.session.delete(instance)

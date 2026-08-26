@@ -2,8 +2,8 @@ from typing import Callable, List, Optional, Type, Union
 
 from app.checkpoints.checkpoint_store import CheckpointStore
 from app.checkpoints.exceptions import (
-    CheckpointStoreException,
-    CheckpointNotFoundException,
+    CheckpointNotFoundError,
+    CheckpointStoreError,
 )
 
 
@@ -11,11 +11,18 @@ class CheckpointRegistry:
     """Registry for managing and discovering checkpoint stores and factories."""
 
     def __init__(self) -> None:
-        self._stores: dict[str, Union[CheckpointStore, Type[CheckpointStore], Callable[[], CheckpointStore]]] = {}
+        self._stores: dict[
+            str,
+            Union[
+                CheckpointStore, Type[CheckpointStore], Callable[[], CheckpointStore]
+            ],
+        ] = {}
 
     def register(
         self,
-        store: Union[CheckpointStore, Type[CheckpointStore], Callable[[], CheckpointStore]],
+        store: Union[
+            CheckpointStore, Type[CheckpointStore], Callable[[], CheckpointStore]
+        ],
         store_id: Optional[str] = None,
         overwrite: bool = False,
     ) -> None:
@@ -32,7 +39,7 @@ class CheckpointRegistry:
                 target_id = str(store)
 
         if target_id in self._stores and not overwrite:
-            raise CheckpointStoreException(
+            raise CheckpointStoreError(
                 f"Checkpoint store with ID '{target_id}' is already registered."
             )
 
@@ -50,7 +57,7 @@ class CheckpointRegistry:
     def unregister(self, store_id: str) -> None:
         """Unregisters a store by ID."""
         if store_id not in self._stores:
-            raise CheckpointNotFoundException(
+            raise CheckpointNotFoundError(
                 f"Checkpoint store with ID '{store_id}' not found."
             )
         del self._stores[store_id]
@@ -62,7 +69,7 @@ class CheckpointRegistry:
     def lookup(self, store_id: str) -> CheckpointStore:
         """Retrieves and instantiates a CheckpointStore by ID."""
         if store_id not in self._stores:
-            raise CheckpointNotFoundException(
+            raise CheckpointNotFoundError(
                 f"Checkpoint store with ID '{store_id}' not found."
             )
         target = self._stores[store_id]
@@ -75,10 +82,12 @@ class CheckpointRegistry:
             res = target()
             if isinstance(res, CheckpointStore):
                 return res
-            raise CheckpointStoreException(
+            raise CheckpointStoreError(
                 f"Factory function for store '{store_id}' did not return a CheckpointStore."
             )
-        raise CheckpointStoreException(f"Invalid store registration type for '{store_id}'.")
+        raise CheckpointStoreError(
+            f"Invalid store registration type for '{store_id}'."
+        )
 
     def list(self) -> List[str]:
         """Lists IDs of registered stores."""

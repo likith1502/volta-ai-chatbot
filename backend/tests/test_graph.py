@@ -7,26 +7,26 @@ from app.context.state import ConversationState
 from app.context.types import NodeType, WorkflowStatus
 from app.graph import (
     BaseNode,
-    BuilderException,
-    DuplicateEdgeException,
-    DuplicateNodeException,
+    BuilderError,
+    DuplicateEdgeError,
+    DuplicateNodeError,
     ExecutionResult,
     Graph,
     GraphBuilder,
     GraphBuildOptions,
     GraphEdge,
-    GraphException,
+    GraphError,
     GraphMetadata,
     GraphRegistry,
-    GraphValidationException,
+    GraphValidationError,
     GraphValidationResult,
     IGraph,
     IGraphBuilder,
     IGraphEdge,
     IGraphNode,
     IGraphRegistry,
-    NodeNotFoundException,
-    RegistryException,
+    NodeNotFoundError,
+    RegistryError,
 )
 
 
@@ -148,18 +148,18 @@ def test_graph_builder_and_building():
 
 
 def test_builder_rejects_duplicate_node_id():
-    """Verify GraphBuilder raises DuplicateNodeException when registering duplicate node IDs."""
+    """Verify GraphBuilder raises DuplicateNodeError when registering duplicate node IDs."""
     builder = GraphBuilder()
     n1 = DummyNode(node_id="same_id", node_name="Node A")
     n2 = DummyNode(node_id="same_id", node_name="Node B")
 
     builder.add_node(n1)
-    with pytest.raises(DuplicateNodeException):
+    with pytest.raises(DuplicateNodeError):
         builder.add_node(n2)
 
 
 def test_builder_rejects_duplicate_edge():
-    """Verify GraphBuilder raises DuplicateEdgeException when registering identical edges."""
+    """Verify GraphBuilder raises DuplicateEdgeError when registering identical edges."""
     builder = GraphBuilder()
     n1 = DummyNode(node_id="n1", node_name="Node 1")
     n2 = DummyNode(node_id="n2", node_name="Node 2")
@@ -169,7 +169,7 @@ def test_builder_rejects_duplicate_edge():
     edge2 = GraphEdge(source_node="n1", target_node="n2", priority=1)
 
     builder.add_edge(edge1)
-    with pytest.raises(DuplicateEdgeException):
+    with pytest.raises(DuplicateEdgeError):
         builder.add_edge(edge2)
 
 
@@ -183,7 +183,7 @@ def test_builder_detects_orphan_edges():
     orphan_edge = GraphEdge(source_node="n1", target_node="n99")
     builder.add_edge(orphan_edge)
 
-    with pytest.raises(GraphValidationException):
+    with pytest.raises(GraphValidationError):
         builder.build()
 
 
@@ -202,22 +202,22 @@ def test_builder_cycle_detection():
     g_cyclic = builder.build(options=GraphBuildOptions(allow_cycles=True))
     assert len(g_cyclic.edges) == 2
 
-    # Disallowing cycles raises GraphValidationException
-    with pytest.raises(GraphValidationException):
+    # Disallowing cycles raises GraphValidationError
+    with pytest.raises(GraphValidationError):
         builder.build(options=GraphBuildOptions(allow_cycles=False))
 
 
 def test_graph_node_not_found_exception():
-    """Verify Graph raises NodeNotFoundException when requesting non-existent node."""
+    """Verify Graph raises NodeNotFoundError when requesting non-existent node."""
     builder = GraphBuilder()
     n1 = DummyNode(node_id="n1", node_name="Node 1")
     builder.add_node(n1)
     graph = builder.build()
 
-    with pytest.raises(NodeNotFoundException):
+    with pytest.raises(NodeNotFoundError):
         graph.get_node("non_existent")
 
-    with pytest.raises(NodeNotFoundException):
+    with pytest.raises(NodeNotFoundError):
         graph.get_outgoing_edges("non_existent")
 
 
@@ -235,7 +235,7 @@ def test_graph_registry():
     assert registry.list_graphs() == ["main_flow"]
 
     # Prevent duplicate registration without overwrite flag
-    with pytest.raises(RegistryException):
+    with pytest.raises(RegistryError):
         registry.register("main_flow", create_my_graph_builder, overwrite=False)
 
     # Retrieve graph template
@@ -247,7 +247,7 @@ def test_graph_registry():
     registry.unregister("main_flow")
     assert registry.list_graphs() == []
 
-    with pytest.raises(RegistryException):
+    with pytest.raises(RegistryError):
         registry.get("main_flow")
 
 
@@ -270,12 +270,12 @@ def test_contract_dto_models():
 
 def test_exception_hierarchy():
     """Verify typed graph exception inheritance tree."""
-    assert issubclass(BuilderException, GraphException)
-    assert issubclass(DuplicateNodeException, BuilderException)
-    assert issubclass(DuplicateEdgeException, BuilderException)
-    assert issubclass(NodeNotFoundException, GraphException)
-    assert issubclass(GraphValidationException, GraphException)
-    assert issubclass(RegistryException, GraphException)
+    assert issubclass(BuilderError, GraphError)
+    assert issubclass(DuplicateNodeError, BuilderError)
+    assert issubclass(DuplicateEdgeError, BuilderError)
+    assert issubclass(NodeNotFoundError, GraphError)
+    assert issubclass(GraphValidationError, GraphError)
+    assert issubclass(RegistryError, GraphError)
 
 
 def test_import_isolation():

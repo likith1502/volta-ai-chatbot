@@ -14,13 +14,13 @@ from app.graph.contracts import (
 )
 from app.graph.edge import GraphEdge
 from app.graph.exceptions import (
-    BuilderException,
-    DuplicateEdgeException,
-    DuplicateNodeException,
-    GraphException,
-    GraphValidationException,
-    NodeNotFoundException,
-    RegistryException,
+    BuilderError,
+    DuplicateEdgeError,
+    DuplicateNodeError,
+    GraphError,
+    GraphValidationError,
+    NodeNotFoundError,
+    RegistryError,
 )
 from app.graph.graph import Graph
 from app.graph.node import BaseNode
@@ -46,11 +46,11 @@ __all__ = [
     "GraphBuilder",
     "GraphRegistry",
     # Exceptions
-    "GraphException",
-    "BuilderException",
-    "DuplicateNodeException",
-    "DuplicateEdgeException",
-    "NodeNotFoundException",
-    "GraphValidationException",
-    "RegistryException",
+    "GraphError",
+    "BuilderError",
+    "DuplicateNodeError",
+    "DuplicateEdgeError",
+    "NodeNotFoundError",
+    "GraphValidationError",
+    "RegistryError",
 ]

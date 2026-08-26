@@ -1,0 +1,98 @@
+version: "3.9"
+
+name: volta-ai-platform
+
+services:
+
+  # -----------------------------------------------------------------------
+  # VOLTA API Service
+  # -----------------------------------------------------------------------
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: volta-api
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - DATABASE_URL=postgresql+asyncpg://volta:volta_secret@db:5432/volta_dev
+      - REDIS_URL=redis://redis:6379/0
+      - LOG_LEVEL=DEBUG
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+    volumes:
+      - ./backend:/app
+      - ./logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - volta-network
+    restart: unless-stopped
+
+  # -----------------------------------------------------------------------
+  # PostgreSQL Database
+  # -----------------------------------------------------------------------
+  db:
+    image: postgres:15-alpine
+    container_name: volta-db
+    environment:
+      POSTGRES_USER: volta
+      POSTGRES_PASSWORD: volta_secret
+      POSTGRES_DB: volta_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U volta -d volta_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - volta-network
+    restart: unless-stopped
+
+  # -----------------------------------------------------------------------
+  # Redis Cache
+  # -----------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: volta-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - volta-network
+    restart: unless-stopped
+
+  # -----------------------------------------------------------------------
+  # Testing UI Developer Console
+  # -----------------------------------------------------------------------
+  testing-ui:
+    image: nginx:alpine
+    container_name: volta-testing-ui
+    ports:
+      - "3000:80"
+    volumes:
+      - ./testing-ui:/usr/share/nginx/html:ro
+    networks:
+      - volta-network
+    restart: unless-stopped
+
+networks:
+  volta-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:

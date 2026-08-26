@@ -1,7 +1,7 @@
 import uuid
 from typing import Any, Optional
 
-from sqlalchemy import JSON, String, UUID
+from sqlalchemy import JSON, UUID, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -20,7 +20,9 @@ class AuditLog(UUIDMixin, TimestampMixin, Base):
         nullable=True,
     )
     resource_type: Mapped[str] = mapped_column(String(100), index=True, nullable=False)
-    resource_id: Mapped[Optional[str]] = mapped_column(String(255), index=True, nullable=True)
+    resource_id: Mapped[Optional[str]] = mapped_column(
+        String(255), index=True, nullable=True
+    )
     event_metadata: Mapped[Optional[dict[str, Any]]] = mapped_column(
         "event_metadata",
         JSON,

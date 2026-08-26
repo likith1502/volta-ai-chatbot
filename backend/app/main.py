@@ -1,6 +1,9 @@
+import os
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.api.v1.health import get_v1_health
 from app.api.v1.router import api_v1_router
@@ -14,7 +17,9 @@ from app.utils.responses import success_response
 async def lifespan(app: FastAPI):
     # Startup phase
     setup_logging()
-    logger.info(f"Starting {settings.APP_NAME} v{settings.APP_VERSION} ({settings.ENVIRONMENT})")
+    logger.info(
+        f"Starting {settings.APP_NAME} v{settings.APP_VERSION} ({settings.ENVIRONMENT})"
+    )
     yield
     # Shutdown phase
     logger.info(f"Shutting down {settings.APP_NAME}")
@@ -46,6 +51,15 @@ register_exception_handlers(app)
 
 # Include API Routers
 app.include_router(api_v1_router, prefix=settings.API_V1_PREFIX)
+
+# Mount Developer Testing Console UI if testing-ui directory exists
+testing_ui_dir = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "..", "testing-ui")
+)
+if os.path.exists(testing_ui_dir):
+    app.mount(
+        "/console", StaticFiles(directory=testing_ui_dir, html=True), name="console"
+    )
 
 
 # Root Endpoint

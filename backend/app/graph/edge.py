@@ -18,7 +18,11 @@ class GraphEdge(BaseModel, IGraphEdge):
     source_node: str
     target_node: str
     edge_condition: Optional[
-        Union[Callable[[ConversationState], bool], Callable[[ConversationState], Awaitable[bool]], str]
+        Union[
+            Callable[[ConversationState], bool],
+            Callable[[ConversationState], Awaitable[bool]],
+            str,
+        ]
     ] = None
     priority: int = 0
     metadata: dict[str, Any] = Field(default_factory=dict)

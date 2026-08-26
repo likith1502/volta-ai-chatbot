@@ -5,7 +5,7 @@ from typing import Optional
 from app.checkpoints.checkpoint_filter import CheckpointFilter
 from app.checkpoints.checkpoint_manager import CheckpointManager
 from app.checkpoints.checkpoint_status import ReplayAction, ReplayMode
-from app.checkpoints.exceptions import ReplayValidationException
+from app.checkpoints.exceptions import ReplayValidationError
 from app.checkpoints.replay_context import ReplayContext
 from app.checkpoints.replay_history import ReplayHistory
 from app.checkpoints.replay_metrics import ReplayMetrics
@@ -41,7 +41,7 @@ class ReplayEngine:
         start_time = time.perf_counter()
         cps = self.manager.list_checkpoints(CheckpointFilter(workflow_id=workflow_id))
         if not cps:
-            raise ReplayValidationException(
+            raise ReplayValidationError(
                 f"No checkpoints found for workflow_id '{workflow_id}' to replay."
             )
 
@@ -49,7 +49,9 @@ class ReplayEngine:
         context = ReplayContext(replay_mode=mode)
 
         if cps:
-            self.history.record_action(cps[0].checkpoint_id, ReplayAction.START, {"mode": mode.value})
+            self.history.record_action(
+                cps[0].checkpoint_id, ReplayAction.START, {"mode": mode.value}
+            )
 
         result = await active_strategy.execute_replay(cps, context)
 
@@ -74,7 +76,7 @@ class ReplayEngine:
         """Restores ConversationState from the earliest checkpoint matching workflow_id."""
         cps = self.manager.list_checkpoints(CheckpointFilter(workflow_id=workflow_id))
         if not cps:
-            raise ReplayValidationException(
+            raise ReplayValidationError(
                 f"No checkpoints found for workflow_id '{workflow_id}' to restart."
             )
         earliest_cp = min(cps, key=lambda c: c.timestamp)

@@ -5,7 +5,7 @@ from app.checkpoints.checkpoint_manager import CheckpointManager
 from app.context.state import ConversationState
 from app.hitl.approval_manager import ApprovalManager
 from app.hitl.approval_status import ApprovalDecision, ApprovalStatus
-from app.hitl.exceptions import ResumeException
+from app.hitl.exceptions import ResumeError
 
 
 class ResumeManager:
@@ -29,13 +29,18 @@ class ResumeManager:
         from its associated checkpoint.
         """
         req = self.approval_manager.get_request(approval_id)
-        if req.decision != ApprovalDecision.APPROVE and req.status not in (ApprovalStatus.APPROVED, ApprovalStatus.COMPLETED):
-            raise ResumeException(
+        if req.decision != ApprovalDecision.APPROVE and req.status not in (
+            ApprovalStatus.APPROVED,
+            ApprovalStatus.COMPLETED,
+        ):
+            raise ResumeError(
                 f"Cannot resume execution from approval '{approval_id}': status is '{req.status.value}', decision is '{req.decision.value}'."
             )
 
         if not req.checkpoint_id:
-            raise ResumeException(f"Approval request '{approval_id}' has no associated checkpoint_id to resume from.")
+            raise ResumeError(
+                f"Approval request '{approval_id}' has no associated checkpoint_id to resume from."
+            )
 
         return self.checkpoint_manager.restore_checkpoint(req.checkpoint_id)
 
@@ -44,6 +49,8 @@ class ResumeManager:
         cps = self.checkpoint_manager.list_checkpoints()
         wf_cps = [c for c in cps if c.workflow_id == workflow_id]
         if not wf_cps:
-            raise ResumeException(f"No checkpoints found for workflow '{workflow_id}' to restart.")
+            raise ResumeError(
+                f"No checkpoints found for workflow '{workflow_id}' to restart."
+            )
         earliest = min(wf_cps, key=lambda c: c.timestamp)
         return earliest.state_snapshot

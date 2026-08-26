@@ -11,7 +11,7 @@ from app.api.dependencies.services import (
     get_recommendation_service,
     get_user_service,
 )
-from app.exceptions.domain import UserAlreadyExistsException, UserNotFoundException
+from app.exceptions.domain import UserAlreadyExistsError, UserNotFoundError
 from app.main import app
 from app.models.booking import Booking
 from app.models.conversation import Conversation
@@ -78,8 +78,8 @@ def test_users_api_endpoints():
 def test_domain_exception_translation():
     """Verify domain exceptions raised by services map to correct HTTP envelope status codes."""
     mock_user_service = MagicMock()
-    mock_user_service.get_user_by_id = AsyncMock(side_effect=UserNotFoundException("User not found"))
-    mock_user_service.create_user = AsyncMock(side_effect=UserAlreadyExistsException("User exists"))
+    mock_user_service.get_user_by_id = AsyncMock(side_effect=UserNotFoundError("User not found"))
+    mock_user_service.create_user = AsyncMock(side_effect=UserAlreadyExistsError("User exists"))
     app.dependency_overrides[get_user_service] = lambda: mock_user_service
 
     # 404 Not Found

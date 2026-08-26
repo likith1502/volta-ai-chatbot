@@ -14,7 +14,7 @@ from app.ai.prompts.recommendation import is_recommendation_requested
 from app.ai.tools.dispatcher import AIToolDispatcher
 from app.ai.tools.recommendation_tool import RecommendationTool
 from app.ai.tools.registry import AIToolRegistry
-from app.exceptions.domain import UserNotFoundException
+from app.exceptions.domain import UserNotFoundError
 from app.models.enums import ConversationSource, ConversationStatus, MessageRole
 from app.models.message import Message
 from app.repositories.base import BaseRepository
@@ -58,7 +58,7 @@ class ChatService(BaseService):
         """Orchestrates an authenticated user chat turn through the refined enterprise pipeline."""
         user = await self.user_repo.get_by_id(user_id)
         if not user:
-            raise UserNotFoundException(f"User with ID '{user_id}' not found.")
+            raise UserNotFoundError(f"User with ID '{user_id}' not found.")
 
         conv = await self.conversation_repo.get_by_session_id(session_id)
         if not conv:
@@ -74,7 +74,7 @@ class ChatService(BaseService):
 
         # 1. Save User Message
         msg_count = await self.message_repo.count()
-        user_msg = await self.message_repo.create(
+        await self.message_repo.create(
             {
                 "conversation_id": conv.id,
                 "role": MessageRole.USER,
@@ -84,7 +84,9 @@ class ChatService(BaseService):
         )
 
         # 2. Memory Strategy Retrieval
-        memories = await self.memory_strategy.retrieve_memories(self.session, conv.id, limit=10)
+        memories = await self.memory_strategy.retrieve_memories(
+            self.session, conv.id, limit=10
+        )
 
         # 3. Fetch Recent Conversation History
         stmt = (
@@ -114,7 +116,11 @@ class ChatService(BaseService):
             for call in ai_response.tool_calls:
                 call.arguments["conversation_id"] = str(conv.id)
                 tool_res = await self.tool_dispatcher.dispatch(call)
-                if tool_res.success and tool_res.data and "recommendation_id" in tool_res.data:
+                if (
+                    tool_res.success
+                    and tool_res.data
+                    and "recommendation_id" in tool_res.data
+                ):
                     recommendation_id = tool_res.data["recommendation_id"]
         elif is_recommendation_requested(message_text):
             tool_call = AIToolCall(
@@ -122,7 +128,11 @@ class ChatService(BaseService):
                 arguments={"conversation_id": str(conv.id), "user_query": message_text},
             )
             tool_res = await self.tool_dispatcher.dispatch(tool_call)
-            if tool_res.success and tool_res.data and "recommendation_id" in tool_res.data:
+            if (
+                tool_res.success
+                and tool_res.data
+                and "recommendation_id" in tool_res.data
+            ):
                 recommendation_id = tool_res.data["recommendation_id"]
 
         # 7. Save Assistant Response Turn

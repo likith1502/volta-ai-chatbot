@@ -1,0 +1,39 @@
+name: CD — Release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract changelog entry
+        id: changelog
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "${{ github.ref_name }} — VOLTA Enterprise AI Platform"
+          body: |
+            ## VOLTA Enterprise AI Platform Release
+
+            **Version**: ${{ github.ref_name }}
+
+            See [CHANGELOG.md](CHANGELOG.md) for full release notes.
+
+            **Platform Stack**: v7.0–v7.8 (Enterprise Runtime Constitution — FROZEN)
+          draft: false
+          prerelease: false
+          generate_release_notes: true

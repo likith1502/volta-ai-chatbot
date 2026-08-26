@@ -1,7 +1,7 @@
 from typing import Any, Optional
 
 
-class AppException(Exception):
+class AppError(Exception):
     """Base application exception for custom error handling."""
 
     def __init__(

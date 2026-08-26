@@ -3,7 +3,7 @@ from typing import Any, List, Optional
 from app.context.events import WorkflowEvent, WorkflowEventType
 from app.context.state import ConversationState
 from app.execution.dispatcher import ExecutionDispatcher
-from app.execution.exceptions import ExecutionValidationException
+from app.execution.exceptions import ExecutionValidationError
 from app.execution.execution_context import ExecutionContext
 from app.execution.execution_policy import ExecutionPolicy
 from app.execution.execution_result import ExecutionResult
@@ -35,7 +35,9 @@ class GraphExecutor(IGraphExecutor):
         self.planner = planner or ExecutionPlanner()
         self.events: List[WorkflowEvent] = []
 
-    def _emit_event(self, event_type: WorkflowEventType, conversation_id: Any, payload: dict) -> None:
+    def _emit_event(
+        self, event_type: WorkflowEventType, conversation_id: Any, payload: dict
+    ) -> None:
         if self.policy.emit_events:
             evt = WorkflowEvent(
                 event_type=event_type,
@@ -58,17 +60,22 @@ class GraphExecutor(IGraphExecutor):
             validation_res = graph.validate()
             if hasattr(validation_res, "is_valid") and not validation_res.is_valid:
                 errors = getattr(validation_res, "errors", [])
-                raise ExecutionValidationException(
+                raise ExecutionValidationError(
                     f"Graph validation failed prior to execution. Errors: {errors}"
                 )
-        except ExecutionValidationException:
+        except ExecutionValidationError:
             raise
         except Exception as exc:
-            raise ExecutionValidationException(
+            raise ExecutionValidationError(
                 f"Graph validation failed prior to execution: {str(exc)}"
             ) from exc
 
-        conv_id = getattr(getattr(initial_state, "conversation", None), "conversation_id", None) or initial_state.metadata.state_id
+        conv_id = (
+            getattr(
+                getattr(initial_state, "conversation", None), "conversation_id", None
+            )
+            or initial_state.metadata.state_id
+        )
 
         context = ExecutionContext(
             graph_id=graph.metadata.name or "graph",
@@ -79,7 +86,10 @@ class GraphExecutor(IGraphExecutor):
         self._emit_event(
             event_type=WorkflowEventType.WORKFLOW_STARTED,
             conversation_id=conv_id,
-            payload={"graph_id": graph.metadata.name, "execution_id": str(context.execution_id)},
+            payload={
+                "graph_id": graph.metadata.name,
+                "execution_id": str(context.execution_id),
+            },
         )
 
         try:

@@ -11,7 +11,9 @@ class RecommendationTool(AITool):
     """Tool wrapper executing RecommendationService logic for ride & route requests."""
 
     name: str = "recommendation"
-    description: str = "Generates and persists ride/route recommendations for active conversations."
+    description: str = (
+        "Generates and persists ride/route recommendations for active conversations."
+    )
 
     def __init__(self, session: AsyncSession) -> None:
         from app.services.recommendation import RecommendationService
@@ -45,8 +47,16 @@ class RecommendationTool(AITool):
                     "options": arguments.get(
                         "options",
                         [
-                            {"tier": "Standard Sedan", "estimated_price": 24.50, "eta_minutes": 4},
-                            {"tier": "Comfort SUV", "estimated_price": 35.00, "eta_minutes": 6},
+                            {
+                                "tier": "Standard Sedan",
+                                "estimated_price": 24.50,
+                                "eta_minutes": 4,
+                            },
+                            {
+                                "tier": "Comfort SUV",
+                                "estimated_price": 35.00,
+                                "eta_minutes": 6,
+                            },
                         ],
                     ),
                 },

@@ -17,7 +17,11 @@ class StreamMetrics(BaseModel):
         if self.messages_sent == 1:
             self.average_latency = round(latency, 4)
         else:
-            self.average_latency = round((self.average_latency * (self.messages_sent - 1) + latency) / self.messages_sent, 4)
+            self.average_latency = round(
+                (self.average_latency * (self.messages_sent - 1) + latency)
+                / self.messages_sent,
+                4,
+            )
 
     def record_dropped(self) -> None:
         """Records a dropped message due to backpressure or filtering."""

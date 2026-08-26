@@ -1,7 +1,7 @@
 import json
 from abc import ABC, abstractmethod
 
-from app.streaming.exceptions import StreamSerializationException
+from app.streaming.exceptions import StreamSerializationError
 from app.streaming.stream_message import StreamMessage
 
 
@@ -26,7 +26,9 @@ class JSONStreamSerializer(StreamSerializer):
         try:
             return message.model_dump_json().encode("utf-8")
         except Exception as exc:
-            raise StreamSerializationException(f"Failed to serialize StreamMessage to JSON: {exc}")
+            raise StreamSerializationError(
+                f"Failed to serialize StreamMessage to JSON: {exc}"
+            )
 
     def deserialize(self, data: bytes) -> StreamMessage:
         try:
@@ -34,7 +36,9 @@ class JSONStreamSerializer(StreamSerializer):
             raw_dict = json.loads(raw_str)
             return StreamMessage.model_validate(raw_dict)
         except Exception as exc:
-            raise StreamSerializationException(f"Failed to deserialize JSON bytes to StreamMessage: {exc}")
+            raise StreamSerializationError(
+                f"Failed to deserialize JSON bytes to StreamMessage: {exc}"
+            )
 
 
 class MessagePackStreamSerializer(StreamSerializer):
