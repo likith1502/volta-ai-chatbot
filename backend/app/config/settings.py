@@ -1,4 +1,5 @@
 from typing import List, Optional, Union
+
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -59,6 +60,17 @@ class Settings(BaseSettings):
 
     # Memory Strategy Configuration
     MEMORY_STRATEGY: str = "recent"
+
+    # Enterprise Messaging Connectors (Phase 7)
+    WHATSAPP_API_TOKEN: str = ""
+    WHATSAPP_PHONE_NUMBER_ID: str = ""
+    WHATSAPP_VERIFY_TOKEN: str = ""
+    WHATSAPP_APP_SECRET: str = ""
+    WHATSAPP_API_BASE_URL: str = "https://graph.facebook.com/v19.0"
+
+    TELEGRAM_BOT_TOKEN: str = ""
+    TELEGRAM_WEBHOOK_SECRET: str = ""
+    TELEGRAM_API_BASE_URL: str = "https://api.telegram.org"
 
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -18,6 +18,7 @@ class ConversationSource(str, Enum):
     WEB = "web"
     VOICE = "voice"
     WHATSAPP = "whatsapp"
+    TELEGRAM = "telegram"
     API = "api"
 
 

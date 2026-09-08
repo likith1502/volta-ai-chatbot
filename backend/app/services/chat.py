@@ -64,6 +64,7 @@ class ChatService(BaseService):
         user_id: uuid.UUID,
         session_id: str,
         message_text: str,
+        source: Optional[ConversationSource] = None,
     ) -> dict[str, Any]:
         """Orchestrates an authenticated user chat turn through the refined enterprise pipeline."""
         user = await self.user_repo.get_by_id(user_id)
@@ -76,7 +77,7 @@ class ChatService(BaseService):
                 {
                     "user_id": user_id,
                     "session_id": session_id,
-                    "source": ConversationSource.WEB,
+                    "source": source or ConversationSource.WEB,
                     "status": ConversationStatus.ACTIVE,
                     "title": message_text[:30] if message_text else "New Chat",
                 }
