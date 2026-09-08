@@ -3,9 +3,26 @@ import pytest
 from importlib import import_module
 from app.main import app
 
+def get_effective_routes(routes, prefix=""):
+    effective = []
+    for route in routes:
+        if type(route).__name__ == "_IncludedRouter":
+            include_prefix = getattr(route.include_context, "prefix", "") or ""
+            effective.extend(
+                get_effective_routes(
+                    route.original_router.routes,
+                    prefix=prefix + include_prefix,
+                )
+            )
+        else:
+            path = prefix + (getattr(route, "path", "") or "")
+            effective.append(path)
+    return effective
+
+
 def test_fastapi_routes_count():
     """Verify all FastAPI routes remain registered."""
-    routes = [r.path for r in app.routes]
+    routes = get_effective_routes(app.routes)
     assert len(routes) >= 103, f"Expected at least 103 routes, got {len(routes)}"
 
 @pytest.mark.parametrize("mod_path,class_name", [

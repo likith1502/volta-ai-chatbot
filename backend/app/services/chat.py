@@ -1,3 +1,4 @@
+import logging
 import uuid
 from typing import Any, Optional
 
@@ -21,6 +22,9 @@ from app.repositories.base import BaseRepository
 from app.repositories.conversation import ConversationRepository
 from app.repositories.user import UserRepository
 from app.services.base import BaseService
+from app.services.chat_graph import ChatGraphOrchestrator
+
+logger = logging.getLogger("app.services.chat")
 
 
 class ChatService(BaseService):
@@ -49,6 +53,12 @@ class ChatService(BaseService):
             registry.register(RecommendationTool(session))
             self.tool_dispatcher = AIToolDispatcher(registry)
 
+        self.graph_orchestrator = ChatGraphOrchestrator(
+            provider=self.provider,
+            tool_dispatcher=self.tool_dispatcher,
+            prompt_builder=self.prompt_builder,
+        )
+
     async def process_chat(
         self,
         user_id: uuid.UUID,
@@ -74,7 +84,7 @@ class ChatService(BaseService):
 
         # 1. Save User Message
         msg_count = await self.message_repo.count()
-        user_msg = await self.message_repo.create(
+        await self.message_repo.create(
             {
                 "conversation_id": conv.id,
                 "role": MessageRole.USER,
@@ -96,48 +106,74 @@ class ChatService(BaseService):
         res = await self.session.execute(stmt)
         history_messages = list(res.scalars().all())
 
-        # 4. Prompt Builder Construction
-        ai_request = self.prompt_builder.build(
-            user_input=message_text,
-            conversation_history=history_messages,
-            memories=memories,
-        )
-
-        # 5. Invoke Provider-Independent AI Engine
-        ai_response = await self.provider.generate_response(ai_request)
-
-        # 6. Tool Execution Framework Dispatching
+        # 4. Execute Chat Turn via Graph Runtime with Safe Fallback
+        ai_content: str
+        ai_model: str
+        token_count: int
+        usage_data: dict[str, Any]
         recommendation_id: Optional[uuid.UUID] = None
 
-        # Execute explicitly requested tool calls or fallback intent detection
-        if ai_response.tool_calls:
-            for call in ai_response.tool_calls:
-                call.arguments["conversation_id"] = str(conv.id)
-                tool_res = await self.tool_dispatcher.dispatch(call)
+        try:
+            graph_turn = await self.graph_orchestrator.execute_chat_turn(
+                conversation_id=conv.id,
+                user_id=user_id,
+                session_id=session_id,
+                message_text=message_text,
+                history_messages=history_messages,
+                memories=memories,
+            )
+            ai_content = graph_turn["content"]
+            ai_model = graph_turn["model_used"]
+            token_count = graph_turn["total_tokens"]
+            usage_data = graph_turn["usage"]
+            recommendation_id = graph_turn["recommendation_id"]
+        except Exception as graph_err:
+            logger.warning(
+                "Graph runtime execution failed, falling back to direct pipeline: %s",
+                graph_err,
+                exc_info=True,
+            )
+            # Direct Proven Fallback Path
+            ai_request = self.prompt_builder.build(
+                user_input=message_text,
+                conversation_history=history_messages,
+                memories=memories,
+            )
+            ai_response = await self.provider.generate_response(ai_request)
+
+            if ai_response.tool_calls:
+                for call in ai_response.tool_calls:
+                    call.arguments["conversation_id"] = str(conv.id)
+                    tool_res = await self.tool_dispatcher.dispatch(call)
+                    if tool_res.success and tool_res.data and "recommendation_id" in tool_res.data:
+                        recommendation_id = tool_res.data["recommendation_id"]
+            elif is_recommendation_requested(message_text):
+                tool_call = AIToolCall(
+                    tool_name="recommendation",
+                    arguments={"conversation_id": str(conv.id), "user_query": message_text},
+                )
+                tool_res = await self.tool_dispatcher.dispatch(tool_call)
                 if tool_res.success and tool_res.data and "recommendation_id" in tool_res.data:
                     recommendation_id = tool_res.data["recommendation_id"]
-        elif is_recommendation_requested(message_text):
-            tool_call = AIToolCall(
-                tool_name="recommendation",
-                arguments={"conversation_id": str(conv.id), "user_query": message_text},
-            )
-            tool_res = await self.tool_dispatcher.dispatch(tool_call)
-            if tool_res.success and tool_res.data and "recommendation_id" in tool_res.data:
-                recommendation_id = tool_res.data["recommendation_id"]
 
-        # 7. Save Assistant Response Turn
+            ai_content = ai_response.content
+            ai_model = ai_response.model_used
+            token_count = ai_response.usage.total_tokens
+            usage_data = ai_response.usage.model_dump()
+
+        # 5. Save Assistant Response Turn
         assistant_msg = await self.message_repo.create(
             {
                 "conversation_id": conv.id,
                 "role": MessageRole.ASSISTANT,
-                "content": ai_response.content,
-                "model_used": ai_response.model_used,
-                "token_count": ai_response.usage.total_tokens,
+                "content": ai_content,
+                "model_used": ai_model,
+                "token_count": token_count,
                 "sequence_number": msg_count + 2,
             }
         )
 
-        # 8. Commit Transaction Boundary
+        # 6. Commit Transaction Boundary
         await self.commit()
 
         return {
@@ -145,5 +181,5 @@ class ChatService(BaseService):
             "session_id": session_id,
             "message": assistant_msg,
             "recommendation_id": recommendation_id,
-            "usage": ai_response.usage.model_dump(),
+            "usage": usage_data,
         }

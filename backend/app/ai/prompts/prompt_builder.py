@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from typing import Any, Optional, Sequence, Union
 
 from app.ai.models import AIMessage, AIRequest
 from app.ai.prompts.system_prompt import VOLTA_SYSTEM_PROMPT
@@ -16,8 +16,8 @@ class PromptBuilder:
     def build(
         self,
         user_input: str,
-        conversation_history: Sequence[Message] = (),
-        memories: Sequence[Memory] = (),
+        conversation_history: Sequence[Union[Message, dict[str, Any]]] = (),
+        memories: Sequence[Union[Memory, Any]] = (),
     ) -> AIRequest:
         """Merges system prompt, memories, conversation history, and user input turn."""
         messages: list[AIMessage] = []
@@ -28,12 +28,20 @@ class PromptBuilder:
 
         # 2. Enrich current user message with memories if available
         if memories:
-            memory_summary = "\n".join([f"- {m.memory_key}: {m.memory_value}" for m in memories if hasattr(m, "memory_key")])
+            memory_summary = "\n".join(
+                [f"- {m.memory_key}: {m.memory_value}" for m in memories if hasattr(m, "memory_key")]
+            )
             enriched_content = f"[User Context & Preferences]\n{memory_summary}\n\n{user_input}"
             messages.append(AIMessage(role="user", content=enriched_content))
         else:
             # Avoid duplicating user_input if already present in history
-            if not conversation_history or (conversation_history and conversation_history[-1].content != user_input):
+            last_msg = conversation_history[-1] if conversation_history else None
+            last_content = (
+                last_msg.get("content")
+                if isinstance(last_msg, dict)
+                else getattr(last_msg, "content", None)
+            )
+            if not conversation_history or last_content != user_input:
                 messages.append(AIMessage(role="user", content=user_input))
 
         return AIRequest(
