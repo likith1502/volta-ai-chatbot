@@ -78,11 +78,14 @@ class WhatsAppMessagingAdapter(BaseMessagingAdapter):
                     status_code=401,
                 )
 
-            expected_sig = "sha256=" + hmac.new(
-                self.app_secret.encode("utf-8"),
-                raw_body,
-                hashlib.sha256,
-            ).hexdigest()
+            expected_sig = (
+                "sha256="
+                + hmac.new(
+                    self.app_secret.encode("utf-8"),
+                    raw_body,
+                    hashlib.sha256,
+                ).hexdigest()
+            )
 
             if not hmac.compare_digest(sig_header, expected_sig):
                 logger.warning("WhatsApp HMAC-SHA256 signature mismatch.")
@@ -136,22 +139,26 @@ class WhatsAppMessagingAdapter(BaseMessagingAdapter):
                         btn_reply = interactive.get("button_reply", {})
                         list_reply = interactive.get("list_reply", {})
                         content = (
-                            btn_reply.get("title")
-                            or list_reply.get("title")
-                            or ""
+                            btn_reply.get("title") or list_reply.get("title") or ""
                         ).strip()
 
                     if not content:
-                        logger.debug("Skipping non-text or empty WhatsApp message: %s", msg_id)
+                        logger.debug(
+                            "Skipping non-text or empty WhatsApp message: %s", msg_id
+                        )
                         continue
 
                     ts_val = msg.get("timestamp")
                     timestamp: datetime | None = None
                     if ts_val:
                         try:
-                            timestamp = datetime.fromtimestamp(int(ts_val), tz=timezone.utc)
+                            timestamp = datetime.fromtimestamp(
+                                int(ts_val), tz=timezone.utc
+                            )
                             # Replay protection: skip messages older than 24 hours
-                            age_seconds = (datetime.now(timezone.utc) - timestamp).total_seconds()
+                            age_seconds = (
+                                datetime.now(timezone.utc) - timestamp
+                            ).total_seconds()
                             if (
                                 self.max_replay_age is not None
                                 and age_seconds > self.max_replay_age
@@ -175,7 +182,11 @@ class WhatsAppMessagingAdapter(BaseMessagingAdapter):
                             content=content,
                             timestamp=timestamp,
                             raw_payload=msg,
-                            metadata={"phone_number_id": value.get("metadata", {}).get("phone_number_id")},
+                            metadata={
+                                "phone_number_id": value.get("metadata", {}).get(
+                                    "phone_number_id"
+                                )
+                            },
                         )
                     )
 
@@ -208,8 +219,7 @@ class WhatsAppMessagingAdapter(BaseMessagingAdapter):
     ) -> bool:
         """Dispatches outbound message to Meta WhatsApp Cloud API."""
         phone_number_id = (
-            message.metadata.get("phone_number_id")
-            or self.phone_number_id
+            message.metadata.get("phone_number_id") or self.phone_number_id
         )
         url = f"{self.api_base_url.rstrip('/')}/{phone_number_id}/messages"
         headers = {
@@ -233,5 +243,7 @@ class WhatsAppMessagingAdapter(BaseMessagingAdapter):
                 resp = await async_client.post(url, headers=headers, json=payload)
                 return resp.status_code in [200, 201]
         except Exception as exc:
-            logger.error("Failed to send WhatsApp message to %s: %s", message.recipient_id, exc)
+            logger.error(
+                "Failed to send WhatsApp message to %s: %s", message.recipient_id, exc
+            )
             return False

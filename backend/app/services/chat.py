@@ -95,7 +95,9 @@ class ChatService(BaseService):
         )
 
         # 2. Memory Strategy Retrieval
-        memories = await self.memory_strategy.retrieve_memories(self.session, conv.id, limit=10)
+        memories = await self.memory_strategy.retrieve_memories(
+            self.session, conv.id, limit=10
+        )
 
         # 3. Fetch Recent Conversation History
         stmt = (
@@ -146,15 +148,26 @@ class ChatService(BaseService):
                 for call in ai_response.tool_calls:
                     call.arguments["conversation_id"] = str(conv.id)
                     tool_res = await self.tool_dispatcher.dispatch(call)
-                    if tool_res.success and tool_res.data and "recommendation_id" in tool_res.data:
+                    if (
+                        tool_res.success
+                        and tool_res.data
+                        and "recommendation_id" in tool_res.data
+                    ):
                         recommendation_id = tool_res.data["recommendation_id"]
             elif is_recommendation_requested(message_text):
                 tool_call = AIToolCall(
                     tool_name="recommendation",
-                    arguments={"conversation_id": str(conv.id), "user_query": message_text},
+                    arguments={
+                        "conversation_id": str(conv.id),
+                        "user_query": message_text,
+                    },
                 )
                 tool_res = await self.tool_dispatcher.dispatch(tool_call)
-                if tool_res.success and tool_res.data and "recommendation_id" in tool_res.data:
+                if (
+                    tool_res.success
+                    and tool_res.data
+                    and "recommendation_id" in tool_res.data
+                ):
                     recommendation_id = tool_res.data["recommendation_id"]
 
             ai_content = ai_response.content

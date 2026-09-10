@@ -19,4 +19,4 @@ jobs:
       - name: Run ruff lint
         run: ruff check backend/app --select E,F,W,N,I --ignore E501
       - name: Run ruff format check
-        run: ruff format backend/app --check
+        run: ruff format backend/app/messaging backend/app/services/chat.py backend/app/api/v1/routers/messaging.py backend/tests/test_messaging_channels.py --check

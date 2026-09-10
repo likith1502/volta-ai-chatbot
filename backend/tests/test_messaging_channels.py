@@ -86,7 +86,9 @@ def test_whatsapp_signature_verification_success():
     """Verify valid Meta HMAC-SHA256 signature is accepted."""
     app_secret = "meta_app_secret_xyz"
     raw_body = b'{"object": "whatsapp_business_account"}'
-    sig = "sha256=" + hmac.new(app_secret.encode(), raw_body, hashlib.sha256).hexdigest()
+    sig = (
+        "sha256=" + hmac.new(app_secret.encode(), raw_body, hashlib.sha256).hexdigest()
+    )
 
     adapter = WhatsAppMessagingAdapter(app_secret=app_secret)
     result = adapter.verify_webhook(
@@ -137,14 +139,19 @@ def test_whatsapp_inbound_normalization():
                             "messaging_product": "whatsapp",
                             "metadata": {"phone_number_id": "999888"},
                             "contacts": [
-                                {"profile": {"name": "Alice Green"}, "wa_id": "14155552671"}
+                                {
+                                    "profile": {"name": "Alice Green"},
+                                    "wa_id": "14155552671",
+                                }
                             ],
                             "messages": [
                                 {
                                     "from": "14155552671",
                                     "id": "wamid.HBgLMDExMQ==",
                                     "timestamp": "1672531199",
-                                    "text": {"body": "Find EV charging stations near me"},
+                                    "text": {
+                                        "body": "Find EV charging stations near me"
+                                    },
                                     "type": "text",
                                 }
                             ],
@@ -216,7 +223,10 @@ def test_whatsapp_interactive_button_reply():
                                     "type": "interactive",
                                     "interactive": {
                                         "type": "button_reply",
-                                        "button_reply": {"id": "btn_confirm", "title": "Confirm Booking"},
+                                        "button_reply": {
+                                            "id": "btn_confirm",
+                                            "title": "Confirm Booking",
+                                        },
                                     },
                                 }
                             ],
@@ -578,7 +588,10 @@ async def test_idempotency_state_transitions():
     # NEW -> PROCESSING
     acquired = await store.try_acquire(ChannelType.WHATSAPP, msg_id)
     assert acquired is True
-    assert await store.get_state(ChannelType.WHATSAPP, msg_id) == IdempotencyState.PROCESSING
+    assert (
+        await store.get_state(ChannelType.WHATSAPP, msg_id)
+        == IdempotencyState.PROCESSING
+    )
 
     # Duplicate acquisition while PROCESSING must be rejected
     dup_acquired = await store.try_acquire(ChannelType.WHATSAPP, msg_id)
@@ -586,7 +599,10 @@ async def test_idempotency_state_transitions():
 
     # PROCESSING -> COMPLETED
     await store.mark_completed(ChannelType.WHATSAPP, msg_id)
-    assert await store.get_state(ChannelType.WHATSAPP, msg_id) == IdempotencyState.COMPLETED
+    assert (
+        await store.get_state(ChannelType.WHATSAPP, msg_id)
+        == IdempotencyState.COMPLETED
+    )
 
     # Acquisition after COMPLETED must also be rejected
     completed_acquired = await store.try_acquire(ChannelType.WHATSAPP, msg_id)
@@ -634,7 +650,9 @@ def test_whatsapp_stale_replay_skipped():
                 "changes": [
                     {
                         "value": {
-                            "contacts": [{"profile": {"name": "Old User"}, "wa_id": "111"}],
+                            "contacts": [
+                                {"profile": {"name": "Old User"}, "wa_id": "111"}
+                            ],
                             "messages": [
                                 {
                                     "from": "111",
@@ -679,7 +697,9 @@ async def test_telegram_markdown_error_fallback():
     mock_client = AsyncMock()
 
     # First call returns 400 with Markdown parse error; second call succeeds with 200
-    mock_resp_fail = MagicMock(status_code=400, text="Bad Request: can't parse entities")
+    mock_resp_fail = MagicMock(
+        status_code=400, text="Bad Request: can't parse entities"
+    )
     mock_resp_success = MagicMock(status_code=200, text="ok")
     mock_client.post = AsyncMock(side_effect=[mock_resp_fail, mock_resp_success])
 
@@ -693,4 +713,3 @@ async def test_telegram_markdown_error_fallback():
     # Verify second call stripped parse_mode
     second_call_payload = mock_client.post.call_args_list[1].kwargs["json"]
     assert "parse_mode" not in second_call_payload
-

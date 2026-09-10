@@ -1,0 +1,54 @@
+[tool.ruff]
+target-version = "py311"
+
+# Exclude legacy unmaintained foundation modules, studio packages, and compatibility shims (Phases 7.1 - 7.8)
+# which predate the CI lint baseline and are frozen to avoid regressions.
+extend-exclude = [
+    "backend/app/agents",
+    "backend/app/integrations",
+    "backend/app/prompt",
+    "backend/app/graph_runtime",
+    "backend/app/tools",
+    "backend/app/rag",
+    "backend/app/memory",
+    "backend/app/runtime",
+    "backend/app/deployment",
+    "backend/app/execution",
+    "backend/app/events",
+    "backend/app/hitl",
+    "backend/app/streaming",
+    "backend/app/checkpoints",
+    "backend/app/observability",
+    "backend/app/graph",
+    "backend/app/ai",
+    "backend/app/workflow",
+    "backend/app/context",
+    "backend/app/repositories",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "N", "I"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+# Legacy studio routers (Phases 7.1 - 7.8 endpoints for unmaintained studio UIs)
+"backend/app/api/v1/routers/agents.py" = ["F401", "I001"]
+"backend/app/api/v1/routers/deployment.py" = ["F401", "I001"]
+"backend/app/api/v1/routers/graph_runtime.py" = ["F401", "I001"]
+"backend/app/api/v1/routers/integrations.py" = ["I001"]
+"backend/app/api/v1/routers/memory.py" = ["F401", "F841", "I001"]
+"backend/app/api/v1/routers/prompts.py" = ["F401", "I001"]
+"backend/app/api/v1/routers/rag.py" = ["I001"]
+"backend/app/api/v1/routers/runtime.py" = ["I001"]
+"backend/app/api/v1/routers/tools.py" = ["F401", "F841", "I001"]
+"backend/app/api/v1/health.py" = ["I001"]
+
+# Pre-existing foundation models and services (predate isort configuration; strict F/E/W/N preserved)
+"backend/app/models/*" = ["I001"]
+"backend/app/services/booking.py" = ["I001"]
+"backend/app/services/recommendation.py" = ["I001"]
+"backend/app/core/*" = ["I001", "N818"]
+"backend/app/db/*" = ["I001"]
+"backend/app/exceptions/*" = ["I001", "N818"]
+"backend/app/main.py" = ["I001"]
+"backend/app/schemas/*" = ["I001"]

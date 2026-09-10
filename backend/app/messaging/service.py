@@ -147,7 +147,9 @@ class MessagingBridgeService:
                 sessionmaker = get_sessionmaker()
                 async with sessionmaker() as db_session:
                     try:
-                        result = await self._execute_chat_turn(message, db_session, chat_service)
+                        result = await self._execute_chat_turn(
+                            message, db_session, chat_service
+                        )
                         await db_session.commit()
                     except Exception as exc:
                         await db_session.rollback()

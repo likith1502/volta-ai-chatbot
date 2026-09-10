@@ -44,7 +44,7 @@ jobs:
             -q
         env:
           ENVIRONMENT: testing
-          DATABASE_URL: "sqlite+aiosqlite:///:memory:"
+          DATABASE_URL: "postgresql+asyncpg://postgres:postgres@localhost:5432/volta_db"
           REDIS_URL: ""
           GEMINI_API_KEY: ""
 
