@@ -48,7 +48,9 @@ class ChatGraphOrchestrator:
         self.tool_dispatcher = tool_dispatcher
         self.prompt_builder = prompt_builder or PromptBuilder()
         self.event_bus = event_bus or WorkflowEventBus()
-        self.checkpoint_manager = checkpoint_manager or CheckpointManager(store=InMemoryCheckpointStore())
+        self.checkpoint_manager = checkpoint_manager or CheckpointManager(
+            store=InMemoryCheckpointStore()
+        )
         self.executor = GraphExecutor(policy=ExecutionPolicy(emit_events=True))
 
     def build_graph(self) -> Graph:
@@ -86,15 +88,21 @@ class ChatGraphOrchestrator:
 
         # 2. Add Directed Edges with Conditional Branching
         # Start -> Intent -> Decision
-        builder.add_edge(GraphEdge(source_node="start", target_node="intent", priority=0))
-        builder.add_edge(GraphEdge(source_node="intent", target_node="decision", priority=0))
+        builder.add_edge(
+            GraphEdge(source_node="start", target_node="intent", priority=0)
+        )
+        builder.add_edge(
+            GraphEdge(source_node="intent", target_node="decision", priority=0)
+        )
 
         # Decision -> Direct Tool (if pre-staged tool calls exist)
         builder.add_edge(
             GraphEdge(
                 source_node="decision",
                 target_node="tool",
-                edge_condition=lambda s: s.execution.node_results.get("decision", {}).get("route") == "tool",
+                edge_condition=lambda s: (
+                    s.execution.node_results.get("decision", {}).get("route") == "tool"
+                ),
                 priority=20,
             )
         )
@@ -104,7 +112,9 @@ class ChatGraphOrchestrator:
             GraphEdge(
                 source_node="decision",
                 target_node="llm",
-                edge_condition=lambda s: s.execution.node_results.get("decision", {}).get("route") != "tool",
+                edge_condition=lambda s: (
+                    s.execution.node_results.get("decision", {}).get("route") != "tool"
+                ),
                 priority=10,
             )
         )
@@ -114,8 +124,13 @@ class ChatGraphOrchestrator:
             GraphEdge(
                 source_node="llm",
                 target_node="tool",
-                edge_condition=lambda s: bool(s.execution.tool_calls)
-                or (s.memory.detected_intent and s.memory.detected_intent.get("requires_recommendation")),
+                edge_condition=lambda s: (
+                    bool(s.execution.tool_calls)
+                    or (
+                        s.memory.detected_intent
+                        and s.memory.detected_intent.get("requires_recommendation")
+                    )
+                ),
                 priority=10,
             )
         )
@@ -130,14 +145,22 @@ class ChatGraphOrchestrator:
         )
 
         # Tool -> Memory
-        builder.add_edge(GraphEdge(source_node="tool", target_node="memory", priority=10))
+        builder.add_edge(
+            GraphEdge(source_node="tool", target_node="memory", priority=10)
+        )
 
         # Memory -> Response -> End
-        builder.add_edge(GraphEdge(source_node="memory", target_node="response", priority=10))
-        builder.add_edge(GraphEdge(source_node="response", target_node="end", priority=10))
+        builder.add_edge(
+            GraphEdge(source_node="memory", target_node="response", priority=10)
+        )
+        builder.add_edge(
+            GraphEdge(source_node="response", target_node="end", priority=10)
+        )
 
         builder.set_entry_node("start")
-        builder.set_metadata(GraphMetadata(name="chat_orchestration_graph", version="1.0.0"))
+        builder.set_metadata(
+            GraphMetadata(name="chat_orchestration_graph", version="1.0.0")
+        )
 
         return builder.build()
 
@@ -149,6 +172,7 @@ class ChatGraphOrchestrator:
         message_text: str,
         history_messages: Sequence[Any] = (),
         memories: Sequence[Any] = (),
+        saved_locations: Sequence[Any] = (),
     ) -> dict[str, Any]:
         """Executes a complete chat turn through the Graph Runtime."""
         # 1. Prepare Initial ConversationState
@@ -167,7 +191,10 @@ class ChatGraphOrchestrator:
             history=history_payload,
         )
         state = ConversationState(conversation=conv_data).with_update(
-            short_term_memory={"memories": list(memories)},
+            short_term_memory={
+                "memories": list(memories),
+                "saved_locations": list(saved_locations),
+            },
         )
 
         # 2. Publish Workflow Started Event
@@ -197,7 +224,9 @@ class ChatGraphOrchestrator:
                 state=final_state,
                 execution_snapshot=snapshot,
             )
-            final_state = final_state.with_update(checkpoint_id=checkpoint.checkpoint_id)
+            final_state = final_state.with_update(
+                checkpoint_id=checkpoint.checkpoint_id
+            )
         except Exception as cp_exc:
             logger.debug("Checkpoint creation non-blocking error: %s", cp_exc)
 

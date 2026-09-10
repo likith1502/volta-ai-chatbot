@@ -8,7 +8,6 @@ from app.ai.base import AIProvider
 from app.ai.models import AIRequest, AIResponse, AITokenUsage
 from app.api.v1.routers.messaging import get_messaging_bridge_service
 from app.main import app
-from app.messaging.adapters.telegram import TelegramMessagingAdapter
 from app.messaging.adapters.whatsapp import WhatsAppMessagingAdapter
 from app.messaging.idempotency import IdempotencyState, IdempotencyStore
 from app.messaging.identity import ChannelIdentityResolver
@@ -243,70 +242,7 @@ def test_whatsapp_interactive_button_reply():
 
 
 # ============================================================================
-# 4. Telegram Webhook Secret & Payload Normalization
-# ============================================================================
-
-
-def test_telegram_webhook_secret_success():
-    """Verify Telegram webhook secret token header matches configured secret."""
-    adapter = TelegramMessagingAdapter(webhook_secret="tg_secret_token_abc")
-    result = adapter.verify_webhook(
-        headers={"x-telegram-bot-api-secret-token": "tg_secret_token_abc"},
-        raw_body=b"{}",
-        query_params={},
-    )
-    assert result.is_valid
-    assert result.status_code == 200
-
-
-def test_telegram_webhook_secret_failure():
-    """Verify invalid Telegram webhook secret token returns HTTP 403."""
-    adapter = TelegramMessagingAdapter(webhook_secret="tg_secret_token_abc")
-    result = adapter.verify_webhook(
-        headers={"x-telegram-bot-api-secret-token": "wrong_secret"},
-        raw_body=b"{}",
-        query_params={},
-    )
-    assert not result.is_valid
-    assert result.status_code == 403
-
-
-def test_telegram_inbound_normalization():
-    """Verify Telegram message update is normalized into canonical InboundMessage."""
-    payload = {
-        "update_id": 987654321,
-        "message": {
-            "message_id": 4201,
-            "from": {
-                "id": 554433221,
-                "first_name": "Carol",
-                "last_name": "Danvers",
-                "username": "captain_carol",
-            },
-            "chat": {
-                "id": 554433221,
-                "first_name": "Carol",
-                "type": "private",
-            },
-            "date": 1672531199,
-            "text": "Book an electric cab to the airport",
-        },
-    }
-
-    adapter = TelegramMessagingAdapter()
-    messages = adapter.parse_inbound(payload)
-
-    assert len(messages) == 1
-    msg = messages[0]
-    assert msg.channel == ChannelType.TELEGRAM
-    assert msg.external_message_id == "4201"
-    assert msg.external_user_id == "554433221"
-    assert msg.sender_name == "Carol Danvers"
-    assert msg.content == "Book an electric cab to the airport"
-
-
-# ============================================================================
-# 5. Immediate Webhook Acknowledgement (Decoupled Flow) Tests
+# 4. Immediate Webhook Acknowledgement (Decoupled Flow) Tests
 # ============================================================================
 
 
@@ -330,28 +266,8 @@ def test_whatsapp_immediate_acknowledgement_endpoint(client):
         app.dependency_overrides.pop(get_messaging_bridge_service, None)
 
 
-def test_telegram_immediate_acknowledgement_endpoint(client):
-    """Verify Telegram POST webhook returns immediate HTTP 200 OK without blocking."""
-    mock_service = MagicMock()
-    mock_service.handle_inbound_webhook = AsyncMock(
-        return_value={"ok": True, "result": "accepted", "count": 1}
-    )
-    app.dependency_overrides[get_messaging_bridge_service] = lambda: mock_service
-
-    try:
-        response = client.post(
-            "/api/v1/messaging/telegram/webhook",
-            json={"update_id": 12345},
-        )
-        assert response.status_code == 200
-        assert response.json()["ok"] is True
-        assert mock_service.handle_inbound_webhook.called
-    finally:
-        app.dependency_overrides.pop(get_messaging_bridge_service, None)
-
-
 # ============================================================================
-# 6. Channel Identity Resolution & Session Continuity Tests
+# 5. Channel Identity Resolution & Session Continuity Tests
 # ============================================================================
 
 
@@ -397,35 +313,8 @@ async def test_channel_identity_resolution_whatsapp():
     assert session_id == "whatsapp_14155552671"
 
 
-@pytest.mark.asyncio
-async def test_channel_identity_resolution_telegram():
-    """Verify Telegram identity creates user with internal email and generates session."""
-    session = AsyncMock()
-    resolver = ChannelIdentityResolver(session)
-
-    created_user = User(
-        id=uuid.uuid4(),
-        full_name="Carol Danvers",
-        email="tg_554433221@volta.internal",
-        phone_number=None,
-    )
-    resolver.user_repo.get_by_email = AsyncMock(return_value=None)
-    resolver.user_repo.create = AsyncMock(return_value=created_user)
-
-    user = await resolver.resolve_or_create_user(
-        ChannelType.TELEGRAM,
-        "554433221",
-        "Carol Danvers",
-    )
-    assert user.id == created_user.id
-    assert user.email == "tg_554433221@volta.internal"
-
-    session_id = resolver.get_session_id(ChannelType.TELEGRAM, "554433221")
-    assert session_id == "telegram_554433221"
-
-
 # ============================================================================
-# 7. Idempotency Deduplication Tests
+# 6. Idempotency Deduplication Tests
 # ============================================================================
 
 
@@ -444,8 +333,7 @@ async def test_idempotency_store():
     # Subsequent check: is duplicate
     assert await store.is_duplicate(ChannelType.WHATSAPP, msg_id)
 
-    # Different channel or message ID: not duplicate
-    assert not await store.is_duplicate(ChannelType.TELEGRAM, msg_id)
+    # Different message ID: not duplicate
     assert not await store.is_duplicate(ChannelType.WHATSAPP, "wamid.OTHER_02")
 
 
@@ -557,22 +445,8 @@ def test_whatsapp_outbound_formatting():
     assert outbound.reply_to_message_id == "wamid.12345"
 
 
-def test_telegram_outbound_formatting():
-    """Verify Telegram outbound message formatting."""
-    adapter = TelegramMessagingAdapter()
-    outbound = adapter.format_outbound(
-        content="*Volta AI:* Ride scheduled.",
-        recipient_id="554433221",
-        reply_to_message_id="4201",
-    )
-    assert outbound.channel == ChannelType.TELEGRAM
-    assert outbound.recipient_id == "554433221"
-    assert outbound.content == "*Volta AI:* Ride scheduled."
-    assert outbound.reply_to_message_id == "4201"
-
-
 # ============================================================================
-# 10. Hardening Review & Resilience Tests
+# 8. Hardening Review & Resilience Tests
 # ============================================================================
 
 
@@ -679,37 +553,3 @@ def test_whatsapp_outbound_truncation():
     outbound = adapter.format_outbound(content=long_content, recipient_id="111")
     assert len(outbound.content) <= 4096
     assert outbound.content.endswith("...")
-
-
-def test_telegram_outbound_truncation():
-    """Verify Telegram messages exceeding 4096 characters are clamped safely."""
-    adapter = TelegramMessagingAdapter()
-    long_content = "Y" * 5000
-    outbound = adapter.format_outbound(content=long_content, recipient_id="222")
-    assert len(outbound.content) <= 4096
-    assert outbound.content.endswith("...")
-
-
-@pytest.mark.asyncio
-async def test_telegram_markdown_error_fallback():
-    """Verify Telegram markdown parse error falls back safely to plain text."""
-    adapter = TelegramMessagingAdapter(bot_token="test_token")
-    mock_client = AsyncMock()
-
-    # First call returns 400 with Markdown parse error; second call succeeds with 200
-    mock_resp_fail = MagicMock(
-        status_code=400, text="Bad Request: can't parse entities"
-    )
-    mock_resp_success = MagicMock(status_code=200, text="ok")
-    mock_client.post = AsyncMock(side_effect=[mock_resp_fail, mock_resp_success])
-
-    outbound = adapter.format_outbound(
-        content="*Hello _broken markdown",
-        recipient_id="222",
-    )
-    result = await adapter.send_outbound(outbound, client=mock_client)
-    assert result is True
-    assert mock_client.post.call_count == 2
-    # Verify second call stripped parse_mode
-    second_call_payload = mock_client.post.call_args_list[1].kwargs["json"]
-    assert "parse_mode" not in second_call_payload

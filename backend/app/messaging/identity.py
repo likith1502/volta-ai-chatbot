@@ -49,25 +49,6 @@ class ChannelIdentityResolver:
             )
             return user
 
-        elif channel == ChannelType.TELEGRAM:
-            # 1. Try finding by deterministic internal channel email
-            email = f"tg_{cleaned_id}@volta.internal"
-            user = await self.user_repo.get_by_email(email)
-            if user:
-                return user
-
-            # 2. Create new user entity for Telegram customer
-            logger.info("Creating new Volta user for Telegram identity: %s", cleaned_id)
-            user = await self.user_repo.create(
-                {
-                    "full_name": sender_name or f"Telegram User {cleaned_id}",
-                    "email": email,
-                    "phone_number": None,
-                    "is_active": True,
-                }
-            )
-            return user
-
         else:
             raise ValueError(f"Unsupported messaging channel: {channel}")
 

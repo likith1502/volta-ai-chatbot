@@ -6,7 +6,6 @@ from fastapi import BackgroundTasks, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_sessionmaker
-from app.messaging.adapters.telegram import TelegramMessagingAdapter
 from app.messaging.adapters.whatsapp import WhatsAppMessagingAdapter
 from app.messaging.base import BaseMessagingAdapter
 from app.messaging.idempotency import IdempotencyStore, get_idempotency_store
@@ -29,7 +28,6 @@ class MessagingBridgeService:
     ) -> None:
         self.adapters: dict[ChannelType, BaseMessagingAdapter] = adapters or {
             ChannelType.WHATSAPP: WhatsAppMessagingAdapter(),
-            ChannelType.TELEGRAM: TelegramMessagingAdapter(),
         }
         self.idempotency_store = idempotency_store or get_idempotency_store()
         self.http_client = http_client
@@ -115,8 +113,6 @@ class MessagingBridgeService:
                 asyncio.create_task(self.process_inbound_message(msg))
 
         # 4. Immediate provider-required acknowledgement
-        if channel == ChannelType.TELEGRAM:
-            return {"ok": True, "result": "accepted", "count": len(messages)}
         return {"status": "accepted", "channel": channel.value, "count": len(messages)}
 
     async def process_inbound_message(
@@ -198,7 +194,7 @@ class MessagingBridgeService:
         source = (
             ConversationSource.WHATSAPP
             if message.channel == ChannelType.WHATSAPP
-            else ConversationSource.TELEGRAM
+            else ConversationSource.WEB
         )
 
         # C. Execute ChatService -> Graph Runtime

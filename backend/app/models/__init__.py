@@ -16,10 +16,12 @@ from app.models.memory import Memory
 from app.models.message import Message
 from app.models.notification import Notification
 from app.models.recommendation import Recommendation
+from app.models.saved_location import SavedLocation
 from app.models.user import User
 
 __all__ = [
     "User",
+    "SavedLocation",
     "Conversation",
     "Message",
     "Memory",

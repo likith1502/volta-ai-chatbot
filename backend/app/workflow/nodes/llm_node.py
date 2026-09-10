@@ -36,11 +36,13 @@ class LLMNode(BaseWorkflowNode):
         user_text = state.conversation.current_message.get("content", "")
         history = state.conversation.history or []
         memories = state.memory.short_term_memory.get("memories", [])
+        saved_locations = state.memory.short_term_memory.get("saved_locations", [])
 
         ai_request = prompt_builder.build(
             user_input=user_text,
             conversation_history=history,
             memories=memories,
+            saved_locations=saved_locations,
         )
 
         ai_response = await provider.generate_response(ai_request)

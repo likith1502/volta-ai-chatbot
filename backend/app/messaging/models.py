@@ -9,7 +9,6 @@ class ChannelType(str, Enum):
     """Supported external enterprise messaging channels."""
 
     WHATSAPP = "whatsapp"
-    TELEGRAM = "telegram"
 
 
 class InboundMessage(BaseModel):

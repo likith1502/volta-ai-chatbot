@@ -63,3 +63,17 @@ class NotificationNotFoundException(AppException):
 
     def __init__(self, message: str = "Notification not found", details: Optional[Any] = None) -> None:
         super().__init__(message=message, status_code=404, details=details)
+
+
+class SavedLocationNotFoundException(AppException):
+    """Raised when a requested saved location cannot be found."""
+
+    def __init__(self, message: str = "Saved location not found", details: Optional[Any] = None) -> None:
+        super().__init__(message=message, status_code=404, details=details)
+
+
+class SavedLocationAlreadyExistsException(AppException):
+    """Raised when attempting to create an active saved location with a duplicate label for the same user."""
+
+    def __init__(self, message: str = "Saved location with this label already exists for this user", details: Optional[Any] = None) -> None:
+        super().__init__(message=message, status_code=409, details=details)

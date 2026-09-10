@@ -68,10 +68,6 @@ class Settings(BaseSettings):
     WHATSAPP_APP_SECRET: str = ""
     WHATSAPP_API_BASE_URL: str = "https://graph.facebook.com/v19.0"
 
-    TELEGRAM_BOT_TOKEN: str = ""
-    TELEGRAM_WEBHOOK_SECRET: str = ""
-    TELEGRAM_API_BASE_URL: str = "https://api.telegram.org"
-
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

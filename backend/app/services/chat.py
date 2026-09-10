@@ -23,6 +23,7 @@ from app.repositories.conversation import ConversationRepository
 from app.repositories.user import UserRepository
 from app.services.base import BaseService
 from app.services.chat_graph import ChatGraphOrchestrator
+from app.services.saved_location import LocationResolver, SavedLocationService
 
 logger = logging.getLogger("app.services.chat")
 
@@ -41,6 +42,8 @@ class ChatService(BaseService):
         self.conversation_repo = ConversationRepository(session)
         self.user_repo = UserRepository(session)
         self.message_repo = BaseRepository(Message, session)
+        self.saved_location_service = SavedLocationService(session)
+        self.location_resolver = LocationResolver(self.saved_location_service)
         self.provider = provider or AIProviderFactory.get_provider()
         self.memory_strategy = memory_strategy or MemoryStrategyFactory.get_strategy()
         self.prompt_builder = PromptBuilder()
@@ -99,7 +102,12 @@ class ChatService(BaseService):
             self.session, conv.id, limit=10
         )
 
-        # 3. Fetch Recent Conversation History
+        # 3. Retrieve User Saved Locations for Deterministic Resolution & Turn Context
+        saved_locations = await self.saved_location_service.list_saved_locations(
+            user_id
+        )
+
+        # 4. Fetch Recent Conversation History
         stmt = (
             select(Message)
             .where(Message.conversation_id == conv.id, Message.is_deleted == False)  # noqa: E712
@@ -109,7 +117,7 @@ class ChatService(BaseService):
         res = await self.session.execute(stmt)
         history_messages = list(res.scalars().all())
 
-        # 4. Execute Chat Turn via Graph Runtime with Safe Fallback
+        # 5. Execute Chat Turn via Graph Runtime with Safe Fallback
         ai_content: str
         ai_model: str
         token_count: int
@@ -124,6 +132,7 @@ class ChatService(BaseService):
                 message_text=message_text,
                 history_messages=history_messages,
                 memories=memories,
+                saved_locations=saved_locations,
             )
             ai_content = graph_turn["content"]
             ai_model = graph_turn["model_used"]
@@ -141,6 +150,7 @@ class ChatService(BaseService):
                 user_input=message_text,
                 conversation_history=history_messages,
                 memories=memories,
+                saved_locations=saved_locations,
             )
             ai_response = await self.provider.generate_response(ai_request)
 
@@ -197,3 +207,11 @@ class ChatService(BaseService):
             "recommendation_id": recommendation_id,
             "usage": usage_data,
         }
+
+    async def resolve_user_location(
+        self,
+        user_id: uuid.UUID,
+        label_query: str,
+    ):
+        """Resolves user landmark location deterministically for ride workflows."""
+        return await self.location_resolver.resolve(user_id, label_query)

@@ -15,6 +15,7 @@ from app.api.v1.routers.prompts import router as prompts_router
 from app.api.v1.routers.rag import router as rag_router
 from app.api.v1.routers.recommendations import router as recommendations_router
 from app.api.v1.routers.runtime import router as runtime_router
+from app.api.v1.routers.saved_locations import router as saved_locations_router
 from app.api.v1.routers.tools import router as tools_router
 from app.api.v1.routers.users import router as users_router
 
@@ -23,6 +24,7 @@ api_v1_router = APIRouter()
 # Register V1 Sub-Routers
 api_v1_router.include_router(health_router, prefix="/health", tags=["Health"])
 api_v1_router.include_router(users_router)
+api_v1_router.include_router(saved_locations_router)
 api_v1_router.include_router(conversations_router)
 api_v1_router.include_router(recommendations_router)
 api_v1_router.include_router(bookings_router)

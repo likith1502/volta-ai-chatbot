@@ -1,4 +1,3 @@
-from app.messaging.adapters.telegram import TelegramMessagingAdapter
 from app.messaging.adapters.whatsapp import WhatsAppMessagingAdapter
 from app.messaging.base import BaseMessagingAdapter
 from app.messaging.idempotency import (
@@ -24,7 +23,6 @@ __all__ = [
     "WebhookVerificationResult",
     "BaseMessagingAdapter",
     "WhatsAppMessagingAdapter",
-    "TelegramMessagingAdapter",
     "ChannelIdentityResolver",
     "IdempotencyState",
     "IdempotencyStore",

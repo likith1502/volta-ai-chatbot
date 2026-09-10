@@ -7,12 +7,20 @@ from app.services.chat import ChatService
 from app.services.conversation import ConversationService
 from app.services.notification import NotificationService
 from app.services.recommendation import RecommendationService
+from app.services.saved_location import SavedLocationService
 from app.services.user import UserService
 
 
 def get_user_service(session: AsyncSession = Depends(get_db_session)) -> UserService:
     """Dependency provider yielding a UserService instance."""
     return UserService(session)
+
+
+def get_saved_location_service(
+    session: AsyncSession = Depends(get_db_session),
+) -> SavedLocationService:
+    """Dependency provider yielding a SavedLocationService instance."""
+    return SavedLocationService(session)
 
 
 def get_conversation_service(session: AsyncSession = Depends(get_db_session)) -> ConversationService:

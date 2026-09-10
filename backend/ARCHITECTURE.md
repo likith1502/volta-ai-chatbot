@@ -568,7 +568,7 @@ Validate all input boundaries strictly, apply principle of least privilege, and 
 
 ## 13. Future Roadmap
 
-- **Phase 7 — Enterprise Messaging Runtime**: Complete text-based multi-channel integration (Web, WhatsApp, Telegram), LLM runtime, prompt engine, memory runtime, and multi-agent coordination.
+- **Phase 7 — Enterprise Messaging Runtime**: Complete text-based multi-channel integration (Web, WhatsApp), LLM runtime, prompt engine, memory runtime, and multi-agent coordination.
 - **Phase 8 — Voice Platform**: Speech-to-Text (STT), Text-to-Speech (TTS), low-latency bidirectional WebSockets, telephony (SIP), and multimodal voice interactions.
 - **Shared AI Brain**: Cross-channel context synchronization across messaging and voice platforms.
 - **Corporate Features**: Enterprise accounts, split billing, team travel management.

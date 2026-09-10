@@ -4,11 +4,14 @@ from app.services.chat import ChatService
 from app.services.conversation import ConversationService
 from app.services.notification import NotificationService
 from app.services.recommendation import RecommendationService
+from app.services.saved_location import LocationResolver, SavedLocationService
 from app.services.user import UserService
 
 __all__ = [
     "BaseService",
     "UserService",
+    "SavedLocationService",
+    "LocationResolver",
     "ConversationService",
     "RecommendationService",
     "BookingService",
