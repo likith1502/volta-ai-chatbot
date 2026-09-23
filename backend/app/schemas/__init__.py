@@ -1,4 +1,10 @@
 from app.schemas.booking import BookingCreate, BookingResponse
+from app.schemas.cab import (
+    CabAvailabilityQuote,
+    CabAvailabilityRequest,
+    CabOption,
+    LocationPoint,
+)
 from app.schemas.chat import ChatMessage, ChatRequest, ChatResponse, ChatUsage
 from app.schemas.common import ResponseEnvelope
 from app.schemas.conversation import ConversationCreate, ConversationResponse
@@ -33,4 +39,8 @@ __all__ = [
     "ChatResponse",
     "ChatMessage",
     "ChatUsage",
+    "LocationPoint",
+    "CabOption",
+    "CabAvailabilityRequest",
+    "CabAvailabilityQuote",
 ]

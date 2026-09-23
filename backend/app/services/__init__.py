@@ -1,5 +1,6 @@
 from app.services.base import BaseService
 from app.services.booking import BookingService
+from app.services.cab_pricing import CabPricingService
 from app.services.chat import ChatService
 from app.services.conversation import ConversationService
 from app.services.notification import NotificationService
@@ -12,6 +13,7 @@ __all__ = [
     "UserService",
     "SavedLocationService",
     "LocationResolver",
+    "CabPricingService",
     "ConversationService",
     "RecommendationService",
     "BookingService",

@@ -10,6 +10,7 @@ from app.models.enums import (
     MessageRole,
     NotificationType,
     RecommendationStatus,
+    VehicleTier,
 )
 from app.models.intent import Intent
 from app.models.memory import Memory
@@ -38,4 +39,5 @@ __all__ = [
     "RecommendationStatus",
     "BookingStatus",
     "NotificationType",
+    "VehicleTier",
 ]

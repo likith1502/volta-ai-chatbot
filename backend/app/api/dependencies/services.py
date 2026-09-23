@@ -2,7 +2,10 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db_session
+from app.fleet.base import BaseFleetPricingProvider
+from app.fleet.demo import DemoFleetPricingProvider
 from app.services.booking import BookingService
+from app.services.cab_pricing import CabPricingService
 from app.services.chat import ChatService
 from app.services.conversation import ConversationService
 from app.services.notification import NotificationService
@@ -23,22 +26,30 @@ def get_saved_location_service(
     return SavedLocationService(session)
 
 
-def get_conversation_service(session: AsyncSession = Depends(get_db_session)) -> ConversationService:
+def get_conversation_service(
+    session: AsyncSession = Depends(get_db_session),
+) -> ConversationService:
     """Dependency provider yielding a ConversationService instance."""
     return ConversationService(session)
 
 
-def get_recommendation_service(session: AsyncSession = Depends(get_db_session)) -> RecommendationService:
+def get_recommendation_service(
+    session: AsyncSession = Depends(get_db_session),
+) -> RecommendationService:
     """Dependency provider yielding a RecommendationService instance."""
     return RecommendationService(session)
 
 
-def get_booking_service(session: AsyncSession = Depends(get_db_session)) -> BookingService:
+def get_booking_service(
+    session: AsyncSession = Depends(get_db_session),
+) -> BookingService:
     """Dependency provider yielding a BookingService instance."""
     return BookingService(session)
 
 
-def get_notification_service(session: AsyncSession = Depends(get_db_session)) -> NotificationService:
+def get_notification_service(
+    session: AsyncSession = Depends(get_db_session),
+) -> NotificationService:
     """Dependency provider yielding a NotificationService instance."""
     return NotificationService(session)
 
@@ -46,3 +57,16 @@ def get_notification_service(session: AsyncSession = Depends(get_db_session)) ->
 def get_chat_service(session: AsyncSession = Depends(get_db_session)) -> ChatService:
     """Dependency provider yielding a ChatService instance."""
     return ChatService(session)
+
+
+def get_fleet_pricing_provider() -> BaseFleetPricingProvider:
+    """Dependency provider yielding the configured fleet pricing provider."""
+    return DemoFleetPricingProvider()
+
+
+def get_cab_pricing_service(
+    session: AsyncSession = Depends(get_db_session),
+    provider: BaseFleetPricingProvider = Depends(get_fleet_pricing_provider),
+) -> CabPricingService:
+    """Dependency provider yielding a CabPricingService instance."""
+    return CabPricingService(session, provider=provider)
