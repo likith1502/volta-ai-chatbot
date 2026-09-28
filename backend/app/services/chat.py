@@ -12,6 +12,7 @@ from app.ai.memory.factory import MemoryStrategyFactory
 from app.ai.models import AIToolCall
 from app.ai.prompts.prompt_builder import PromptBuilder
 from app.ai.prompts.recommendation import is_recommendation_requested
+from app.ai.tools.booking_tool import BookingTool
 from app.ai.tools.dispatcher import AIToolDispatcher
 from app.ai.tools.recommendation_tool import RecommendationTool
 from app.ai.tools.registry import AIToolRegistry
@@ -54,7 +55,9 @@ class ChatService(BaseService):
         else:
             registry = AIToolRegistry()
             registry.register(RecommendationTool(session))
+            registry.register(BookingTool(session))
             self.tool_dispatcher = AIToolDispatcher(registry)
+
 
         self.graph_orchestrator = ChatGraphOrchestrator(
             provider=self.provider,

@@ -41,6 +41,56 @@ RIDE_INTENT_PATTERNS = [
     r"\b(?:ride\s+home|cab\s+home)\b",
 ]
 
+# Vehicle tier matching patterns
+KNOWN_VEHICLE_TIERS = ["mini", "sedan", "suv"]
+
+
+# Explicit booking confirmation patterns
+BOOKING_CONFIRMATION_PATTERNS = [
+    r"^(?:confirm|confirm\s+(?:the\s+)?(?:booking|ride|cab)|yes,?\s*confirm|yes,?\s*please|proceed|yes\s+go\s+ahead|go\s+ahead|please\s+book\s+it|confirm\s+it)$",
+    r"\b(?:confirm\s+(?:my\s+)?(?:booking|ride|cab))\b",
+]
+
+# Ambiguous booking intents without explicit tier specification
+AMBIGUOUS_BOOKING_PATTERNS = [
+    r"^(?:book\s*it|book\s+a\s+cab|book\s+the\s+ride|book|book\s+now|yes|yep|sure)$",
+    r"\b(?:book\s+it|book\s+now)\b",
+]
+
+
+def extract_vehicle_tier(user_input: str) -> Optional[str]:
+    """Extracts quoted vehicle tier (mini, sedan, suv) from user input."""
+    text = user_input.strip().lower()
+    for tier in KNOWN_VEHICLE_TIERS:
+        # Match 'volta sedan', 'sedan', 'the sedan', 'book sedan', 'sedan please'
+        if re.search(rf"\b(?:volta\s+)?{tier}\b", text):
+            return tier
+    return None
+
+
+def is_booking_confirmation(user_input: str) -> bool:
+    """Returns True if message explicitly confirms a pending vehicle booking."""
+    text = user_input.strip().lower()
+    # KB queries and cancellation queries take precedence
+    if is_knowledge_base_query(text) or is_cancellation_intent(text):
+        return False
+    for pattern in BOOKING_CONFIRMATION_PATTERNS:
+        if re.search(pattern, text):
+            return True
+    return False
+
+
+def is_ambiguous_booking_intent(user_input: str) -> bool:
+    """Returns True if message expresses intent to book without specifying a vehicle tier."""
+    text = user_input.strip().lower()
+    if is_knowledge_base_query(text) or is_cancellation_intent(text):
+        return False
+    for pattern in AMBIGUOUS_BOOKING_PATTERNS:
+        if re.search(pattern, text):
+            return True
+    return False
+
+
 
 def is_knowledge_base_query(user_input: str) -> bool:
     """Returns True if the user query is asking about company policies, FAQs, or information."""
@@ -78,10 +128,15 @@ def is_ride_intent(user_input: str, has_pending_request: bool = False) -> bool:
     if is_cancellation_intent(text):
         return False
 
-    # 3. Explicit false positive guard
+    # 3. Booking confirmation is handled as booking, not new ride creation
+    if is_booking_confirmation(text):
+        return False
+
+    # 4. Explicit false positive guard
     for fp in NON_RIDE_FALSE_POSITIVES:
         if re.search(fp, text):
             return False
+
 
     # 4. If there is already an active multi-turn request awaiting slots,
     # then location phrases or simple answers are valid ride continuations.

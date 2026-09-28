@@ -186,7 +186,7 @@ class ChatGraphOrchestrator:
             )
         )
 
-        # LLM -> Tool (if tool calls requested or recommendation required)
+        # LLM -> Tool (if tool calls requested or recommendation or booking required)
         builder.add_edge(
             GraphEdge(
                 source_node="llm",
@@ -195,7 +195,10 @@ class ChatGraphOrchestrator:
                     bool(s.execution.tool_calls)
                     or (
                         s.memory.detected_intent
-                        and s.memory.detected_intent.get("requires_recommendation")
+                        and (
+                            s.memory.detected_intent.get("requires_recommendation")
+                            or s.memory.detected_intent.get("requires_booking")
+                        )
                     )
                 ),
                 priority=10,

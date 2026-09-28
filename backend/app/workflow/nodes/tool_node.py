@@ -31,16 +31,20 @@ class ToolNode(BaseWorkflowNode):
 
         recommendation_id: Optional[str] = None
         executed_results: list[dict[str, Any]] = []
+        new_entities = dict(state.memory.extracted_entities)
 
         if self.tool_dispatcher:
             conv_id_str = str(state.conversation.conversation_id)
-            ride_data = state.memory.extracted_entities.get("ride", {})
+            user_id_str = str(state.conversation.user_id) if state.conversation.user_id else None
+            ride_data = dict(state.memory.extracted_entities.get("ride") or {})
 
             if state.execution.tool_calls:
                 for call in state.execution.tool_calls:
                     call_dict = dict(call)
                     args = dict(call_dict.get("arguments", {}))
                     args["conversation_id"] = conv_id_str
+                    if user_id_str:
+                        args["user_id"] = user_id_str
 
                     if "pickup" not in args and ride_data:
                         pickup_arg = ride_data.get("pickup_point") or ride_data.get(
@@ -113,6 +117,53 @@ class ToolNode(BaseWorkflowNode):
                     and "recommendation_id" in tool_res.data
                 ):
                     recommendation_id = str(tool_res.data["recommendation_id"])
+                    ride_data["recommendation_id"] = recommendation_id
+                    ride_data["available_options"] = tool_res.data.get("options", [])
+                    # Clear stale selection and booking state to enforce fresh tier choice
+                    ride_data["selected_tier"] = None
+                    ride_data["selected_fare"] = None
+                    ride_data["selected_display_name"] = None
+                    ride_data["booking_id"] = None
+                    ride_data["booking_reference"] = None
+                    ride_data["booking_status"] = None
+                    ride_data["is_booked"] = False
+                    ride_data["booking_error"] = None
+                    new_entities["ride"] = ride_data
+
+            elif state.memory.detected_intent and state.memory.detected_intent.get(
+                "requires_booking"
+            ):
+                tool_call_obj = AIToolCall(
+                    tool_name="booking",
+                    arguments={
+                        "conversation_id": conv_id_str,
+                        "user_id": user_id_str,
+                        "recommendation_id": ride_data.get("recommendation_id"),
+                        "selected_tier": ride_data.get("selected_tier"),
+                    },
+                )
+                tool_res = await self.tool_dispatcher.dispatch(tool_call_obj)
+                res_dict = {
+                    "tool_name": "booking",
+                    "success": tool_res.success,
+                    "data": tool_res.data,
+                    "error": tool_res.error,
+                }
+                executed_results.append(res_dict)
+                if tool_res.success and tool_res.data:
+                    ride_data["booking_id"] = tool_res.data.get("booking_id")
+                    ride_data["booking_reference"] = tool_res.data.get(
+                        "booking_reference"
+                    )
+                    ride_data["booking_status"] = tool_res.data.get(
+                        "booking_status", "confirmed"
+                    )
+                    ride_data["is_booked"] = True
+                    ride_data["status"] = "booked"
+                    new_entities["ride"] = ride_data
+                elif not tool_res.success:
+                    ride_data["booking_error"] = tool_res.error
+                    new_entities["ride"] = ride_data
 
         tool_payload = {
             "executed": bool(executed_results),
@@ -127,4 +178,5 @@ class ToolNode(BaseWorkflowNode):
             workflow_step=self.node_id,
             tool_results=executed_results,
             node_results=new_node_results,
+            extracted_entities=new_entities,
         )

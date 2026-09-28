@@ -36,7 +36,7 @@ class ResponseNode(BaseWorkflowNode):
 
         total_tokens = usage.get("total_tokens", 0) if isinstance(usage, dict) else 0
 
-        # Check ride entity state to present clarification prompts or formatted quotes
+        # Check ride entity state to present clarification prompts, quotes, or booking confirmations
         ride_data = state.memory.extracted_entities.get("ride")
         if ride_data:
             if ride_data.get("is_cancelled"):
@@ -44,11 +44,43 @@ class ResponseNode(BaseWorkflowNode):
                     ride_data.get("clarification_question")
                     or "Your ride request has been cancelled. Let me know if there's anything else I can help you with!"
                 )
-            elif ride_data.get("status") in (
-                "needs_both",
-                "needs_pickup",
-                "needs_destination",
-            ) and ride_data.get("clarification_question"):
+            elif ride_data.get("is_booked") or ride_data.get("booking_reference"):
+                ref = ride_data.get("booking_reference")
+                b_status = ride_data.get("booking_status", "confirmed").capitalize()
+                raw_tier = (
+                    ride_data.get("selected_display_name")
+                    or (ride_data.get("selected_tier", "Ride").capitalize())
+                )
+                tier_str = raw_tier if raw_tier.lower().startswith("volta") else f"Volta {raw_tier}"
+                fare_val = ride_data.get("selected_fare")
+                pickup_lbl = (
+                    ride_data.get("pickup_point", {}).get("label")
+                    if isinstance(ride_data.get("pickup_point"), dict)
+                    else getattr(ride_data.get("pickup_point"), "label", None)
+                ) or ride_data.get("pickup_raw", "Pickup")
+                dest_lbl = (
+                    ride_data.get("destination_point", {}).get("label")
+                    if isinstance(ride_data.get("destination_point"), dict)
+                    else getattr(ride_data.get("destination_point"), "label", None)
+                ) or ride_data.get("destination_raw", "Destination")
+
+
+                fare_line = f"\n- Quoted Fare: INR {fare_val}" if fare_val else ""
+                content = (
+                    f"Your {tier_str} ride has been successfully booked!\n"
+                    f"- Booking Reference: {ref}\n"
+                    f"- Status: {b_status}\n"
+                    f"- Vehicle Tier: {tier_str}"
+                    f"{fare_line}\n"
+                    f"- Route: {pickup_lbl} to {dest_lbl}\n\n"
+                    "Your booking is confirmed in the VOLTA system. A notification has been sent to your account."
+                )
+            elif ride_data.get("booking_error"):
+                content = (
+                    f"We were unable to confirm your booking: {ride_data['booking_error']}. "
+                    "Please try again or request a new quote."
+                )
+            elif ride_data.get("clarification_question"):
                 content = ride_data["clarification_question"]
             elif ride_data.get("status") == "resolved":
                 # If tool executed and LLM output is generic placeholder, format options clearly

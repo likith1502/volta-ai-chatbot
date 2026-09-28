@@ -108,9 +108,9 @@ class RideEntityResolver:
                 clarification_question="Your ride request has been cancelled. Let me know if there's anything else I can help you with!",
             )
 
-        # 3. If prior request was completed or cancelled, check if a brand-new ride request is made
+        # 3. If prior request was booked or cancelled, check if a brand-new ride request is made
         active_prior = prior_state
-        if prior_state and (prior_state.is_complete or prior_state.is_cancelled):
+        if prior_state and (prior_state.is_booked or prior_state.is_cancelled):
             if is_ride_intent(user_text, has_pending_request=False):
                 active_prior = None
             else:
@@ -221,6 +221,22 @@ class RideEntityResolver:
 
         # 8. Determine final slot status and clarification question
         if pickup_point and destination_point:
+            is_route_changed = bool(
+                not active_prior
+                or is_override
+                or active_prior.pickup_raw != effective_pickup_raw
+                or active_prior.destination_raw != effective_dest_raw
+            )
+            rec_id = (
+                None
+                if is_route_changed
+                else (active_prior.recommendation_id if active_prior else None)
+            )
+            options = (
+                []
+                if is_route_changed
+                else (active_prior.available_options if active_prior else [])
+            )
             return RideEntityState(
                 pickup_raw=effective_pickup_raw,
                 destination_raw=effective_dest_raw,
@@ -228,6 +244,15 @@ class RideEntityResolver:
                 destination_point=destination_point,
                 status=RideSlotStatus.RESOLVED,
                 clarification_question=None,
+                recommendation_id=rec_id,
+                available_options=options,
+                selected_tier=None,
+                selected_fare=None,
+                selected_display_name=None,
+                booking_id=None,
+                booking_reference=None,
+                booking_status=None,
+                is_booked=False,
             )
         elif pickup_point and not destination_point:
             lbl = pickup_point.label or effective_pickup_raw
