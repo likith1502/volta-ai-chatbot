@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import DateTime, Enum, ForeignKey, String, UUID, func
+from sqlalchemy import DateTime, Enum, ForeignKey, String, UUID, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -52,4 +52,8 @@ class Booking(UUIDMixin, TimestampMixin, SoftDeleteMixin, AuditMixin, Base):
         "Recommendation",
         back_populates="bookings",
         passive_deletes=True,
+    )
+
+    __table_args__ = (
+        UniqueConstraint("recommendation_id", name="uq_bookings_recommendation_id"),
     )

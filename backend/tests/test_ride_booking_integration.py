@@ -12,6 +12,7 @@ from app.ai.tools.recommendation_tool import RecommendationTool
 from app.ai.tools.registry import AIToolRegistry
 from app.checkpoints.checkpoint_manager import CheckpointManager
 from app.checkpoints.checkpoint_store import InMemoryCheckpointStore
+from app.exceptions.domain import InvalidBookingStatusException
 from app.fleet.demo import DemoFleetPricingProvider
 from app.models.booking import Booking
 from app.models.conversation import Conversation
@@ -1355,5 +1356,803 @@ async def test_19_valid_authenticated_user_and_conversation_completes_booking():
         provider="volta_fleet",
         external_booking_id=None,
     )
+
+
+# ============================================================================
+# 20. Booking Transaction Integrity & Rollback on Failure (Fix A)
+# ============================================================================
+
+
+@pytest.mark.asyncio
+async def test_20_booking_service_transaction_rollback_on_notification_failure():
+    """Verify that a failure in notification creation rolls back intermediate flushed state cleanly."""
+    session = AsyncMock()
+    session.add = MagicMock()
+    service = BookingService(session)
+
+    rec_id = uuid.uuid4()
+    conv_id = uuid.uuid4()
+    user_id = uuid.uuid4()
+
+    mock_rec = Recommendation(
+        id=rec_id,
+        conversation_id=conv_id,
+        status=RecommendationStatus.PENDING,
+    )
+    service.recommendation_repo.get_by_id = AsyncMock(return_value=mock_rec)
+    service.recommendation_repo.update = AsyncMock(return_value=mock_rec)
+
+    mock_booking = Booking(id=uuid.uuid4(), recommendation_id=rec_id, booking_reference="BK-ROLLBACK1")
+    service.booking_repo.create = AsyncMock(return_value=mock_booking)
+
+    mock_conv = Conversation(id=conv_id, user_id=user_id)
+    service.conversation_repo.get_by_id = AsyncMock(return_value=mock_conv)
+    # Notification creation crashes
+    service.notification_repo.create = AsyncMock(side_effect=RuntimeError("Notification channel crashed"))
+
+    with pytest.raises(RuntimeError, match="Notification channel crashed"):
+        await service.create_booking_from_recommendation(rec_id)
+
+    # Rollback must be awaited to clear dirty / intermediate flushed entities
+    session.rollback.assert_awaited_once()
+    session.commit.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_21_booking_tool_rolls_back_session_on_unexpected_failure():
+    """Verify that BookingTool triggers session.rollback() upon service error."""
+    session = AsyncSessionMock()
+    session.rollback = AsyncMock()
+    booking_service = BookingService(session)
+
+    rec_id = uuid.uuid4()
+    conv_id = uuid.uuid4()
+    user_id = uuid.uuid4()
+
+    mock_rec = Recommendation(
+        id=rec_id,
+        conversation_id=conv_id,
+        status=RecommendationStatus.PENDING,
+        recommendation_data={},
+    )
+    booking_service.recommendation_repo.get_by_id = AsyncMock(return_value=mock_rec)
+    booking_service.conversation_repo.get_by_id = AsyncMock(
+        return_value=Conversation(id=conv_id, user_id=user_id)
+    )
+    booking_service.create_booking_from_recommendation = AsyncMock(
+        side_effect=RuntimeError("Disk I/O failure during commit")
+    )
+
+    bkg_tool = BookingTool(session=session, booking_service=booking_service)
+    res = await bkg_tool.execute(
+        {
+            "recommendation_id": str(rec_id),
+            "conversation_id": str(conv_id),
+            "user_id": str(user_id),
+            "selected_tier": "sedan",
+        }
+    )
+
+    assert res.success is False
+    assert "Disk I/O failure" in res.error
+    session.rollback.assert_awaited()
+
+
+# ============================================================================
+# 21. Duplicate-Confirmation & Concurrency Hardening (Fix B)
+# ============================================================================
+
+
+@pytest.mark.asyncio
+async def test_22_concurrent_duplicate_confirmation_status_race_resolves_idempotently():
+    """Verify that if a concurrent confirmation wins and updates recommendation to ACCEPTED,
+    the losing confirmation catches InvalidBookingStatusException, rolls back, and returns the existing booking.
+    """
+    session = AsyncSessionMock()
+    session.rollback = AsyncMock()
+    booking_service = BookingService(session)
+
+    rec_id = uuid.uuid4()
+    conv_id = uuid.uuid4()
+    user_id = uuid.uuid4()
+
+    mock_rec = Recommendation(
+        id=rec_id,
+        conversation_id=conv_id,
+        status=RecommendationStatus.PENDING,
+        recommendation_data={"options": [{"tier": "sedan", "fare": 300, "display_name": "Volta Sedan"}]},
+    )
+    booking_service.recommendation_repo.get_by_id = AsyncMock(return_value=mock_rec)
+    booking_service.conversation_repo.get_by_id = AsyncMock(
+        return_value=Conversation(id=conv_id, user_id=user_id)
+    )
+
+    # When create_booking_from_recommendation is called, the winning transaction already committed,
+    # so BookingService raises InvalidBookingStatusException (status is now ACCEPTED)
+    booking_service.create_booking_from_recommendation = AsyncMock(
+        side_effect=InvalidBookingStatusException("Recommendation status is 'ACCEPTED', must be PENDING.")
+    )
+
+    existing_booking = Booking(
+        id=uuid.uuid4(),
+        recommendation_id=rec_id,
+        booking_reference="BK-CONCURRENT-WINNER",
+        booking_status=BookingStatus.CONFIRMED,
+        provider="volta_fleet",
+    )
+    session.execute = AsyncMock(
+        return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=existing_booking))
+    )
+
+    bkg_tool = BookingTool(session=session, booking_service=booking_service)
+    res = await bkg_tool.execute(
+        {
+            "recommendation_id": str(rec_id),
+            "conversation_id": str(conv_id),
+            "user_id": str(user_id),
+            "selected_tier": "sedan",
+        }
+    )
+
+    assert res.success is True
+    assert res.data["booking_reference"] == "BK-CONCURRENT-WINNER"
+    assert res.data["is_duplicate_replay"] is True
+    session.rollback.assert_awaited()
+
+
+@pytest.mark.asyncio
+async def test_23_concurrent_duplicate_confirmation_integrity_collision_resolves_idempotently():
+    """Verify that when concurrent inserts collide on unique constraint uq_bookings_recommendation_id,
+    the losing request catches IntegrityError, rolls back, and resolves to the existing booking.
+    """
+    from sqlalchemy.exc import IntegrityError
+
+    session = AsyncSessionMock()
+    session.rollback = AsyncMock()
+    booking_service = BookingService(session)
+
+    rec_id = uuid.uuid4()
+    conv_id = uuid.uuid4()
+    user_id = uuid.uuid4()
+
+    mock_rec = Recommendation(
+        id=rec_id,
+        conversation_id=conv_id,
+        status=RecommendationStatus.PENDING,
+        recommendation_data={},
+    )
+    booking_service.recommendation_repo.get_by_id = AsyncMock(return_value=mock_rec)
+    booking_service.conversation_repo.get_by_id = AsyncMock(
+        return_value=Conversation(id=conv_id, user_id=user_id)
+    )
+
+    # Simulate database unique constraint violation
+    booking_service.create_booking_from_recommendation = AsyncMock(
+        side_effect=IntegrityError("duplicate key value violates unique constraint 'uq_bookings_recommendation_id'", params={}, orig=Exception())
+    )
+
+    existing_booking = Booking(
+        id=uuid.uuid4(),
+        recommendation_id=rec_id,
+        booking_reference="BK-UNIQUE-RECOVERED",
+        booking_status=BookingStatus.CONFIRMED,
+        provider="volta_fleet",
+    )
+    session.execute = AsyncMock(
+        return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=existing_booking))
+    )
+
+    bkg_tool = BookingTool(session=session, booking_service=booking_service)
+    res = await bkg_tool.execute(
+        {
+            "recommendation_id": str(rec_id),
+            "conversation_id": str(conv_id),
+            "user_id": str(user_id),
+            "selected_tier": "sedan",
+        }
+    )
+
+    assert res.success is True
+    assert res.data["booking_reference"] == "BK-UNIQUE-RECOVERED"
+    assert res.data["is_duplicate_replay"] is True
+    session.rollback.assert_awaited()
+
+
+@pytest.mark.asyncio
+async def test_24_pessimistic_locking_in_create_booking_from_recommendation():
+    """Verify BookingService.create_booking_from_recommendation requests row lock (with_for_update=True)."""
+    session = AsyncMock()
+    session.add = MagicMock()
+    service = BookingService(session)
+
+    rec_id = uuid.uuid4()
+    conv_id = uuid.uuid4()
+    user_id = uuid.uuid4()
+
+    mock_rec = Recommendation(
+        id=rec_id,
+        conversation_id=conv_id,
+        status=RecommendationStatus.PENDING,
+    )
+    service.recommendation_repo.get_by_id = AsyncMock(return_value=mock_rec)
+    service.recommendation_repo.update = AsyncMock(return_value=mock_rec)
+
+    mock_booking = Booking(id=uuid.uuid4(), recommendation_id=rec_id, booking_reference="BK-LOCKTEST1")
+    service.booking_repo.create = AsyncMock(return_value=mock_booking)
+
+    mock_conv = Conversation(id=conv_id, user_id=user_id)
+    service.conversation_repo.get_by_id = AsyncMock(return_value=mock_conv)
+    service.notification_repo.create = AsyncMock(return_value=MagicMock())
+
+    await service.create_booking_from_recommendation(rec_id)
+
+    # Ensure get_by_id was called with with_for_update=True
+    service.recommendation_repo.get_by_id.assert_awaited_once_with(rec_id, with_for_update=True)
+
+
+def test_25_database_unique_constraint_on_recommendation_id():
+    """Verify that Booking entity metadata defines the uq_bookings_recommendation_id constraint."""
+    constraint_names = [c.name for c in Booking.__table__.constraints]
+    assert "uq_bookings_recommendation_id" in constraint_names
+
+    # Verify column uniqueness property
+    unique_constraint = next(c for c in Booking.__table__.constraints if c.name == "uq_bookings_recommendation_id")
+    col_names = [col.name for col in unique_constraint.columns]
+    assert col_names == ["recommendation_id"]
+
+
+def test_26_live_database_unique_constraint_enforcement():
+    """Verify SQLite database engine enforces uniqueness on recommendation_id while permitting multiple NULLs."""
+    from app.db.base import Base
+    from sqlalchemy import create_engine
+    from sqlalchemy.exc import IntegrityError
+    from sqlalchemy.orm import Session
+
+    engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(engine)
+
+    rec_id = uuid.uuid4()
+    bkg1 = Booking(
+        id=uuid.uuid4(),
+        recommendation_id=rec_id,
+        booking_reference="BK-LIVE-001",
+        booking_status=BookingStatus.CONFIRMED,
+        provider="volta_fleet",
+    )
+    bkg2_dup = Booking(
+        id=uuid.uuid4(),
+        recommendation_id=rec_id,
+        booking_reference="BK-LIVE-002",
+        booking_status=BookingStatus.CONFIRMED,
+        provider="volta_fleet",
+    )
+    bkg_null1 = Booking(
+        id=uuid.uuid4(),
+        recommendation_id=None,
+        booking_reference="BK-LIVE-003",
+        booking_status=BookingStatus.CONFIRMED,
+        provider="volta_fleet",
+    )
+    bkg_null2 = Booking(
+        id=uuid.uuid4(),
+        recommendation_id=None,
+        booking_reference="BK-LIVE-004",
+        booking_status=BookingStatus.CONFIRMED,
+        provider="volta_fleet",
+    )
+
+    with Session(engine) as db:
+        # First booking succeeds
+        db.add(bkg1)
+        db.commit()
+
+        # Second booking with same recommendation_id must violate unique constraint
+        db.add(bkg2_dup)
+        with pytest.raises(IntegrityError):
+            db.commit()
+        db.rollback()
+
+        # Multiple bookings with recommendation_id=None are permitted
+        db.add(bkg_null1)
+        db.commit()
+        db.add(bkg_null2)
+        db.commit()
+
+
+# ============================================================================
+# 22. Booking Replay Response Consistency & Tier Integrity
+# ============================================================================
+
+
+@pytest.mark.asyncio
+async def test_27_sequential_replay_with_different_tier_does_not_echo_or_misrepresent():
+    """Verify that replaying a booking with a different incoming selected_tier does NOT echo
+    the new tier or invent fare information, returning tier=None, fare=None, and is_duplicate_replay=True.
+    """
+    user_id = uuid.uuid4()
+    conv_id = uuid.uuid4()
+    rec_id = uuid.uuid4()
+
+    session = AsyncSessionMock()
+    booking_service = BookingService(session)
+
+    # Recommendation already ACCEPTED
+    mock_rec = Recommendation(
+        id=rec_id,
+        conversation_id=conv_id,
+        status=RecommendationStatus.ACCEPTED,
+        recommendation_data={
+            "currency": "INR",
+            "options": [
+                {"tier": "sedan", "fare": 350, "display_name": "Volta Sedan"},
+                {"tier": "suv", "fare": 550, "display_name": "Volta SUV"},
+            ],
+        },
+    )
+    existing_bkg = Booking(
+        id=uuid.uuid4(),
+        recommendation_id=rec_id,
+        booking_reference="BK-SEDAN-ORIGINAL",
+        booking_status=BookingStatus.CONFIRMED,
+        provider="volta_fleet",
+        booked_at=datetime.now(timezone.utc),
+    )
+    booking_service.recommendation_repo.get_by_id = AsyncMock(return_value=mock_rec)
+    booking_service.conversation_repo.get_by_id = AsyncMock(
+        return_value=Conversation(id=conv_id, user_id=user_id)
+    )
+
+    session.execute = AsyncMock(
+        return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=existing_bkg))
+    )
+    booking_service.create_booking_from_recommendation = AsyncMock()
+
+    bkg_tool = BookingTool(session=session, booking_service=booking_service)
+    # Incoming replay request attempts to claim a different tier ("suv")
+    res = await bkg_tool.execute(
+        {
+            "recommendation_id": str(rec_id),
+            "conversation_id": str(conv_id),
+            "user_id": str(user_id),
+            "selected_tier": "suv",
+        }
+    )
+
+    assert res.success is True
+    assert res.data["is_duplicate_replay"] is True
+    assert res.data["booking_reference"] == "BK-SEDAN-ORIGINAL"
+    # Must NOT echo the replayed tier ("suv") or claim its fare (550)
+    assert res.data["tier"] is None
+    assert res.data["fare"] is None
+    assert res.data["currency"] == "INR"
+    booking_service.create_booking_from_recommendation.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_28_concurrent_race_replay_with_different_tier_does_not_echo_tier():
+    """Verify concurrent race replay (InvalidBookingStatusException) with a different incoming tier
+    does not echo or misrepresent the tier.
+    """
+    user_id = uuid.uuid4()
+    conv_id = uuid.uuid4()
+    rec_id = uuid.uuid4()
+
+    session = AsyncSessionMock()
+    session.rollback = AsyncMock()
+    booking_service = BookingService(session)
+
+    mock_rec = Recommendation(
+        id=rec_id,
+        conversation_id=conv_id,
+        status=RecommendationStatus.PENDING,
+        recommendation_data={"options": [{"tier": "sedan", "fare": 300}]},
+    )
+    booking_service.recommendation_repo.get_by_id = AsyncMock(return_value=mock_rec)
+    booking_service.conversation_repo.get_by_id = AsyncMock(
+        return_value=Conversation(id=conv_id, user_id=user_id)
+    )
+
+    booking_service.create_booking_from_recommendation = AsyncMock(
+        side_effect=InvalidBookingStatusException(
+            "Recommendation status is 'ACCEPTED', must be PENDING."
+        )
+    )
+
+    existing_booking = Booking(
+        id=uuid.uuid4(),
+        recommendation_id=rec_id,
+        booking_reference="BK-RACE-WINNER",
+        booking_status=BookingStatus.CONFIRMED,
+        provider="volta_fleet",
+        booked_at=datetime.now(timezone.utc),
+    )
+    session.execute = AsyncMock(
+        return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=existing_booking))
+    )
+
+    bkg_tool = BookingTool(session=session, booking_service=booking_service)
+    # Incoming request attempts tier "auto"
+    res = await bkg_tool.execute(
+        {
+            "recommendation_id": str(rec_id),
+            "conversation_id": str(conv_id),
+            "user_id": str(user_id),
+            "selected_tier": "auto",
+        }
+    )
+
+    assert res.success is True
+    assert res.data["booking_reference"] == "BK-RACE-WINNER"
+    assert res.data["is_duplicate_replay"] is True
+    assert res.data["tier"] is None
+    assert res.data["fare"] is None
+    session.rollback.assert_awaited()
+
+
+@pytest.mark.asyncio
+async def test_29_concurrent_integrity_collision_replay_with_different_tier_does_not_echo_tier():
+    """Verify concurrent integrity collision replay with a different incoming tier
+    does not echo or misrepresent the tier.
+    """
+    from sqlalchemy.exc import IntegrityError
+
+    user_id = uuid.uuid4()
+    conv_id = uuid.uuid4()
+    rec_id = uuid.uuid4()
+
+    session = AsyncSessionMock()
+    session.rollback = AsyncMock()
+    booking_service = BookingService(session)
+
+    mock_rec = Recommendation(
+        id=rec_id,
+        conversation_id=conv_id,
+        status=RecommendationStatus.PENDING,
+        recommendation_data={},
+    )
+    booking_service.recommendation_repo.get_by_id = AsyncMock(return_value=mock_rec)
+    booking_service.conversation_repo.get_by_id = AsyncMock(
+        return_value=Conversation(id=conv_id, user_id=user_id)
+    )
+
+    booking_service.create_booking_from_recommendation = AsyncMock(
+        side_effect=IntegrityError("duplicate key", params={}, orig=Exception())
+    )
+
+    existing_booking = Booking(
+        id=uuid.uuid4(),
+        recommendation_id=rec_id,
+        booking_reference="BK-COLLISION-WINNER",
+        booking_status=BookingStatus.CONFIRMED,
+        provider="volta_fleet",
+        booked_at=datetime.now(timezone.utc),
+    )
+    session.execute = AsyncMock(
+        return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=existing_booking))
+    )
+
+    bkg_tool = BookingTool(session=session, booking_service=booking_service)
+    # Incoming request attempts tier "premium_suv"
+    res = await bkg_tool.execute(
+        {
+            "recommendation_id": str(rec_id),
+            "conversation_id": str(conv_id),
+            "user_id": str(user_id),
+            "selected_tier": "premium_suv",
+        }
+    )
+
+    assert res.success is True
+    assert res.data["booking_reference"] == "BK-COLLISION-WINNER"
+    assert res.data["is_duplicate_replay"] is True
+    assert res.data["tier"] is None
+    assert res.data["fare"] is None
+    session.rollback.assert_awaited()
+
+
+# ============================================================================
+# 23. Duplicate-Booking Replay Response Path Fix (ToolNode & ResponseNode)
+# ============================================================================
+
+
+@pytest.mark.asyncio
+async def test_30_tool_node_duplicate_replay_state_update():
+    """Verify ToolNode clears unverified tier/fare and sets is_duplicate_replay=True on duplicate replay."""
+    from app.ai.models import AIToolResult
+    from app.context.state import ConversationData, ConversationState
+    from app.workflow.nodes.tool_node import ToolNode
+
+    conv_id = uuid.uuid4()
+    user_id = uuid.uuid4()
+    rec_id = uuid.uuid4()
+    booking_id = uuid.uuid4()
+
+    mock_dispatcher = MagicMock()
+    mock_dispatcher.dispatch = AsyncMock(
+        return_value=AIToolResult(
+            tool_name="booking",
+            success=True,
+            data={
+                "booking_id": str(booking_id),
+                "booking_reference": "BK-REPLAY-001",
+                "booking_status": "confirmed",
+                "tier": None,
+                "fare": None,
+                "is_duplicate_replay": True,
+            },
+        )
+    )
+
+    tool_node = ToolNode(node_id="tool", tool_dispatcher=mock_dispatcher)
+
+    initial_ride = {
+        "recommendation_id": str(rec_id),
+        "selected_tier": "suv",
+        "selected_display_name": "Volta SUV",
+        "selected_fare": 550,
+        "status": "awaiting_confirmation",
+    }
+    state = ConversationState(
+        conversation=ConversationData(
+            conversation_id=conv_id,
+            user_id=str(user_id),
+            current_message={"role": "user", "content": "Confirm"},
+        )
+    ).with_update(
+        detected_intent={"requires_booking": True},
+        extracted_entities={"ride": initial_ride},
+    )
+
+    updated_state = await tool_node.execute(state)
+    ride_res = updated_state.memory.extracted_entities.get("ride", {})
+
+    # Existing booking reference and status preserved
+    assert ride_res.get("booking_reference") == "BK-REPLAY-001"
+    assert ride_res.get("booking_id") == str(booking_id)
+    assert ride_res.get("booking_status") == "confirmed"
+    assert ride_res.get("is_booked") is True
+    # Replay flag explicitly persisted
+    assert ride_res.get("is_duplicate_replay") is True
+    # Unverified selection fields must be cleared, not echoing incoming 'suv' or 550
+    assert ride_res.get("selected_tier") is None
+    assert ride_res.get("selected_display_name") is None
+    assert ride_res.get("selected_fare") is None
+
+
+@pytest.mark.asyncio
+async def test_31_response_node_duplicate_replay_formatting():
+    """Verify ResponseNode formats replay confirmations without claiming vehicle tier or stale fare."""
+    from app.context.state import ConversationData, ConversationState
+    from app.workflow.nodes.response_node import ResponseNode
+
+    conv_id = uuid.uuid4()
+    user_id = uuid.uuid4()
+
+    response_node = ResponseNode(node_id="response")
+
+    ride_replay_state = {
+        "booking_reference": "BK-REPLAY-002",
+        "booking_status": "confirmed",
+        "is_booked": True,
+        "is_duplicate_replay": True,
+        "selected_tier": None,
+        "selected_display_name": None,
+        "selected_fare": None,
+        "pickup_raw": "Indiranagar",
+        "destination_raw": "Whitefield",
+    }
+    state = ConversationState(
+        conversation=ConversationData(
+            conversation_id=conv_id,
+            user_id=str(user_id),
+            current_message={"role": "user", "content": "Confirm"},
+        )
+    ).with_update(
+        extracted_entities={"ride": ride_replay_state},
+        node_results={"tool": {"executed": True}},
+    )
+
+    final_state = await response_node.execute(state)
+    resp = final_state.execution.node_results.get("response", {})
+    content = resp.get("content", "")
+
+    # States existing booking is already confirmed
+    assert "This ride has already been confirmed." in content
+    assert "BK-REPLAY-002" in content
+    assert "Status: Confirmed" in content
+    assert "Route: Indiranagar to Whitefield" in content
+
+    # Must NOT claim a vehicle tier or quoted fare
+    assert "Vehicle Tier:" not in content
+    assert "Quoted Fare:" not in content
+    assert "suv" not in content.lower()
+    assert "sedan" not in content.lower()
+    assert "successfully booked" not in content.lower()
+
+
+@pytest.mark.asyncio
+async def test_32_workflow_duplicate_replay_with_different_tier_does_not_echo_tier_or_fare():
+    """Verify end-to-end chat turn on duplicate replay with different tier does not mention incoming tier or stale fare."""
+    from app.context.state import ConversationData, ConversationState
+
+    user_id = uuid.uuid4()
+    conv_id = uuid.uuid4()
+    session_id = "sess_replay_tier_mismatch"
+    mock_home, mock_work = _create_mock_saved_locations(user_id)
+
+    cp_manager = CheckpointManager(store=InMemoryCheckpointStore())
+    session = AsyncSessionMock()
+    session.add = MagicMock()
+
+    pricing_service = CabPricingService(
+        session=session, provider=DemoFleetPricingProvider()
+    )
+    rec_id = uuid.uuid4()
+    mock_rec = Recommendation(
+        id=rec_id,
+        conversation_id=conv_id,
+        recommendation_type="cab_availability",
+        status=RecommendationStatus.PENDING,
+        recommendation_data={
+            "currency": "INR",
+            "options": [
+                {"tier": "sedan", "fare": 300, "display_name": "Volta Sedan"},
+                {"tier": "suv", "fare": 500, "display_name": "Volta SUV"},
+            ],
+        },
+    )
+    pricing_service.recommendation_service.create_recommendation = AsyncMock(
+        return_value=mock_rec
+    )
+    rec_tool = RecommendationTool(session=session, cab_pricing_service=pricing_service)
+
+    booking_service = BookingService(session)
+    booking_id = uuid.uuid4()
+    mock_bkg = Booking(
+        id=booking_id,
+        recommendation_id=rec_id,
+        booking_reference="BK-ORIGINAL-SEDAN",
+        booking_status=BookingStatus.CONFIRMED,
+        provider="volta_fleet",
+        booked_at=datetime.now(timezone.utc),
+    )
+    # First booking creates original booking
+    booking_service.create_booking_from_recommendation = AsyncMock(
+        return_value=mock_bkg
+    )
+    booking_service.recommendation_repo.get_by_id = AsyncMock(return_value=mock_rec)
+    booking_service.conversation_repo.get_by_id = AsyncMock(
+        return_value=Conversation(id=conv_id, user_id=user_id)
+    )
+
+    orchestrator, _ = _setup_orchestrator(
+        session=session,
+        booking_service=booking_service,
+        checkpoint_manager=cp_manager,
+        rec_tool=rec_tool,
+    )
+
+    # 1. Quoting Turn
+    t1 = await orchestrator.execute_chat_turn(
+        conversation_id=conv_id,
+        user_id=user_id,
+        session_id=session_id,
+        message_text="Book a cab from Home to Work",
+        saved_locations=[mock_home, mock_work],
+    )
+    assert t1["recommendation_id"] is not None
+
+    # 2. Select Sedan
+    t2 = await orchestrator.execute_chat_turn(
+        conversation_id=conv_id,
+        user_id=user_id,
+        session_id=session_id,
+        message_text="Volta Sedan",
+        saved_locations=[mock_home, mock_work],
+    )
+    assert "Would you like to confirm this booking?" in t2["content"]
+
+    # 3. Confirm Sedan (first-time booking)
+    t3 = await orchestrator.execute_chat_turn(
+        conversation_id=conv_id,
+        user_id=user_id,
+        session_id=session_id,
+        message_text="Yes, confirm",
+        saved_locations=[mock_home, mock_work],
+    )
+    assert "Your Volta Sedan ride has been successfully booked!" in t3["content"]
+    assert "BK-ORIGINAL-SEDAN" in t3["content"]
+    assert "Vehicle Tier: Volta Sedan" in t3["content"]
+    assert "Quoted Fare: INR 240.00" in t3["content"]
+
+    # 4. Replay arrives: Now recommendation is ACCEPTED.
+    mock_rec.status = RecommendationStatus.ACCEPTED
+    session.execute = AsyncMock(
+        return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=mock_bkg))
+    )
+
+    # Replay confirmation with incoming tier='suv'
+    replay_ride = {
+        "recommendation_id": str(rec_id),
+        "selected_tier": "suv",
+        "selected_display_name": "Volta SUV",
+        "selected_fare": 500,
+        "available_options": mock_rec.recommendation_data["options"],
+        "status": "awaiting_confirmation",
+        "pickup_point": {"label": "Home"},
+        "destination_point": {"label": "Work"},
+    }
+    replay_state = ConversationState(
+        conversation=ConversationData(
+            conversation_id=conv_id,
+            user_id=str(user_id),
+            current_message={"role": "user", "content": "Yes, confirm"},
+        )
+    ).with_update(
+        detected_intent={"requires_booking": True},
+        extracted_entities={"ride": replay_ride},
+    )
+
+    graph = orchestrator.build_graph()
+    exec_result = await orchestrator.executor.execute(graph, replay_state)
+    final_resp = exec_result.final_state.execution.node_results.get("response", {})
+    replay_content = final_resp.get("content", "")
+
+    # Assert replay response
+    assert "This ride has already been confirmed." in replay_content
+    assert "BK-ORIGINAL-SEDAN" in replay_content
+    assert "Status: Confirmed" in replay_content
+    assert "Route: Home to Work" in replay_content
+    # Must NOT echo 'Volta SUV' or 500
+    assert "Volta SUV" not in replay_content
+    assert "SUV" not in replay_content
+    assert "500" not in replay_content
+    assert "Quoted Fare" not in replay_content
+
+
+@pytest.mark.asyncio
+async def test_33_normal_booking_preserves_tier_and_fare():
+    """Verify normal first-time booking output still displays selected tier and fare."""
+    from app.context.state import ConversationData, ConversationState
+    from app.workflow.nodes.response_node import ResponseNode
+
+    conv_id = uuid.uuid4()
+    user_id = uuid.uuid4()
+
+    response_node = ResponseNode(node_id="response")
+
+    ride_normal_state = {
+        "booking_reference": "BK-FIRST-TIME",
+        "booking_status": "confirmed",
+        "is_booked": True,
+        "is_duplicate_replay": False,
+        "selected_tier": "sedan",
+        "selected_display_name": "Volta Sedan",
+        "selected_fare": 350,
+        "pickup_raw": "Airport",
+        "destination_raw": "Hotel",
+    }
+    state = ConversationState(
+        conversation=ConversationData(
+            conversation_id=conv_id,
+            user_id=str(user_id),
+            current_message={"role": "user", "content": "Confirm"},
+        )
+    ).with_update(
+        extracted_entities={"ride": ride_normal_state},
+        node_results={"tool": {"executed": True}},
+    )
+
+    final_state = await response_node.execute(state)
+    resp = final_state.execution.node_results.get("response", {})
+    content = resp.get("content", "")
+
+    # First-time confirmation format must be preserved
+    assert "Your Volta Sedan ride has been successfully booked!" in content
+    assert "BK-FIRST-TIME" in content
+    assert "Status: Confirmed" in content
+    assert "Vehicle Tier: Volta Sedan" in content
+    assert "Quoted Fare: INR 350" in content
+    assert "Route: Airport to Hotel" in content
 
 

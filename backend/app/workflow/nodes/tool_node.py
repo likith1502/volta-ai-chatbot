@@ -76,6 +76,31 @@ class ToolNode(BaseWorkflowNode):
                     ):
                         recommendation_id = str(tool_res.data["recommendation_id"])
 
+                    if (
+                        tool_res.success
+                        and tool_res.data
+                        and tool_name in ("booking", "book_cab_recommendation")
+                        and ("booking_reference" in tool_res.data or "booking_id" in tool_res.data)
+                    ):
+                        is_replay = bool(tool_res.data.get("is_duplicate_replay"))
+                        ride_data["booking_id"] = tool_res.data.get("booking_id")
+                        ride_data["booking_reference"] = tool_res.data.get(
+                            "booking_reference"
+                        )
+                        ride_data["booking_status"] = tool_res.data.get(
+                            "booking_status", "confirmed"
+                        )
+                        ride_data["is_booked"] = True
+                        ride_data["status"] = "booked"
+                        ride_data["is_duplicate_replay"] = is_replay
+                        if is_replay:
+                            ride_data["selected_tier"] = None
+                            ride_data["selected_display_name"] = None
+                            ride_data["selected_fare"] = None
+                        else:
+                            ride_data["is_duplicate_replay"] = False
+                        new_entities["ride"] = ride_data
+
             elif state.memory.detected_intent and state.memory.detected_intent.get(
                 "requires_recommendation"
             ):
@@ -151,6 +176,7 @@ class ToolNode(BaseWorkflowNode):
                 }
                 executed_results.append(res_dict)
                 if tool_res.success and tool_res.data:
+                    is_replay = bool(tool_res.data.get("is_duplicate_replay"))
                     ride_data["booking_id"] = tool_res.data.get("booking_id")
                     ride_data["booking_reference"] = tool_res.data.get(
                         "booking_reference"
@@ -160,6 +186,16 @@ class ToolNode(BaseWorkflowNode):
                     )
                     ride_data["is_booked"] = True
                     ride_data["status"] = "booked"
+                    ride_data["is_duplicate_replay"] = is_replay
+
+                    if is_replay:
+                        # Clear unverified selection fields; do not substitute incoming tool arguments
+                        ride_data["selected_tier"] = None
+                        ride_data["selected_display_name"] = None
+                        ride_data["selected_fare"] = None
+                    else:
+                        ride_data["is_duplicate_replay"] = False
+
                     new_entities["ride"] = ride_data
                 elif not tool_res.success:
                     ride_data["booking_error"] = tool_res.error

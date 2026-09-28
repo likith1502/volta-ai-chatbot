@@ -45,6 +45,7 @@ class RideEntityState(BaseModel):
     booking_reference: Optional[str] = None
     booking_status: Optional[str] = None
     is_booked: bool = False
+    is_duplicate_replay: bool = False
 
     last_updated_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc)

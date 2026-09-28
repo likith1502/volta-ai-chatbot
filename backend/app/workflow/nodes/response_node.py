@@ -47,12 +47,6 @@ class ResponseNode(BaseWorkflowNode):
             elif ride_data.get("is_booked") or ride_data.get("booking_reference"):
                 ref = ride_data.get("booking_reference")
                 b_status = ride_data.get("booking_status", "confirmed").capitalize()
-                raw_tier = (
-                    ride_data.get("selected_display_name")
-                    or (ride_data.get("selected_tier", "Ride").capitalize())
-                )
-                tier_str = raw_tier if raw_tier.lower().startswith("volta") else f"Volta {raw_tier}"
-                fare_val = ride_data.get("selected_fare")
                 pickup_lbl = (
                     ride_data.get("pickup_point", {}).get("label")
                     if isinstance(ride_data.get("pickup_point"), dict)
@@ -64,17 +58,42 @@ class ResponseNode(BaseWorkflowNode):
                     else getattr(ride_data.get("destination_point"), "label", None)
                 ) or ride_data.get("destination_raw", "Destination")
 
-
-                fare_line = f"\n- Quoted Fare: INR {fare_val}" if fare_val else ""
-                content = (
-                    f"Your {tier_str} ride has been successfully booked!\n"
-                    f"- Booking Reference: {ref}\n"
-                    f"- Status: {b_status}\n"
-                    f"- Vehicle Tier: {tier_str}"
-                    f"{fare_line}\n"
-                    f"- Route: {pickup_lbl} to {dest_lbl}\n\n"
-                    "Your booking is confirmed in the VOLTA system. A notification has been sent to your account."
-                )
+                if ride_data.get("is_duplicate_replay"):
+                    has_route = bool(
+                        pickup_lbl
+                        and dest_lbl
+                        and pickup_lbl != "Pickup"
+                        and dest_lbl != "Destination"
+                    )
+                    route_line = (
+                        f"\n- Route: {pickup_lbl} to {dest_lbl}"
+                        if has_route
+                        else ""
+                    )
+                    content = (
+                        "This ride has already been confirmed.\n"
+                        f"- Booking Reference: {ref}\n"
+                        f"- Status: {b_status}"
+                        f"{route_line}\n\n"
+                        "Your existing booking remains confirmed in the VOLTA system."
+                    )
+                else:
+                    raw_tier = (
+                        ride_data.get("selected_display_name")
+                        or (ride_data.get("selected_tier", "Ride").capitalize())
+                    )
+                    tier_str = raw_tier if raw_tier.lower().startswith("volta") else f"Volta {raw_tier}"
+                    fare_val = ride_data.get("selected_fare")
+                    fare_line = f"\n- Quoted Fare: INR {fare_val}" if fare_val else ""
+                    content = (
+                        f"Your {tier_str} ride has been successfully booked!\n"
+                        f"- Booking Reference: {ref}\n"
+                        f"- Status: {b_status}\n"
+                        f"- Vehicle Tier: {tier_str}"
+                        f"{fare_line}\n"
+                        f"- Route: {pickup_lbl} to {dest_lbl}\n\n"
+                        "Your booking is confirmed in the VOLTA system. A notification has been sent to your account."
+                    )
             elif ride_data.get("booking_error"):
                 content = (
                     f"We were unable to confirm your booking: {ride_data['booking_error']}. "

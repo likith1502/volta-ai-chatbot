@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from typing import Any, Optional
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.models import AIToolResult
@@ -36,8 +37,35 @@ class BookingTool(AITool):
         self.session = session
         self.booking_service = booking_service or BookingService(session)
 
+    def _build_replay_result(
+        self,
+        existing_booking: Booking,
+        currency: Optional[str] = None,
+    ) -> AIToolResult:
+        """Constructs a safe duplicate-replay response without guessing unpersisted tier or fare."""
+        return AIToolResult(
+            tool_name=self.name,
+            success=True,
+            data={
+                "booking_id": str(existing_booking.id),
+                "booking_reference": existing_booking.booking_reference,
+                "booking_status": existing_booking.booking_status.value,
+                "tier": None,
+                "fare": None,
+                "currency": currency,
+                "booked_at": (
+                    existing_booking.booked_at.isoformat()
+                    if existing_booking.booked_at
+                    else None
+                ),
+                "is_duplicate_replay": True,
+            },
+        )
+
     async def execute(self, arguments: dict[str, Any]) -> AIToolResult:
         """Executes BookingService inside the tool boundary with strict validation."""
+        rec_id: Optional[uuid.UUID] = None
+        selected_tier: Optional[str] = None
         try:
             rec_id_raw = arguments.get("recommendation_id")
             if not rec_id_raw:
@@ -140,16 +168,11 @@ class BookingTool(AITool):
                 res = await self.session.execute(stmt)
                 existing_booking = res.scalar_one_or_none()
                 if existing_booking:
-                    return AIToolResult(
-                        tool_name=self.name,
-                        success=True,
-                        data={
-                            "booking_id": str(existing_booking.id),
-                            "booking_reference": existing_booking.booking_reference,
-                            "booking_status": existing_booking.booking_status.value,
-                            "tier": selected_tier,
-                            "is_duplicate_replay": True,
-                        },
+                    rec_currency = (
+                        recommendation.recommendation_data or {}
+                    ).get("currency")
+                    return self._build_replay_result(
+                        existing_booking, currency=rec_currency
                     )
 
             # 4. Check for Expiration
@@ -225,17 +248,89 @@ class BookingTool(AITool):
                 },
             )
 
+        except InvalidBookingStatusException as status_err:
+            try:
+                await self.session.rollback()
+            except Exception:
+                pass
+            if rec_id:
+                try:
+                    stmt = select(Booking).where(
+                        Booking.recommendation_id == rec_id,
+                        Booking.is_deleted == False,  # noqa: E712
+                    )
+                    res = await self.session.execute(stmt)
+                    existing_booking = res.scalar_one_or_none()
+                    if existing_booking:
+                        logger.info(
+                            "Concurrent booking resolved via existing booking %s for recommendation %s",
+                            existing_booking.booking_reference,
+                            rec_id,
+                        )
+                        return self._build_replay_result(existing_booking)
+                except Exception as query_err:
+                    logger.error(
+                        "Failed to query existing booking after InvalidBookingStatusException: %s",
+                        query_err,
+                    )
+            return AIToolResult(
+                tool_name=self.name,
+                success=False,
+                error=str(status_err),
+            )
+        except IntegrityError as integ_err:
+            logger.warning(
+                "Database integrity conflict during booking creation for recommendation %s: %s",
+                rec_id,
+                integ_err,
+            )
+            try:
+                await self.session.rollback()
+            except Exception:
+                pass
+            if rec_id:
+                try:
+                    stmt = select(Booking).where(
+                        Booking.recommendation_id == rec_id,
+                        Booking.is_deleted == False,  # noqa: E712
+                    )
+                    res = await self.session.execute(stmt)
+                    existing_booking = res.scalar_one_or_none()
+                    if existing_booking:
+                        logger.info(
+                            "Database integrity collision resolved via existing booking %s for recommendation %s",
+                            existing_booking.booking_reference,
+                            rec_id,
+                        )
+                        return self._build_replay_result(existing_booking)
+                except Exception as query_err:
+                    logger.error(
+                        "Failed to query existing booking after IntegrityError: %s",
+                        query_err,
+                    )
+            return AIToolResult(
+                tool_name=self.name,
+                success=False,
+                error=f"Booking creation failed due to database integrity conflict: {integ_err}",
+            )
         except (
             RecommendationExpiredException,
-            InvalidBookingStatusException,
             RecommendationNotFoundException,
         ) as dom_err:
+            try:
+                await self.session.rollback()
+            except Exception:
+                pass
             return AIToolResult(
                 tool_name=self.name,
                 success=False,
                 error=str(dom_err),
             )
         except Exception as exc:
+            try:
+                await self.session.rollback()
+            except Exception:
+                pass
             logger.exception(
                 "BookingTool execution encountered unexpected error: %s", exc
             )
