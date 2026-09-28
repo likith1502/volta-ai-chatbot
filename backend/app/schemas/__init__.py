@@ -16,6 +16,7 @@ from app.schemas.saved_location import (
     SavedLocationUpdate,
     normalize_label,
 )
+from app.schemas.ride import RideEntityState, RideSlotStatus
 from app.schemas.user import UserCreate, UserResponse, UserUpdate
 
 __all__ = [
@@ -43,4 +44,6 @@ __all__ = [
     "CabOption",
     "CabAvailabilityRequest",
     "CabAvailabilityQuote",
+    "RideEntityState",
+    "RideSlotStatus",
 ]

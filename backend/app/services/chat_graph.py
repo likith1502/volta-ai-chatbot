@@ -1,10 +1,12 @@
 import logging
+import re
 import uuid
 from typing import Any, Optional, Sequence
 
 from app.ai.base import AIProvider
 from app.ai.prompts.prompt_builder import PromptBuilder
 from app.ai.tools.dispatcher import AIToolDispatcher
+from app.checkpoints.checkpoint_filter import CheckpointFilter
 from app.checkpoints.checkpoint_manager import CheckpointManager
 from app.checkpoints.checkpoint_store import InMemoryCheckpointStore
 from app.context.state import ConversationData, ConversationState
@@ -28,12 +30,74 @@ from app.workflow.nodes.tool_node import ToolNode
 
 logger = logging.getLogger("app.services.chat_graph")
 
+# Process-level default in-memory checkpoint store for multi-turn state preservation
+_default_checkpoint_store = InMemoryCheckpointStore()
+_default_checkpoint_manager = CheckpointManager(store=_default_checkpoint_store)
+
+
+def _extract_ride_from_history(
+    history_messages: Sequence[Any],
+) -> Optional[dict[str, Any]]:
+    """Recovers partial ride slots from conversation history when checkpoint is absent."""
+    if not history_messages:
+        return None
+
+    for msg in reversed(history_messages):
+        role = getattr(msg, "role", None)
+        role_str = getattr(role, "value", str(role)).lower()
+        if role_str == "assistant":
+            content = getattr(msg, "content", "")
+            if not content:
+                continue
+
+            # Assistant asked for destination: "Where would you like to go from {pickup}?"
+            m_dest = re.search(
+                r"where would you like to go from ([^?]+)\?", content, re.IGNORECASE
+            )
+            if m_dest:
+                pickup = m_dest.group(1).strip()
+                return {
+                    "pickup_raw": pickup,
+                    "destination_raw": None,
+                    "status": "needs_destination",
+                    "is_cancelled": False,
+                }
+
+            # Assistant asked for pickup: "Where would you like to be picked up from to go to {dest}?"
+            m_pick = re.search(
+                r"where would you like to be picked up from to go to ([^?]+)\?",
+                content,
+                re.IGNORECASE,
+            )
+            if m_pick:
+                dest = m_pick.group(1).strip()
+                return {
+                    "pickup_raw": None,
+                    "destination_raw": dest,
+                    "status": "needs_pickup",
+                    "is_cancelled": False,
+                }
+
+            # Assistant asked for both:
+            if (
+                "where would you like to be picked up and where are you heading"
+                in content.lower()
+            ):
+                return {
+                    "pickup_raw": None,
+                    "destination_raw": None,
+                    "status": "needs_both",
+                    "is_cancelled": False,
+                }
+
+    return None
+
 
 class ChatGraphOrchestrator:
-    """
-    Adapter orchestrating chat interactions through the StateGraph and GraphExecutor runtime.
+    """Adapter orchestrating chat interactions through the StateGraph and GraphExecutor runtime.
+
     Integrates IntentNode, DecisionNode, LLMNode, ToolNode, MemoryNode, ResponseNode,
-    CheckpointManager, and WorkflowEventBus.
+    CheckpointManager, and WorkflowEventBus. Maintains multi-turn conversation state.
     """
 
     def __init__(
@@ -43,14 +107,14 @@ class ChatGraphOrchestrator:
         prompt_builder: Optional[PromptBuilder] = None,
         event_bus: Optional[WorkflowEventBus] = None,
         checkpoint_manager: Optional[CheckpointManager] = None,
+        location_resolver: Optional[Any] = None,
     ) -> None:
         self.provider = provider
         self.tool_dispatcher = tool_dispatcher
         self.prompt_builder = prompt_builder or PromptBuilder()
         self.event_bus = event_bus or WorkflowEventBus()
-        self.checkpoint_manager = checkpoint_manager or CheckpointManager(
-            store=InMemoryCheckpointStore()
-        )
+        self.checkpoint_manager = checkpoint_manager or _default_checkpoint_manager
+        self.location_resolver = location_resolver
         self.executor = GraphExecutor(policy=ExecutionPolicy(emit_events=True))
 
     def build_graph(self) -> Graph:
@@ -59,7 +123,10 @@ class ChatGraphOrchestrator:
 
         # 1. Instantiate Graph Nodes
         start_node = StartNode(node_id="start")
-        intent_node = IntentNode(node_id="intent")
+        intent_node = IntentNode(
+            node_id="intent",
+            location_resolver=self.location_resolver,
+        )
         decision_node = DecisionNode(node_id="decision")
         llm_node = LLMNode(
             node_id="llm",
@@ -175,7 +242,7 @@ class ChatGraphOrchestrator:
         saved_locations: Sequence[Any] = (),
     ) -> dict[str, Any]:
         """Executes a complete chat turn through the Graph Runtime."""
-        # 1. Prepare Initial ConversationState
+        # 1. Restore Prior Extracted Entities from Checkpoint or History
         history_payload = [
             {
                 "role": getattr(m.role, "value", str(m.role)),
@@ -184,6 +251,26 @@ class ChatGraphOrchestrator:
             for m in history_messages
         ]
 
+        prior_extracted_entities: dict[str, Any] = {}
+        try:
+            prior_checkpoints = self.checkpoint_manager.list_checkpoints(
+                filter=CheckpointFilter(workflow_id=str(conversation_id))
+            )
+            if prior_checkpoints:
+                latest_cp = max(prior_checkpoints, key=lambda cp: cp.timestamp)
+                if latest_cp.state_snapshot and latest_cp.state_snapshot.memory:
+                    prior_extracted_entities = dict(
+                        latest_cp.state_snapshot.memory.extracted_entities or {}
+                    )
+        except Exception as cp_err:
+            logger.debug("Checkpoint retrieval non-blocking error: %s", cp_err)
+
+        if not prior_extracted_entities.get("ride") and history_messages:
+            fallback_ride = _extract_ride_from_history(history_messages)
+            if fallback_ride:
+                prior_extracted_entities["ride"] = fallback_ride
+
+        # 2. Prepare Initial ConversationState
         conv_data = ConversationData(
             conversation_id=conversation_id,
             user_id=str(user_id),
@@ -195,9 +282,10 @@ class ChatGraphOrchestrator:
                 "memories": list(memories),
                 "saved_locations": list(saved_locations),
             },
+            extracted_entities=prior_extracted_entities,
         )
 
-        # 2. Publish Workflow Started Event
+        # 3. Publish Workflow Started Event
         try:
             await self.event_bus.publish(
                 WorkflowEvent(
@@ -209,13 +297,13 @@ class ChatGraphOrchestrator:
         except Exception as evt_exc:
             logger.debug("Event publication non-blocking error: %s", evt_exc)
 
-        # 3. Compile and Execute Graph
+        # 4. Compile and Execute Graph
         graph = self.build_graph()
         exec_result = await self.executor.execute(graph, state)
 
         final_state = exec_result.final_state
 
-        # 4. Capture Checkpoint
+        # 5. Capture Checkpoint
         try:
             snapshot = exec_result.snapshots[-1] if exec_result.snapshots else None
             checkpoint = self.checkpoint_manager.create_checkpoint(
@@ -230,7 +318,7 @@ class ChatGraphOrchestrator:
         except Exception as cp_exc:
             logger.debug("Checkpoint creation non-blocking error: %s", cp_exc)
 
-        # 5. Publish Workflow Completed Event
+        # 6. Publish Workflow Completed Event
         try:
             await self.event_bus.publish(
                 WorkflowEvent(
@@ -242,7 +330,7 @@ class ChatGraphOrchestrator:
         except Exception as evt_exc:
             logger.debug("Event publication non-blocking error: %s", evt_exc)
 
-        # 6. Extract Response Turn Elements
+        # 7. Extract Response Turn Elements
         resp_data = final_state.execution.node_results.get("response", {})
         content = resp_data.get("content", "I am here to assist you.")
         model_used = resp_data.get("model_used", "volta-assistant")

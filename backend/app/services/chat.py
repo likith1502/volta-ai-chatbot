@@ -60,6 +60,7 @@ class ChatService(BaseService):
             provider=self.provider,
             tool_dispatcher=self.tool_dispatcher,
             prompt_builder=self.prompt_builder,
+            location_resolver=self.location_resolver,
         )
 
     async def process_chat(

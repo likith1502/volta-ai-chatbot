@@ -8,9 +8,10 @@ from app.workflow.node_types import WorkflowNodeType
 
 
 class ResponseNode(BaseWorkflowNode):
-    """
-    Workflow Node consolidating execution outputs into final turn response payload.
-    Extracts AI inference results, tool recommendations, and token metrics.
+    """Workflow Node consolidating execution outputs into final turn response payload.
+
+    Extracts AI inference results, tool recommendations, slot clarification prompts,
+    and token metrics.
     """
 
     node_name: str = "ResponseNode"
@@ -34,6 +35,45 @@ class ResponseNode(BaseWorkflowNode):
         recommendation_id = tool_data.get("recommendation_id")
 
         total_tokens = usage.get("total_tokens", 0) if isinstance(usage, dict) else 0
+
+        # Check ride entity state to present clarification prompts or formatted quotes
+        ride_data = state.memory.extracted_entities.get("ride")
+        if ride_data:
+            if ride_data.get("is_cancelled"):
+                content = (
+                    ride_data.get("clarification_question")
+                    or "Your ride request has been cancelled. Let me know if there's anything else I can help you with!"
+                )
+            elif ride_data.get("status") in (
+                "needs_both",
+                "needs_pickup",
+                "needs_destination",
+            ) and ride_data.get("clarification_question"):
+                content = ride_data["clarification_question"]
+            elif ride_data.get("status") == "resolved":
+                # If tool executed and LLM output is generic placeholder, format options clearly
+                if tool_data.get("results"):
+                    for res in tool_data["results"]:
+                        data = res.get("data")
+                        if data and "options" in data:
+                            options = data["options"]
+                            currency = data.get("currency", "INR")
+                            lines = ["Here are the available ride options:"]
+                            for opt in options:
+                                name = opt.get("display_name", opt.get("tier", "Ride"))
+                                fare = opt.get("fare")
+                                eta = opt.get("eta_minutes")
+                                lines.append(
+                                    f"- {name}: {currency} {fare} (ETA: {eta} mins)"
+                                )
+                            formatted_opts = "\n".join(lines)
+                            if content in (
+                                "I am here to assist you.",
+                                "I can help with that.",
+                                "I can assist you with your ride.",
+                                "",
+                            ):
+                                content = formatted_opts
 
         response_payload = {
             "content": content,
