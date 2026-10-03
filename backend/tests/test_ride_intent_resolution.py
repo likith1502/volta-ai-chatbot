@@ -716,7 +716,7 @@ async def test_14_step3_cab_pricing_integration_and_recommendation_persistence()
     )
 
     assert quote.recommendation_id == mock_rec.id
-    assert len(quote.options) == 3
+    assert len(quote.options) == 5
     assert all(opt.fare > Decimal("0.00") for opt in quote.options)
     assert quote.currency == "INR"
     pricing_service.recommendation_service.create_recommendation.assert_awaited_once()

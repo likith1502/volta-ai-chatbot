@@ -11,7 +11,8 @@ class DemoFleetPricingProvider(BaseFleetPricingProvider):
     """Demo fleet pricing provider returning staging telemetry and baseline pricing.
 
     IMPORTANT ARCHITECTURAL NOTICE:
-    The fares defined in this class (Mini ₹180, Sedan ₹240, SUV ₹360) are demonstration
+    The fares defined in this class (Mini ₹180, Sedan ₹240, SUV ₹360, EV ₹260,
+    Luxury ₹520) are demonstration
     fixtures constructed solely for local evaluation and staging verification.
     They do NOT represent production fares, distance-matrix calculations, or live
     metered rates. This provider is designed to be seamlessly swapped with a live
@@ -54,6 +55,24 @@ class DemoFleetPricingProvider(BaseFleetPricingProvider):
                 eta_minutes=8,
                 capacity=6,
                 description="Spacious electric SUV suited for groups, luggage, and maximum comfort.",
+            ),
+            CabOption(
+                tier=VehicleTier.EV,
+                display_name="EV",
+                fare=Decimal("260.00"),
+                currency=self.DEMO_CURRENCY,
+                eta_minutes=7,
+                capacity=4,
+                description="Eco-friendly all-electric car with a smooth, quiet ride.",
+            ),
+            CabOption(
+                tier=VehicleTier.LUXURY,
+                display_name="Luxury",
+                fare=Decimal("520.00"),
+                currency=self.DEMO_CURRENCY,
+                eta_minutes=10,
+                capacity=4,
+                description="Premium high-end car with top comfort for special trips.",
             ),
         ]
 

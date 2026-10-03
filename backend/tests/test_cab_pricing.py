@@ -30,8 +30,16 @@ def test_01_vehicle_tier_enum_values():
     assert VehicleTier.MINI == "mini"
     assert VehicleTier.SEDAN == "sedan"
     assert VehicleTier.SUV == "suv"
-    assert set(VehicleTier) == {VehicleTier.MINI, VehicleTier.SEDAN, VehicleTier.SUV}
-    assert len(VehicleTier) == 3
+    assert VehicleTier.EV == "ev"
+    assert VehicleTier.LUXURY == "luxury"
+    assert set(VehicleTier) == {
+        VehicleTier.MINI,
+        VehicleTier.SEDAN,
+        VehicleTier.SUV,
+        VehicleTier.EV,
+        VehicleTier.LUXURY,
+    }
+    assert len(VehicleTier) == 5
 
 
 # ============================================================================
@@ -288,7 +296,7 @@ async def test_07_demo_provider_structured_etas_and_capacities():
         LocationPoint(label="Point A"), LocationPoint(label="Point B")
     )
 
-    assert len(quote.options) == 3
+    assert len(quote.options) == 5
     assert quote.currency == "INR"
     assert quote.expires_at is not None
     assert quote.expires_at > quote.created_at
@@ -397,7 +405,7 @@ async def test_10_cab_pricing_service_calls_provider_and_validates():
     assert quote.pickup.label == "Work"
     assert quote.destination.label == "Home"
     assert quote.currency == "INR"
-    assert len(quote.options) == 3
+    assert len(quote.options) == 5
 
 
 # ============================================================================
@@ -565,7 +573,7 @@ async def test_13_cab_pricing_service_persists_recommendation_when_requested():
     assert call_kwargs["conversation_id"] == conv_id
     assert call_kwargs["recommendation_type"] == "cab_availability"
     assert "options" in call_kwargs["recommendation_data"]
-    assert len(call_kwargs["recommendation_data"]["options"]) == 3
+    assert len(call_kwargs["recommendation_data"]["options"]) == 5
 
 
 # ============================================================================
@@ -685,13 +693,13 @@ def test_16_cabs_quote_api_endpoint_success(client):
     quote_data = json_data["data"]
     assert "quote_id" in quote_data
     assert quote_data["currency"] == "INR"
-    assert len(quote_data["options"]) == 3
+    assert len(quote_data["options"]) == 5
 
     tiers = [opt["tier"] for opt in quote_data["options"]]
-    assert tiers == ["mini", "sedan", "suv"]
+    assert tiers == ["mini", "sedan", "suv", "ev", "luxury"]
 
     fares = [float(opt["fare"]) for opt in quote_data["options"]]
-    assert fares == [180.0, 240.0, 360.0]
+    assert fares == [180.0, 240.0, 360.0, 260.0, 520.0]
 
 
 # ============================================================================
@@ -767,10 +775,27 @@ async def test_18_regression_existing_recommendation_and_graph_compatibility():
     assert result.tool_name == "recommendation"
     assert result.data["recommendation_id"] == rec_id
     assert result.data["currency"] == "INR"
-    assert len(result.data["options"]) == 3
+    assert len(result.data["options"]) == 5
 
     # Read-only guarantee: BookingService / Booking model was never modified or invoked
     from app.services.booking import BookingService
 
     # Verify BookingService has no references to cab_pricing or quote
     assert not hasattr(BookingService, "get_cab_quote")
+
+
+# ============================================================================
+# 19. EV and Luxury tier selection (including customer wording)
+# ============================================================================
+
+
+def test_19_extract_vehicle_tier_ev_and_luxury_aliases():
+    """Customers can pick EV/Luxury by name or by common wording."""
+    from app.ai.prompts.recommendation import extract_vehicle_tier
+
+    assert extract_vehicle_tier("I'll take the EV") == "ev"
+    assert extract_vehicle_tier("book an electric car") == "ev"
+    assert extract_vehicle_tier("Volta Luxury please") == "luxury"
+    assert extract_vehicle_tier("premium one") == "luxury"
+    assert extract_vehicle_tier("sedan") == "sedan"
+    assert extract_vehicle_tier("helicopter") is None

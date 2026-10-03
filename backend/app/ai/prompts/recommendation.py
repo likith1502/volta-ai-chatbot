@@ -42,7 +42,13 @@ RIDE_INTENT_PATTERNS = [
 ]
 
 # Vehicle tier matching patterns
-KNOWN_VEHICLE_TIERS = ["mini", "sedan", "suv"]
+KNOWN_VEHICLE_TIERS = ["mini", "sedan", "suv", "ev", "luxury"]
+
+# Extra words customers use for a tier (checked after the tier name itself).
+VEHICLE_TIER_ALIASES = {
+    "ev": ["electric"],
+    "luxury": ["premium"],
+}
 
 
 # Explicit booking confirmation patterns
@@ -59,12 +65,16 @@ AMBIGUOUS_BOOKING_PATTERNS = [
 
 
 def extract_vehicle_tier(user_input: str) -> Optional[str]:
-    """Extracts quoted vehicle tier (mini, sedan, suv) from user input."""
+    """Extracts quoted vehicle tier (mini, sedan, suv, ev, luxury) from user input."""
     text = user_input.strip().lower()
     for tier in KNOWN_VEHICLE_TIERS:
         # Match 'volta sedan', 'sedan', 'the sedan', 'book sedan', 'sedan please'
         if re.search(rf"\b(?:volta\s+)?{tier}\b", text):
             return tier
+    for tier, aliases in VEHICLE_TIER_ALIASES.items():
+        for alias in aliases:
+            if re.search(rf"\b(?:volta\s+)?{alias}\b", text):
+                return tier
     return None
 
 

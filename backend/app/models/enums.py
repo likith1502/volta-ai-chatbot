@@ -52,3 +52,5 @@ class VehicleTier(str, Enum):
     MINI = "mini"
     SEDAN = "sedan"
     SUV = "suv"
+    EV = "ev"
+    LUXURY = "luxury"
