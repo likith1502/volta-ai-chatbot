@@ -1,5 +1,6 @@
 from typing import Optional
 
+from app.ai.prompts.recommendation import is_cancellation_intent
 from app.ai.prompts.human_text import (
     extract_quoted_fares,
     format_inr,
@@ -44,13 +45,41 @@ class ResponseNode(BaseWorkflowNode):
 
         # Check ride entity state to present clarification prompts, quotes, or booking confirmations
         ride_data = state.memory.extracted_entities.get("ride")
-        if ride_data:
+
+        # Show the booking confirmation only on the turn the customer actually
+        # confirmed (or repeated a confirmation). On later turns the old
+        # booking stays in memory, but the reply must answer the new message.
+        intent_result = state.execution.node_results.get("intent") or {}
+        booking_this_turn = (
+            intent_result.get("intent") == "ride_booking"
+            or bool(tool_data.get("booking_reference"))
+            or any(
+                isinstance(r, dict) and isinstance(r.get("data"), dict)
+                and r["data"].get("booking_reference")
+                for r in (tool_data.get("results") or [])
+            )
+        )
+        # A ride booked on an earlier turn must not leak into later replies
+        # (old booking details, or a stale "Shall I book it?" question).
+        current_text = (state.conversation.current_message or {}).get("content", "")
+        cancelled_this_turn = is_cancellation_intent(current_text)
+        ride_already_done = bool(
+            ride_data
+            and (
+                (
+                    (ride_data.get("is_booked") or ride_data.get("booking_reference"))
+                    and not booking_this_turn
+                )
+                or (ride_data.get("is_cancelled") and not cancelled_this_turn)
+            )
+        )
+        if ride_data and not ride_already_done:
             if ride_data.get("is_cancelled"):
                 content = (
                     ride_data.get("clarification_question")
                     or "Your ride request has been cancelled. Let me know if there's anything else I can help you with!"
                 )
-            elif ride_data.get("is_booked") or ride_data.get("booking_reference"):
+            elif (ride_data.get("is_booked") or ride_data.get("booking_reference")) and booking_this_turn:
                 ref = ride_data.get("booking_reference")
                 b_status = ride_data.get("booking_status", "confirmed").capitalize()
                 pickup_lbl = (

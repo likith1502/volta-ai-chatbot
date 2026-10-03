@@ -256,3 +256,54 @@ async def test_chat_service_fare_save_failure_never_breaks_reply():
     service.session = session
     # must not raise
     await service._apply_quoted_fares({"fare_overrides": {"sedan": "170.00"}}, uuid.uuid4())
+
+
+@pytest.mark.asyncio
+async def test_booking_message_not_repeated_on_later_messages():
+    """Bug report: after booking, every reply repeated 'Done! Your Volta SUV is booked'."""
+    say, booking = _setup()
+    await say("Book a cab from Home to Work")
+    await say("Sedan")
+    t3 = await say("yes")
+    assert "is booked" in t3["content"]
+
+    # Later, unrelated messages get the assistant's own answer, not the old booking.
+    t4 = await say("give me the python code of fibonacci series")
+    assert "is booked" not in t4["content"] and "BK-NATURAL1" not in t4["content"]
+    assert t4["content"] == GEMINI_QUOTE  # the AI's reply is passed through
+
+    t5 = await say("haan give me the python code")
+    assert "is booked" not in t5["content"]
+    booking.create_booking_from_recommendation.assert_awaited_once()  # never rebooked
+
+
+def test_system_prompt_declines_off_topic():
+    from app.ai.prompts.system_prompt import VOLTA_SYSTEM_PROMPT
+
+    assert "do NOT answer it" in VOLTA_SYSTEM_PROMPT
+    assert "programming code" in VOLTA_SYSTEM_PROMPT
+
+
+@pytest.mark.asyncio
+async def test_new_ride_after_booking_gets_fresh_quote():
+    say, booking = _setup()
+    await say("Book a cab from Home to Work")
+    await say("Sedan")
+    await say("yes")
+    t4 = await say("Book a cab from Work to Home")
+    assert "is booked" not in t4["content"]
+    ride = t4["final_state"].memory.extracted_entities["ride"]
+    assert not ride.get("is_booked") and not ride.get("selected_tier")
+    t5 = await say("SUV")
+    assert "Volta SUV" in t5["content"] and "Shall I book it for you?" in t5["content"]
+
+
+@pytest.mark.asyncio
+async def test_cancel_message_not_repeated_later():
+    say, booking = _setup()
+    await say("Book a cab from Home to Work")
+    t2 = await say("cancel my ride")
+    assert "cancel" in t2["content"].lower()
+    t3 = await say("give me the python code")
+    assert "cancelled" not in t3["content"].lower()
+    booking.create_booking_from_recommendation.assert_not_awaited()

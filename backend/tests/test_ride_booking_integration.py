@@ -1951,7 +1951,7 @@ async def test_31_response_node_duplicate_replay_formatting():
         )
     ).with_update(
         extracted_entities={"ride": ride_replay_state},
-        node_results={"tool": {"executed": True}},
+        node_results={"tool": {"executed": True}, "intent": {"intent": "ride_booking"}},
     )
 
     final_state = await response_node.execute(state)
@@ -2147,7 +2147,7 @@ async def test_33_normal_booking_preserves_tier_and_fare():
         )
     ).with_update(
         extracted_entities={"ride": ride_normal_state},
-        node_results={"tool": {"executed": True}},
+        node_results={"tool": {"executed": True}, "intent": {"intent": "ride_booking"}},
     )
 
     final_state = await response_node.execute(state)
