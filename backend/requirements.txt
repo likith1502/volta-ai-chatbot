@@ -8,6 +8,7 @@ uvicorn[standard]>=0.22.0,<1.0.0
 # Configuration & Settings Management
 pydantic-settings>=2.0.0,<3.0.0
 python-dotenv>=1.0.0,<2.0.0
+email-validator>=2.0.0,<3.0.0  # required by pydantic EmailStr (user schemas)
 
 # Database & Async ORM (Primary Relational)
 sqlalchemy[asyncio]>=2.0.0,<3.0.0

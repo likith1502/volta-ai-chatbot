@@ -58,7 +58,6 @@ class ChatService(BaseService):
             registry.register(BookingTool(session))
             self.tool_dispatcher = AIToolDispatcher(registry)
 
-
         self.graph_orchestrator = ChatGraphOrchestrator(
             provider=self.provider,
             tool_dispatcher=self.tool_dispatcher,
