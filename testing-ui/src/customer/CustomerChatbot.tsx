@@ -4,6 +4,8 @@ import {
   Bot,
   Car,
   Loader2,
+  Mic,
+  MicOff,
   MessageSquare,
   RefreshCw,
   Send,
@@ -14,6 +16,8 @@ import { api } from '../api/client';
 import { RideState, UIError, User } from '../types';
 import { formatTimeIST } from '../utils/india';
 import { RideCard } from './RideCard';
+import { FormattedText } from './FormattedText';
+import { SPEECH_LANGUAGES, useSpeechInput } from './useSpeechInput';
 import './CustomerChatbot.css';
 
 
@@ -42,6 +46,8 @@ export const CustomerChatbot: React.FC = () => {
   const [uiError, setUiError] = useState<UIError | null>(null);
   const [isBackendOnline, setIsBackendOnline] = useState<boolean | null>(null);
   const [activeUser, setActiveUser] = useState<User | null>(null);
+  const activeUserRef = useRef<User | null>(null);
+  activeUserRef.current = activeUser;
   const [sessionId] = useState<string>(() => {
     return localStorage.getItem('volta_customer_session') || `sess_${Date.now().toString(36)}`;
   });
@@ -59,6 +65,8 @@ export const CustomerChatbot: React.FC = () => {
     try {
       await api.checkHealth();
       setIsBackendOnline(true);
+      // Recover automatically if the page loaded before the backend started.
+      if (!activeUserRef.current) initUser();
     } catch {
       setIsBackendOnline(false);
     }
@@ -157,6 +165,22 @@ export const CustomerChatbot: React.FC = () => {
       inputRef.current?.focus();
     }
   };
+
+  // Voice input: speak instead of typing (sent through the normal chat).
+  const [speechLang, setSpeechLang] = useState<string>(
+    () => localStorage.getItem('volta_speech_lang') || 'en-IN'
+  );
+  useEffect(() => {
+    localStorage.setItem('volta_speech_lang', speechLang);
+  }, [speechLang]);
+  const speech = useSpeechInput({
+    lang: speechLang,
+    onInterim: text => setInputText(text),
+    onFinal: text => {
+      setInputText('');
+      handleSendMessage(text);
+    },
+  });
 
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -296,7 +320,9 @@ export const CustomerChatbot: React.FC = () => {
 
                 <div className="cb-bubble-wrap">
                   <div className={`cb-bubble ${msg.role === 'user' ? 'cb-bubble--user' : 'cb-bubble--assistant'}`}>
-                    <div className="cb-bubble-text">{msg.content}</div>
+                    <div className="cb-bubble-text">
+                      {msg.role === 'assistant' ? <FormattedText text={msg.content} /> : msg.content}
+                    </div>
                   </div>
 
                   {msg.role === 'assistant' && (
@@ -359,13 +385,26 @@ export const CustomerChatbot: React.FC = () => {
           <textarea
             ref={inputRef}
             className="cb-input-field"
-            placeholder="Book a cab or ask about VOLTA…"
+            placeholder={speech.isListening ? 'Listening… speak now' : 'Book a cab or ask about VOLTA…'}
             value={inputText}
             onChange={e => setInputText(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={isSending}
             rows={1}
           />
+          {speech.isSupported && (
+            <button
+              type="button"
+              className={`cb-mic-btn ${speech.isListening ? 'cb-mic-btn--on' : ''}`}
+              onClick={speech.isListening ? speech.stop : speech.start}
+              disabled={isSending || !activeUser}
+              title={speech.isListening ? 'Stop listening' : 'Speak instead of typing'}
+              aria-label={speech.isListening ? 'Stop listening' : 'Speak instead of typing'}
+              aria-pressed={speech.isListening}
+            >
+              {speech.isListening ? <MicOff size={18} /> : <Mic size={18} />}
+            </button>
+          )}
           <button
             type="submit"
             className="cb-send-btn"
@@ -379,8 +418,34 @@ export const CustomerChatbot: React.FC = () => {
             )}
           </button>
         </form>
+        {speech.error && (
+          <div className="cb-mic-error" role="alert">
+            {speech.error}
+            <button onClick={speech.clearError} aria-label="Dismiss">
+              <X size={12} />
+            </button>
+          </div>
+        )}
         <div className="cb-input-hint">
-          Press <kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for new line
+          {speech.isSupported ? (
+            <>
+              <Mic size={11} /> Tap the mic to speak in
+              <select
+                className="cb-lang-select"
+                value={speechLang}
+                onChange={e => setSpeechLang(e.target.value)}
+                disabled={speech.isListening}
+                aria-label="Voice language"
+              >
+                {SPEECH_LANGUAGES.map(l => (
+                  <option key={l.code} value={l.code}>{l.label}</option>
+                ))}
+              </select>
+              · <kbd>Enter</kbd> to send
+            </>
+          ) : (
+            <>Press <kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for new line</>
+          )}
         </div>
       </footer>
 

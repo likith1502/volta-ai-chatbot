@@ -762,3 +762,47 @@ html:has(.cb-root), html:has(.cb-root) body, html:has(.cb-root) #root {
 .cb-root .cb-input-field::placeholder { color: var(--text-muted); }
 .cb-root kbd { background: #f3f3f3; color: var(--text-secondary); border-color: var(--border-color); }
 .cb-root .ride-option-meta { opacity: 1; color: var(--text-muted); }
+
+/* ---------- Formatted AI replies (bold/lists instead of ** and ###) ---------- */
+.fmt p { margin: 0 0 8px; }
+.fmt p:last-child { margin-bottom: 0; }
+.fmt .fmt-h { font-weight: 700; margin-top: 4px; }
+.fmt ul, .fmt ol { margin: 0 0 8px; padding-left: 22px; }
+.fmt li { margin: 2px 0; }
+.fmt strong { font-weight: 700; color: var(--text-primary); }
+.fmt-code { background: #ececec; border-radius: 4px; padding: 1px 5px; font-size: 0.9em; }
+
+/* ---------- Microphone ---------- */
+.cb-mic-btn {
+  flex-shrink: 0;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: #ffffff;
+  color: var(--text-primary);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.cb-mic-btn:hover:not(:disabled) { border-color: var(--accent-color); color: var(--accent-color); }
+.cb-mic-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.cb-mic-btn--on {
+  background: #d32f2f; border-color: #d32f2f; color: #ffffff;
+  animation: cb-mic-pulse 1.2s ease-in-out infinite;
+}
+@keyframes cb-mic-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.45); }
+  50% { box-shadow: 0 0 0 8px rgba(211, 47, 47, 0); }
+}
+.cb-mic-error {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  margin: 6px 4px 0; padding: 6px 10px; border-radius: 8px;
+  background: var(--danger-bg); color: var(--danger-color); font-size: 12px;
+}
+.cb-mic-error button { background: none; border: none; color: inherit; cursor: pointer; }
+.cb-input-hint { display: flex; align-items: center; justify-content: center; gap: 5px; flex-wrap: wrap; }
+.cb-lang-select {
+  font: inherit; font-size: 12px; color: var(--text-primary);
+  border: 1px solid var(--border-color); border-radius: 6px; padding: 1px 4px; background: #fff;
+}
+@media (prefers-reduced-motion: reduce) { .cb-mic-btn--on { animation: none; } }
