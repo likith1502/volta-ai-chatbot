@@ -145,7 +145,7 @@ async def test_01_full_ride_request_single_turn_resolved():
     ]
     assert "tool" in result["visited_nodes"]
     assert result["recommendation_id"] is not None
-    assert "Here are the available ride options:" in result["content"]
+    assert "Here are the cars available for your trip:" in result["content"]
 
 
 # ============================================================================

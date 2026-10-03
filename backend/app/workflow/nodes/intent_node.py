@@ -5,6 +5,13 @@ from decimal import Decimal
 from typing import Any, Optional
 
 
+from app.ai.prompts.human_text import (
+    format_inr,
+    is_affirmative_reply,
+    is_negative_reply,
+    place_name,
+    vehicle_name,
+)
 from app.ai.prompts.recommendation import (
     extract_vehicle_tier,
     is_ambiguous_booking_intent,
@@ -139,8 +146,46 @@ class IntentNode(BaseWorkflowNode):
         )
 
         if has_active_quote and not is_explicit_new_ride:
-            # 3A. Explicit Booking Confirmation
-            if is_booking_confirmation(user_text):
+            # 3A. Booking Confirmation
+            # Once a vehicle is chosen, everyday replies ("yes", "ok", "haan",
+            # "book it") confirm it - unless they name a different vehicle.
+            mentioned_tier = extract_vehicle_tier(user_text)
+            natural_yes = bool(
+                prior_ride.selected_tier
+                and is_affirmative_reply(user_text)
+                and (mentioned_tier is None or mentioned_tier == prior_ride.selected_tier)
+            )
+
+            # 3A-0. "No" after choosing a vehicle: nothing is booked.
+            if prior_ride.selected_tier and is_negative_reply(user_text) and not mentioned_tier:
+                prior_ride.selected_tier = None
+                prior_ride.selected_fare = None
+                prior_ride.selected_display_name = None
+                prior_ride.status = RideSlotStatus.RESOLVED
+                names = ", ".join(
+                    o.get("display_name", o.get("tier")) for o in prior_ride.available_options
+                )
+                prior_ride.clarification_question = (
+                    "No problem, I haven't booked anything. "
+                    f"Would you like a different car? You can pick from {names}."
+                )
+                new_entities["ride"] = prior_ride.model_dump(mode="json")
+                intent_payload = {
+                    "intent": "ride_recommendation",
+                    "confidence": 0.95,
+                    "requires_booking": False,
+                    "requires_recommendation": False,
+                    "ride_status": prior_ride.status.value,
+                }
+                new_node_results[self.node_id] = intent_payload
+                return state.with_update(
+                    workflow_step=self.node_id,
+                    detected_intent=intent_payload,
+                    extracted_entities=new_entities,
+                    node_results=new_node_results,
+                )
+
+            if natural_yes or (is_booking_confirmation(user_text) and not mentioned_tier):
                 if prior_ride.selected_tier:
                     # User confirmed selected tier -> trigger BookingTool
                     intent_payload = {
@@ -160,12 +205,12 @@ class IntentNode(BaseWorkflowNode):
                     # User confirmed without selecting a tier -> prompt for tier
                     opts_text = ", ".join(
                         [
-                            f"{o.get('display_name', o.get('tier'))} ({o.get('currency', 'INR')} {o.get('fare')})"
+                            f"{o.get('display_name', o.get('tier'))} ({format_inr(o.get('fare'))})"
                             for o in prior_ride.available_options
                         ]
                     )
                     prior_ride.clarification_question = (
-                        f"Which vehicle option would you like to book? Please choose from the available options: {opts_text}."
+                        f"Sure! Which car would you like? You can choose {opts_text}."
                     )
                     new_entities["ride"] = prior_ride.model_dump(mode="json")
                     intent_payload = {
@@ -195,25 +240,27 @@ class IntentNode(BaseWorkflowNode):
                 if matching_opt:
                     opt_name = matching_opt.get("display_name", tier.capitalize())
                     opt_fare = matching_opt.get("fare")
-                    currency = matching_opt.get("currency", "INR")
                     pickup_lbl = (
                         prior_ride.pickup_point.label
                         if prior_ride.pickup_point
                         else prior_ride.pickup_raw
-                    ) or "your pickup"
+                    )
                     dest_lbl = (
                         prior_ride.destination_point.label
                         if prior_ride.destination_point
                         else prior_ride.destination_raw
-                    ) or "your destination"
+                    )
 
                     prior_ride.selected_tier = tier
                     prior_ride.selected_fare = Decimal(str(opt_fare)) if opt_fare is not None else None
                     prior_ride.selected_display_name = opt_name
                     prior_ride.status = RideSlotStatus.AWAITING_CONFIRMATION
+                    fare_text = f" for about {format_inr(opt_fare)}" if opt_fare is not None else ""
                     prior_ride.clarification_question = (
-                        f"You have selected {opt_name} with a quoted fare of {currency} {opt_fare} from {pickup_lbl} to {dest_lbl}. "
-                        "Would you like to confirm this booking? (Please reply 'Confirm' or 'Yes, confirm')"
+                        f"Great choice! {vehicle_name(opt_name)} from "
+                        f"{place_name(pickup_lbl, 'your pickup')} to "
+                        f"{place_name(dest_lbl, 'your destination')}{fare_text}. "
+                        "Shall I book it for you? Just say yes, or tell me if you'd like a different car."
                     )
                     new_entities["ride"] = prior_ride.model_dump(mode="json")
                     intent_payload = {
@@ -238,8 +285,8 @@ class IntentNode(BaseWorkflowNode):
                         ]
                     )
                     prior_ride.clarification_question = (
-                        f"{tier.capitalize()} is not available for this route. "
-                        f"Please choose from the available options: {opts_text}."
+                        f"Sorry, {tier.capitalize()} isn't available for this trip. "
+                        f"You can choose from {opts_text}."
                     )
                     new_entities["ride"] = prior_ride.model_dump(mode="json")
                     intent_payload = {
@@ -273,8 +320,8 @@ class IntentNode(BaseWorkflowNode):
                         ]
                     )
                     prior_ride.clarification_question = (
-                        f"'{requested_word.capitalize()}' is not available for this route. "
-                        f"Please choose from the available options: {opts_text}."
+                        f"Sorry, '{requested_word.capitalize()}' isn't something we offer. "
+                        f"You can choose from {opts_text}."
                     )
                     new_entities["ride"] = prior_ride.model_dump(mode="json")
                     intent_payload = {
@@ -296,12 +343,12 @@ class IntentNode(BaseWorkflowNode):
             if is_ambiguous_booking_intent(user_text):
                 opts_text = ", ".join(
                     [
-                        f"{o.get('display_name', o.get('tier'))} ({o.get('currency', 'INR')} {o.get('fare')})"
+                        f"{o.get('display_name', o.get('tier'))} ({format_inr(o.get('fare'))})"
                         for o in prior_ride.available_options
                     ]
                 )
                 prior_ride.clarification_question = (
-                    f"Which vehicle option would you like to book? Please choose from the available options: {opts_text}."
+                    f"Sure! Which car would you like? You can choose {opts_text}."
                 )
                 new_entities["ride"] = prior_ride.model_dump(mode="json")
                 intent_payload = {

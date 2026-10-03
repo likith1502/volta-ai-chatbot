@@ -19,6 +19,7 @@ from app.ai.tools.registry import AIToolRegistry
 from app.exceptions.domain import UserNotFoundException
 from app.models.enums import ConversationSource, ConversationStatus, MessageRole
 from app.models.message import Message
+from app.models.recommendation import Recommendation
 from app.repositories.base import BaseRepository
 from app.repositories.conversation import ConversationRepository
 from app.repositories.user import UserRepository
@@ -64,6 +65,52 @@ class ChatService(BaseService):
             prompt_builder=self.prompt_builder,
             location_resolver=self.location_resolver,
         )
+
+    async def _apply_quoted_fares(
+        self, graph_turn: dict[str, Any], recommendation_id: Optional[uuid.UUID]
+    ) -> None:
+        """Store the fares Gemini showed into the persisted quote.
+
+        The booking reads its fare from the stored quote, so this keeps the
+        price the customer saw and the price that gets booked the same.
+        """
+        overrides = graph_turn.get("fare_overrides") or {}
+        if not overrides:
+            return
+        rec_id = recommendation_id
+        if rec_id is None:
+            final_state = graph_turn.get("final_state")
+            ride = (
+                final_state.memory.extracted_entities.get("ride")
+                if final_state is not None
+                else None
+            ) or {}
+            raw = ride.get("recommendation_id")
+            try:
+                rec_id = uuid.UUID(str(raw)) if raw else None
+            except (ValueError, TypeError):
+                rec_id = None
+        if rec_id is None:
+            return
+        try:
+            rec = await self.session.get(Recommendation, rec_id)
+            if rec is None:
+                return
+            data = dict(rec.recommendation_data or {})
+            data["options"] = [
+                {
+                    **opt,
+                    "fare": overrides.get(
+                        str(opt.get("tier", "")).lower(), opt.get("fare")
+                    ),
+                }
+                for opt in data.get("options", [])
+            ]
+            data["fare_source"] = "assistant_estimate"
+            rec.recommendation_data = data
+            await self.session.flush()
+        except Exception as exc:  # noqa: BLE001 - never block the reply
+            logger.warning("Could not store quoted fares: %s", exc)
 
     async def process_chat(
         self,
@@ -142,6 +189,7 @@ class ChatService(BaseService):
             token_count = graph_turn["total_tokens"]
             usage_data = graph_turn["usage"]
             recommendation_id = graph_turn["recommendation_id"]
+            await self._apply_quoted_fares(graph_turn, recommendation_id)
         except Exception as graph_err:
             logger.warning(
                 "Graph runtime execution failed, falling back to direct pipeline: %s",

@@ -1,5 +1,11 @@
 from typing import Optional
 
+from app.ai.prompts.human_text import (
+    extract_quoted_fares,
+    format_inr,
+    place_name,
+    vehicle_name,
+)
 from app.context.state import ConversationState
 from app.context.types import NodeType
 from app.workflow.base import BaseWorkflowNode
@@ -66,38 +72,36 @@ class ResponseNode(BaseWorkflowNode):
                         and dest_lbl != "Destination"
                     )
                     route_line = (
-                        f"\n- Route: {pickup_lbl} to {dest_lbl}"
+                        f"\n- Route: {place_name(pickup_lbl, 'Pickup')} → {place_name(dest_lbl, 'Destination')}"
                         if has_route
                         else ""
                     )
                     content = (
-                        "This ride has already been confirmed.\n"
-                        f"- Booking Reference: {ref}\n"
+                        "Good news, this ride is already booked, so I haven't made a second booking.\n"
+                        f"- Booking reference: **{ref}**\n"
                         f"- Status: {b_status}"
-                        f"{route_line}\n\n"
-                        "Your existing booking remains confirmed in the VOLTA system."
+                        f"{route_line}"
                     )
                 else:
                     raw_tier = (
                         ride_data.get("selected_display_name")
                         or (ride_data.get("selected_tier", "Ride").capitalize())
                     )
-                    tier_str = raw_tier if raw_tier.lower().startswith("volta") else f"Volta {raw_tier}"
+                    tier_str = vehicle_name(raw_tier)
                     fare_val = ride_data.get("selected_fare")
-                    fare_line = f"\n- Quoted Fare: INR {fare_val}" if fare_val else ""
+                    fare_line = f"\n- Fare: about {format_inr(fare_val)}" if fare_val else ""
                     content = (
-                        f"Your {tier_str} ride has been successfully booked!\n"
-                        f"- Booking Reference: {ref}\n"
-                        f"- Status: {b_status}\n"
-                        f"- Vehicle Tier: {tier_str}"
+                        f"Done! Your {tier_str} is booked. 🎉\n"
+                        f"- Booking reference: **{ref}**\n"
+                        f"- Route: {place_name(pickup_lbl, 'Pickup')} → {place_name(dest_lbl, 'Destination')}"
                         f"{fare_line}\n"
-                        f"- Route: {pickup_lbl} to {dest_lbl}\n\n"
-                        "Your booking is confirmed in the VOLTA system. A notification has been sent to your account."
+                        f"- Status: {b_status}\n\n"
+                        "You'll get a notification in the app with your booking details. Have a safe trip!"
                     )
             elif ride_data.get("booking_error"):
                 content = (
-                    f"We were unable to confirm your booking: {ride_data['booking_error']}. "
-                    "Please try again or request a new quote."
+                    "Sorry, I couldn't complete that booking just now. "
+                    "Please tell me your pickup and drop again and I'll get you fresh prices."
                 )
             elif ride_data.get("clarification_question"):
                 content = ride_data["clarification_question"]
@@ -108,14 +112,13 @@ class ResponseNode(BaseWorkflowNode):
                         data = res.get("data")
                         if data and "options" in data:
                             options = data["options"]
-                            currency = data.get("currency", "INR")
-                            lines = ["Here are the available ride options:"]
+                            lines = ["Here are the cars available for your trip:"]
                             for opt in options:
                                 name = opt.get("display_name", opt.get("tier", "Ride"))
                                 fare = opt.get("fare")
                                 eta = opt.get("eta_minutes")
                                 lines.append(
-                                    f"- {name}: {currency} {fare} (ETA: {eta} mins)"
+                                    f"- **{vehicle_name(name)}**: {format_inr(fare)} (arrives in about {eta} min)"
                                 )
                             formatted_opts = "\n".join(lines)
                             if content in (
@@ -126,7 +129,31 @@ class ResponseNode(BaseWorkflowNode):
                             ):
                                 content = formatted_opts
 
+        # Keep prices consistent: when Gemini presented the ride options with
+        # its own fare estimates, store those fares in the quote so the
+        # selection, confirmation and booking all use what the customer saw.
+        fare_overrides: dict[str, str] = {}
+        new_entities = None
+        if (
+            ride_data
+            and ride_data.get("status") == "resolved"
+            and not ride_data.get("selected_tier")
+            and ride_data.get("available_options")
+            and model_used != "unavailable"
+            and content == llm_data.get("content")
+        ):
+            fare_overrides = extract_quoted_fares(content, ride_data["available_options"])
+            if fare_overrides:
+                updated_ride = dict(ride_data)
+                updated_ride["available_options"] = [
+                    {**opt, "fare": fare_overrides.get(str(opt.get("tier", "")).lower(), opt.get("fare"))}
+                    for opt in ride_data["available_options"]
+                ]
+                new_entities = dict(state.memory.extracted_entities)
+                new_entities["ride"] = updated_ride
+
         response_payload = {
+            "fare_overrides": fare_overrides,
             "content": content,
             "model_used": model_used,
             "usage": usage,
@@ -137,6 +164,12 @@ class ResponseNode(BaseWorkflowNode):
         new_node_results = dict(state.execution.node_results)
         new_node_results[self.node_id] = response_payload
 
+        if new_entities is not None:
+            return state.with_update(
+                workflow_step=self.node_id,
+                node_results=new_node_results,
+                extracted_entities=new_entities,
+            )
         return state.with_update(
             workflow_step=self.node_id,
             node_results=new_node_results,

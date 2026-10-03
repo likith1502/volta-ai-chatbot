@@ -354,6 +354,7 @@ class ChatGraphOrchestrator:
             "usage": usage,
             "total_tokens": total_tokens,
             "recommendation_id": recommendation_id,
+            "fare_overrides": resp_data.get("fare_overrides") or {},
             "visited_nodes": exec_result.visited_nodes,
             "final_state": final_state,
         }

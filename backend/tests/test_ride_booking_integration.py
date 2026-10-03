@@ -157,7 +157,7 @@ async def test_01_select_each_available_vehicle_tier():
         assert final_ride.selected_tier == chosen_tier
         assert final_ride.selected_fare is not None
         assert final_ride.is_booked is False
-        assert "Would you like to confirm this booking?" in t2["content"]
+        assert "Shall I book it for you?" in t2["content"]
         assert "tool" not in t2["visited_nodes"]  # Did NOT call BookingService yet!
 
 
@@ -288,7 +288,7 @@ async def test_03_ambiguous_booking_asks_which_tier():
     )
     assert final_ride.is_booked is False
     assert final_ride.selected_tier is None
-    assert "Which vehicle option would you like to book?" in t2["content"]
+    assert "Which car would you like?" in t2["content"]
     assert "tool" not in t2["visited_nodes"]
 
 
@@ -431,7 +431,7 @@ async def test_05_successful_end_to_end_booking():
         message_text="Volta Sedan",
         saved_locations=[mock_home, mock_work],
     )
-    assert "Would you like to confirm this booking?" in t2["content"]
+    assert "Shall I book it for you?" in t2["content"]
 
     # Turn 3: Explicit Confirmation
     t3 = await orchestrator.execute_chat_turn(
@@ -450,10 +450,10 @@ async def test_05_successful_end_to_end_booking():
     )
 
     # Verify Response Content contains confirmed facts only (no invented driver/ETA)
-    assert "Your Volta Sedan ride has been successfully booked!" in t3["content"]
+    assert "Your Volta Sedan is booked." in t3["content"]
     assert "BK-7A8B9C10" in t3["content"]
     assert "Status: Confirmed" in t3["content"]
-    assert "Route: Home to Work" in t3["content"]
+    assert "Route: Home → Work" in t3["content"]
     assert "driver" not in t3["content"].lower()
 
     # Traversal verified
@@ -541,8 +541,10 @@ async def test_06_booking_service_failure_reports_not_confirmed():
         saved_locations=[mock_home, mock_work],
     )
 
-    assert "unable to confirm your booking" in t3["content"]
+    assert "couldn't complete that booking" in t3["content"]
     assert "successfully booked" not in t3["content"]
+    assert "is booked" not in t3["content"]
+    assert "Booking reference" not in t3["content"]
 
 
 # ============================================================================
@@ -808,7 +810,7 @@ async def test_11_reject_confirmation_without_prior_tier_selection():
     )
 
     booking_service.create_booking_from_recommendation.assert_not_called()
-    assert "Which vehicle option would you like to book?" in t2["content"]
+    assert "Which car would you like?" in t2["content"]
     assert "tool" not in t2["visited_nodes"]
 
 
@@ -1065,7 +1067,7 @@ async def test_14_stale_state_cleared_on_route_change_prevents_wrong_booking():
 
     # Booking must NOT be invoked with the stale Sedan selection
     booking_service.create_booking_from_recommendation.assert_not_called()
-    assert "Which vehicle option would you like to book?" in t4["content"]
+    assert "Which car would you like?" in t4["content"]
     assert "tool" not in t4["visited_nodes"]
 
 
@@ -1957,14 +1959,17 @@ async def test_31_response_node_duplicate_replay_formatting():
     content = resp.get("content", "")
 
     # States existing booking is already confirmed
-    assert "This ride has already been confirmed." in content
+    assert "this ride is already booked" in content
     assert "BK-REPLAY-002" in content
     assert "Status: Confirmed" in content
-    assert "Route: Indiranagar to Whitefield" in content
+    assert "Route: Indiranagar → Whitefield" in content
 
     # Must NOT claim a vehicle tier or quoted fare
     assert "Vehicle Tier:" not in content
     assert "Quoted Fare:" not in content
+    assert "Fare:" not in content
+    assert "₹" not in content
+    assert "Your Volta" not in content
     assert "suv" not in content.lower()
     assert "sedan" not in content.lower()
     assert "successfully booked" not in content.lower()
@@ -2050,7 +2055,7 @@ async def test_32_workflow_duplicate_replay_with_different_tier_does_not_echo_ti
         message_text="Volta Sedan",
         saved_locations=[mock_home, mock_work],
     )
-    assert "Would you like to confirm this booking?" in t2["content"]
+    assert "Shall I book it for you?" in t2["content"]
 
     # 3. Confirm Sedan (first-time booking)
     t3 = await orchestrator.execute_chat_turn(
@@ -2060,10 +2065,10 @@ async def test_32_workflow_duplicate_replay_with_different_tier_does_not_echo_ti
         message_text="Yes, confirm",
         saved_locations=[mock_home, mock_work],
     )
-    assert "Your Volta Sedan ride has been successfully booked!" in t3["content"]
+    assert "Your Volta Sedan is booked." in t3["content"]
     assert "BK-ORIGINAL-SEDAN" in t3["content"]
-    assert "Vehicle Tier: Volta Sedan" in t3["content"]
-    assert "Quoted Fare: INR 240.00" in t3["content"]
+    assert "Your Volta Sedan is booked." in t3["content"]
+    assert "Fare: about ₹240" in t3["content"]
 
     # 4. Replay arrives: Now recommendation is ACCEPTED.
     mock_rec.status = RecommendationStatus.ACCEPTED
@@ -2099,15 +2104,17 @@ async def test_32_workflow_duplicate_replay_with_different_tier_does_not_echo_ti
     replay_content = final_resp.get("content", "")
 
     # Assert replay response
-    assert "This ride has already been confirmed." in replay_content
+    assert "this ride is already booked" in replay_content
     assert "BK-ORIGINAL-SEDAN" in replay_content
     assert "Status: Confirmed" in replay_content
-    assert "Route: Home to Work" in replay_content
+    assert "Route: Home → Work" in replay_content
     # Must NOT echo 'Volta SUV' or 500
     assert "Volta SUV" not in replay_content
     assert "SUV" not in replay_content
     assert "500" not in replay_content
     assert "Quoted Fare" not in replay_content
+    assert "Fare:" not in replay_content
+    assert "₹" not in replay_content
 
 
 @pytest.mark.asyncio
@@ -2148,11 +2155,11 @@ async def test_33_normal_booking_preserves_tier_and_fare():
     content = resp.get("content", "")
 
     # First-time confirmation format must be preserved
-    assert "Your Volta Sedan ride has been successfully booked!" in content
+    assert "Your Volta Sedan is booked." in content
     assert "BK-FIRST-TIME" in content
     assert "Status: Confirmed" in content
-    assert "Vehicle Tier: Volta Sedan" in content
-    assert "Quoted Fare: INR 350" in content
-    assert "Route: Airport to Hotel" in content
+    assert "Your Volta Sedan is booked." in content
+    assert "Fare: about ₹350" in content
+    assert "Route: Airport → Hotel" in content
 
 
