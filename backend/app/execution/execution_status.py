@@ -1,13 +1,5 @@
-from enum import Enum
+"""Execution_Status (Re-exported from consolidated models module)."""
 
+from app.execution.models import ExecutionStatus
 
-class ExecutionStatus(str, Enum):
-    """Lifecycle status of a graph execution lifecycle."""
-
-    CREATED = "created"
-    RUNNING = "running"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    CANCELLED = "cancelled"
-    PAUSED = "paused"
-    TIMEOUT = "timeout"
+__all__ = ["ExecutionStatus"]

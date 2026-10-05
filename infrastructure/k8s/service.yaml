@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: volta-platform-svc
+  namespace: volta
+  labels:
+    app: volta-platform
+spec:
+  selector:
+    app: volta-platform
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+      name: http
+  type: ClusterIP

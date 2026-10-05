@@ -9,6 +9,7 @@ from app.db.mixins import AuditMixin, SoftDeleteMixin, TimestampMixin, UUIDMixin
 if TYPE_CHECKING:
     from app.models.conversation import Conversation
     from app.models.notification import Notification
+    from app.models.saved_location import SavedLocation
 
 
 class User(UUIDMixin, TimestampMixin, SoftDeleteMixin, AuditMixin, Base):
@@ -33,6 +34,13 @@ class User(UUIDMixin, TimestampMixin, SoftDeleteMixin, AuditMixin, Base):
     )
     notifications: Mapped[list["Notification"]] = relationship(
         "Notification",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+        lazy="selectin",
+    )
+    saved_locations: Mapped[list["SavedLocation"]] = relationship(
+        "SavedLocation",
         back_populates="user",
         cascade="all, delete-orphan",
         passive_deletes=True,

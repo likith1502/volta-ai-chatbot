@@ -1,15 +1,20 @@
-from typing import Any, Sequence
+from typing import Any, Sequence, Union
 
 from app.ai.models import AIMessage
 from app.models.message import Message
 
 
-def format_conversation_history(messages: Sequence[Message]) -> list[AIMessage]:
-    """Converts ORM Message instances into standardized AIMessage payloads."""
+def format_conversation_history(messages: Sequence[Union[Message, dict[str, Any]]]) -> list[AIMessage]:
+    """Converts ORM Message instances or dictionaries into standardized AIMessage payloads."""
     formatted = []
     for msg in messages:
-        role = msg.role.value if hasattr(msg.role, "value") else str(msg.role)
-        formatted.append(AIMessage(role=role, content=msg.content))
+        if isinstance(msg, dict):
+            role = msg.get("role", "user")
+            content = msg.get("content", "")
+        else:
+            role = msg.role.value if hasattr(msg.role, "value") else str(msg.role)
+            content = msg.content
+        formatted.append(AIMessage(role=role, content=content))
     return formatted
 
 

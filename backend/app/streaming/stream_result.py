@@ -1,14 +1,5 @@
-from typing import Any
+"""Stream_Result (Re-exported from consolidated models module)."""
 
-from pydantic import BaseModel, Field
+from app.streaming.models import StreamResult
 
-
-class StreamResult(BaseModel):
-    """Outcome container summarizing stream message dispatch and processing results."""
-
-    success: bool = True
-    delivered: int = 0
-    skipped: int = 0
-    warnings: list[str] = Field(default_factory=list)
-    errors: list[dict[str, Any]] = Field(default_factory=list)
-    processing_time: float = 0.0
+__all__ = ["StreamResult"]

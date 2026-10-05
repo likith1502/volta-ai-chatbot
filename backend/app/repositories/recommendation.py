@@ -27,3 +27,9 @@ class RecommendationRepository(BaseRepository[Recommendation]):
         stmt = self._apply_soft_delete_filter(stmt, include_deleted=False)
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
+
+    async def get_by_id_for_update(
+        self, id: uuid.UUID, include_deleted: bool = False
+    ) -> Recommendation | None:
+        """Retrieves a recommendation by primary key with an exclusive pessimistic row lock (FOR UPDATE)."""
+        return await self.get_by_id(id, include_deleted=include_deleted, with_for_update=True)

@@ -1,0 +1,23 @@
+name: CI — Security Scan
+
+on:
+  push:
+    branches: ["main"]
+  schedule:
+    - cron: "0 4 * * 1"  # Weekly Monday 04:00 UTC
+
+jobs:
+  security:
+    name: Bandit Security Scan + Safety Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install bandit safety
+      - name: Run bandit static analysis
+        run: bandit -r backend/app -ll -ii --exclude backend/app/__pycache__
+      - name: Run safety dependency check
+        run: safety check -r backend/requirements.txt --full-report
+        continue-on-error: true

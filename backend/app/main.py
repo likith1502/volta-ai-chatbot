@@ -47,7 +47,6 @@ register_exception_handlers(app)
 # Include API Routers
 app.include_router(api_v1_router, prefix=settings.API_V1_PREFIX)
 
-
 # Root Endpoint
 @app.get("/", summary="Root Endpoint", tags=["Root"])
 def read_root():

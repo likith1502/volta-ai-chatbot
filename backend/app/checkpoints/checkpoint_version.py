@@ -1,11 +1,5 @@
-from pydantic import BaseModel
+"""Checkpoint_Version (Re-exported from consolidated models module)."""
 
+from app.checkpoints.models import CheckpointVersion
 
-class CheckpointVersion(BaseModel):
-    """Versioning specifications for checkpoint schemas, state models, and graphs."""
-
-    checkpoint_version: str = "1.0.0"
-    schema_version: str = "1.0"
-    state_version: str = "1.0"
-    execution_version: str = "1.0"
-    graph_version: str = "1.0"
+__all__ = ["CheckpointVersion"]

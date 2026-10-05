@@ -1,0 +1,98 @@
+version: "3.9"
+
+name: volta-ai-platform-prod
+
+services:
+
+  api:
+    image: ghcr.io/likith1502/volta-ai-chatbot:${PLATFORM_VERSION:-7.8.0}
+    container_name: volta-api-prod
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - LOG_LEVEL=WARNING
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    volumes:
+      - ./logs:/app/logs
+      - ./backups:/app/backups
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 2G
+        reservations:
+          cpus: "0.25"
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - volta-prod-network
+    restart: always
+
+  db:
+    image: postgres:15-alpine
+    container_name: volta-db-prod
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - volta-prod-network
+    restart: always
+
+  redis:
+    image: redis:7-alpine
+    container_name: volta-redis-prod
+    command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
+    volumes:
+      - redis_prod_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - volta-prod-network
+    restart: always
+
+  nginx:
+    image: nginx:alpine
+    container_name: volta-nginx-prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infrastructure/nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - api
+    networks:
+      - volta-prod-network
+    restart: always
+
+networks:
+  volta-prod-network:
+    driver: bridge
+
+volumes:
+  postgres_prod_data:
+  redis_prod_data:

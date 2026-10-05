@@ -44,7 +44,7 @@ All 7 core foundation tiers—Infrastructure, Database, Domain Models, Repositor
 - **Intent & Entity Graph Nodes**: Dedicated state graph nodes for fine-grained intent classification and entity extraction (pickup location, destination, vehicle preference).
 - **Human-in-the-Loop (HITL) Interruption**: Ability to pause execution graph state when waiting for user confirmation (e.g. confirming fare & vehicle tier) and resume seamlessly.
 - **Episodic & Vector Memory Strategy Integration**: Expand `MemoryStrategy` to support PGVector / Qdrant semantic memory retrieval alongside `RecentConversationStrategy`.
-- **Real-Time Voice Readiness**: Structure workflow state transitions to support streaming tokens over WebSockets for Phase 7 Voice Agent integration.
+- **Real-Time & Streaming Readiness**: Structure workflow state transitions to support streaming tokens over WebSockets for Phase 7 Enterprise Messaging Runtime and Phase 8 Voice Platform integration.
 
 ---
 

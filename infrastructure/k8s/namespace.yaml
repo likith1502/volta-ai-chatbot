@@ -1,0 +1,11 @@
+---
+# VOLTA Enterprise AI Platform — Kubernetes Namespace
+# Phase 7.8: Enterprise Deployment
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: volta
+  labels:
+    app: volta-platform
+    version: "7.8.0"
+    managed-by: kubectl

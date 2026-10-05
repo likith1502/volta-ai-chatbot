@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,6 +17,15 @@ class BookingRepository(BaseRepository[Booking]):
     async def get_by_reference(self, booking_reference: str, include_deleted: bool = False) -> Booking | None:
         """Retrieves a booking by unique reference code."""
         stmt = select(Booking).where(Booking.booking_reference == booking_reference)
+        stmt = self._apply_soft_delete_filter(stmt, include_deleted)
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def get_by_recommendation_id(
+        self, recommendation_id: uuid.UUID, include_deleted: bool = False
+    ) -> Booking | None:
+        """Retrieves a booking by recommendation UUID."""
+        stmt = select(Booking).where(Booking.recommendation_id == recommendation_id)
         stmt = self._apply_soft_delete_filter(stmt, include_deleted)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()

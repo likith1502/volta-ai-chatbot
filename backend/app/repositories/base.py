@@ -22,10 +22,17 @@ class BaseRepository(Generic[T]):
             return stmt.where(self.model_class.is_deleted == False)  # noqa: E712
         return stmt
 
-    async def get_by_id(self, id: uuid.UUID, include_deleted: bool = False) -> T | None:
+    async def get_by_id(
+        self,
+        id: uuid.UUID,
+        include_deleted: bool = False,
+        with_for_update: bool = False,
+    ) -> T | None:
         """Retrieves a single model instance by its primary key UUID."""
         stmt = select(self.model_class).where(self.model_class.id == id)
         stmt = self._apply_soft_delete_filter(stmt, include_deleted)
+        if with_for_update:
+            stmt = stmt.with_for_update()
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 

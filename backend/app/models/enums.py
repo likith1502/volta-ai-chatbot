@@ -46,3 +46,11 @@ class NotificationType(str, Enum):
     RECOMMENDATION = "recommendation"
     SYSTEM = "system"
     PROMOTIONAL = "promotional"
+
+
+class VehicleTier(str, Enum):
+    MINI = "mini"
+    SEDAN = "sedan"
+    SUV = "suv"
+    EV = "ev"
+    LUXURY = "luxury"

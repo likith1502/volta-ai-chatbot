@@ -1,5 +1,5 @@
 import uuid
-from typing import Any
+from typing import Any, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,19 +8,26 @@ from app.ai.tools.base import AITool
 
 
 class RecommendationTool(AITool):
-    """Tool wrapper executing RecommendationService logic for ride & route requests."""
+    """Tool wrapper executing cab availability and pricing via CabPricingService."""
 
     name: str = "recommendation"
-    description: str = "Generates and persists ride/route recommendations for active conversations."
+    description: str = (
+        "Generates and persists ride/route recommendations for active conversations."
+    )
 
-    def __init__(self, session: AsyncSession) -> None:
-        from app.services.recommendation import RecommendationService
+    def __init__(
+        self,
+        session: AsyncSession,
+        cab_pricing_service: Optional[Any] = None,
+    ) -> None:
+        from app.services.cab_pricing import CabPricingService
 
         self.session = session
-        self.recommendation_service = RecommendationService(session)
+        self.cab_pricing_service = cab_pricing_service or CabPricingService(session)
+        self.recommendation_service = self.cab_pricing_service.recommendation_service
 
     async def execute(self, arguments: dict[str, Any]) -> AIToolResult:
-        """Executes RecommendationService inside the tool boundary."""
+        """Executes CabPricingService inside the tool boundary."""
         try:
             conversation_id_raw = arguments.get("conversation_id")
             if not conversation_id_raw:
@@ -35,30 +42,29 @@ class RecommendationTool(AITool):
                 if isinstance(conversation_id_raw, str)
                 else conversation_id_raw
             )
-            user_query = arguments.get("user_query", "Ride requested")
+            user_query = arguments.get("user_query") or "Ride requested"
+            pickup = arguments.get("pickup") or user_query
+            destination = arguments.get("destination") or "Destination"
 
-            rec = await self.recommendation_service.create_recommendation(
+            quote = await self.cab_pricing_service.get_availability_quote(
+                pickup=pickup,
+                destination=destination,
                 conversation_id=conversation_id,
-                recommendation_type="ride",
-                recommendation_data={
-                    "user_query": user_query,
-                    "options": arguments.get(
-                        "options",
-                        [
-                            {"tier": "Standard Sedan", "estimated_price": 24.50, "eta_minutes": 4},
-                            {"tier": "Comfort SUV", "estimated_price": 35.00, "eta_minutes": 6},
-                        ],
-                    ),
-                },
+                persist_recommendation=True,
             )
+
+            rec_id = quote.recommendation_id or quote.quote_id
 
             return AIToolResult(
                 tool_name=self.name,
                 success=True,
                 data={
-                    "recommendation_id": rec.id,
-                    "status": rec.status.value,
-                    "type": rec.recommendation_type,
+                    "recommendation_id": rec_id,
+                    "quote_id": str(quote.quote_id),
+                    "status": "pending",
+                    "type": "cab_availability",
+                    "currency": quote.currency,
+                    "options": [opt.model_dump(mode="json") for opt in quote.options],
                 },
             )
         except Exception as exc:

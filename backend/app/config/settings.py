@@ -1,4 +1,5 @@
 from typing import List, Optional, Union
+
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -40,8 +41,41 @@ class Settings(BaseSettings):
     OPENAI_MAX_TOKENS: int = 1000
     OPENAI_TIMEOUT: float = 30.0
 
+    # Google Gemini API Settings (Phase 7.0)
+    GEMINI_API_KEY: str = ""
+    GOOGLE_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-2.5-flash"
+    # Comma-separated models tried in order when the primary model is
+    # overloaded (HTTP 429/503) or times out.
+    GEMINI_FALLBACK_MODELS: str = (
+        "gemini-3.6-flash,gemini-3.5-flash,gemini-3-flash-preview,gemini-3.1-flash-lite"
+    )
+    GEMINI_TEMPERATURE: float = 0.7
+    # Gemini 3.x models "think" before answering and thinking tokens count
+    # against this limit, so keep it generous or replies get cut off.
+    GEMINI_MAX_TOKENS: int = 4096
+    # Cap on thinking effort for Gemini 3.x (low / medium / high / none).
+    GEMINI_REASONING_EFFORT: str = "low"
+    GEMINI_TIMEOUT: float = 30.0
+
+    # Enterprise LLM Runtime Engine Settings (Phase 7.0)
+    RUNTIME_DEFAULT_PROVIDER: str = "mock"
+    RUNTIME_DEFAULT_MODEL: str = "gemini-2.5-flash"
+    RUNTIME_TIMEOUT: float = 30.0
+    RUNTIME_MAX_RETRIES: int = 3
+    RUNTIME_TEMPERATURE: float = 0.7
+    RUNTIME_MAX_TOKENS: int = 1000
+    DEMO_MODE: bool = True
+
     # Memory Strategy Configuration
     MEMORY_STRATEGY: str = "recent"
+
+    # Enterprise Messaging Connectors (Phase 7)
+    WHATSAPP_API_TOKEN: str = ""
+    WHATSAPP_PHONE_NUMBER_ID: str = ""
+    WHATSAPP_VERIFY_TOKEN: str = ""
+    WHATSAPP_APP_SECRET: str = ""
+    WHATSAPP_API_BASE_URL: str = "https://graph.facebook.com/v19.0"
 
     model_config = SettingsConfigDict(
         env_file=".env",

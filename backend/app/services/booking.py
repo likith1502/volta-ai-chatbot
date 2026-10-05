@@ -31,48 +31,62 @@ class BookingService(BaseService):
         external_booking_id: Optional[str] = None,
     ) -> Booking:
         """Orchestrates creating a ride booking from an active AI recommendation payload."""
-        recommendation = await self.recommendation_repo.get_by_id(recommendation_id)
-        if not recommendation:
-            raise RecommendationNotFoundException(f"Recommendation with ID '{recommendation_id}' not found.")
+        try:
+            recommendation = await self.recommendation_repo.get_by_id(
+                recommendation_id, with_for_update=True
+            )
+            if not recommendation:
+                raise RecommendationNotFoundException(
+                    f"Recommendation with ID '{recommendation_id}' not found."
+                )
 
-        if recommendation.status == RecommendationStatus.EXPIRED:
-            raise RecommendationExpiredException("Cannot create booking from an expired recommendation.")
+            if recommendation.status == RecommendationStatus.EXPIRED:
+                raise RecommendationExpiredException(
+                    "Cannot create booking from an expired recommendation."
+                )
 
-        if recommendation.status != RecommendationStatus.PENDING:
-            raise InvalidBookingStatusException(f"Recommendation status is '{recommendation.status}', must be PENDING.")
+            if recommendation.status != RecommendationStatus.PENDING:
+                raise InvalidBookingStatusException(
+                    f"Recommendation status is '{recommendation.status}', must be PENDING."
+                )
 
-        ref_code = f"BK-{uuid.uuid4().hex[:8].upper()}"
+            ref_code = f"BK-{uuid.uuid4().hex[:8].upper()}"
 
-        booking = await self.booking_repo.create(
-            {
-                "recommendation_id": recommendation_id,
-                "booking_reference": ref_code,
-                "booking_status": BookingStatus.CONFIRMED,
-                "provider": provider,
-                "external_booking_id": external_booking_id,
-            }
-        )
-
-        await self.recommendation_repo.update(
-            recommendation_id,
-            {"status": RecommendationStatus.ACCEPTED},
-        )
-
-        conversation = await self.conversation_repo.get_by_id(recommendation.conversation_id)
-        if conversation and conversation.user_id:
-            await self.notification_repo.create(
+            booking = await self.booking_repo.create(
                 {
-                    "user_id": conversation.user_id,
-                    "notification_type": NotificationType.BOOKING_UPDATE,
-                    "title": "Ride Booking Confirmed",
-                    "body": f"Your ride booking {ref_code} has been successfully confirmed.",
-                    "is_read": False,
-                    "delivery_status": "sent",
+                    "recommendation_id": recommendation_id,
+                    "booking_reference": ref_code,
+                    "booking_status": BookingStatus.CONFIRMED,
+                    "provider": provider,
+                    "external_booking_id": external_booking_id,
                 }
             )
 
-        await self.commit()
-        return booking
+            await self.recommendation_repo.update(
+                recommendation_id,
+                {"status": RecommendationStatus.ACCEPTED},
+            )
+
+            conversation = await self.conversation_repo.get_by_id(
+                recommendation.conversation_id
+            )
+            if conversation and conversation.user_id:
+                await self.notification_repo.create(
+                    {
+                        "user_id": conversation.user_id,
+                        "notification_type": NotificationType.BOOKING_UPDATE,
+                        "title": "Ride Booking Confirmed",
+                        "body": f"Your ride booking {ref_code} has been successfully confirmed.",
+                        "is_read": False,
+                        "delivery_status": "sent",
+                    }
+                )
+
+            await self.commit()
+            return booking
+        except Exception:
+            await self.rollback()
+            raise
 
     async def get_booking_by_reference(self, booking_reference: str) -> Booking:
         """Retrieves a booking reservation by unique reference code."""
@@ -83,19 +97,23 @@ class BookingService(BaseService):
 
     async def cancel_booking(self, booking_id: uuid.UUID) -> Booking:
         """Cancels an active booking reservation."""
-        booking = await self.booking_repo.get_by_id(booking_id)
-        if not booking:
-            raise BookingNotFoundException(f"Booking with ID '{booking_id}' not found.")
+        try:
+            booking = await self.booking_repo.get_by_id(booking_id)
+            if not booking:
+                raise BookingNotFoundException(f"Booking with ID '{booking_id}' not found.")
 
-        if booking.booking_status == BookingStatus.CANCELLED:
-            raise InvalidBookingStatusException("Booking is already cancelled.")
+            if booking.booking_status == BookingStatus.CANCELLED:
+                raise InvalidBookingStatusException("Booking is already cancelled.")
 
-        cancelled = await self.booking_repo.update(
-            booking_id,
-            {"booking_status": BookingStatus.CANCELLED},
-        )
-        if not cancelled:
-            raise BookingNotFoundException(f"Booking with ID '{booking_id}' not found.")
+            cancelled = await self.booking_repo.update(
+                booking_id,
+                {"booking_status": BookingStatus.CANCELLED},
+            )
+            if not cancelled:
+                raise BookingNotFoundException(f"Booking with ID '{booking_id}' not found.")
 
-        await self.commit()
-        return cancelled
+            await self.commit()
+            return cancelled
+        except Exception:
+            await self.rollback()
+            raise
