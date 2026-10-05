@@ -19,6 +19,7 @@ class PromptBuilder:
         conversation_history: Sequence[Union[Message, dict[str, Any]]] = (),
         memories: Sequence[Union[Memory, Any]] = (),
         saved_locations: Sequence[Any] = (),
+        ride_context: Optional[str] = None,
     ) -> AIRequest:
         """Merges system prompt, memories, saved location labels, conversation history, and user input turn."""
         messages: list[AIMessage] = []
@@ -51,6 +52,9 @@ class PromptBuilder:
                     labels.append(f"- {label_val}")
             if labels:
                 context_blocks.append("[Saved Locations]\n" + "\n".join(labels))
+
+        if ride_context:
+            context_blocks.append("[Current Ride Request]\n" + ride_context)
 
         if context_blocks:
             prefix = "\n\n".join(context_blocks)

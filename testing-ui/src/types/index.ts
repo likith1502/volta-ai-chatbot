@@ -49,6 +49,17 @@ export interface CabOption {
   is_demo: boolean;
 }
 
+/** A car option as stored in a persisted quote (GET /api/v1/recommendations/{id}). */
+export interface StoredQuoteOption {
+  tier: string;
+  display_name?: string;
+  fare?: string | number;
+  currency?: string;
+  eta_minutes?: number;
+  capacity?: number;
+  description?: string;
+}
+
 export interface RideBookingInfo {
   id: string;
   reference: string;
@@ -88,7 +99,7 @@ export interface Recommendation {
   conversation_id: string;
   recommendation_type: string;
   recommendation_data: {
-    options?: CabOption[];
+    options?: StoredQuoteOption[];
     is_demo?: boolean;
     selected_tier?: string;
     [key: string]: unknown;

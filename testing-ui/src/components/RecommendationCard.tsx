@@ -32,9 +32,9 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
         setOptions(
           (rec.recommendation_data.options ?? []).map(o => ({
             tier: o.tier,
-            label: `${o.label}${o.is_demo ? ' (DEMO)' : ''}`,
-            estimated_price: o.fare_inr,
-            eta_minutes: o.trip_minutes,
+            label: `Volta ${o.display_name ?? o.tier.toUpperCase()}`,
+            estimated_price: Number(o.fare ?? 0),
+            eta_minutes: Number(o.eta_minutes ?? 0),
           }))
         )
       )
@@ -101,7 +101,7 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
               <div className="rec-card-details">
                 <span className="detail-item">
                   <Clock size={13} />
-                  <span>Trip: ~{opt.eta_minutes} min</span>
+                  <span>Arrives in ~{opt.eta_minutes} min</span>
                 </span>
                 <span className="detail-item provider-tag">
                   Demo provider

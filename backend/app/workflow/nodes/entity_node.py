@@ -3,6 +3,7 @@ import uuid
 from typing import Any, Optional
 
 from app.ai.prompts.recommendation import (
+    cancellation_message,
     extract_ride_slots,
     is_cancellation_intent,
     is_knowledge_base_query,
@@ -105,7 +106,7 @@ class RideEntityResolver:
             return RideEntityState(
                 status=RideSlotStatus.CANCELLED,
                 is_cancelled=True,
-                clarification_question="Your ride request has been cancelled. Let me know if there's anything else I can help you with!",
+                clarification_question=cancellation_message(user_text),
             )
 
         # 3. If prior request was booked or cancelled, check if a brand-new ride request is made
@@ -127,7 +128,7 @@ class RideEntityResolver:
             return RideEntityState(
                 status=RideSlotStatus.CANCELLED,
                 is_cancelled=True,
-                clarification_question="Your ride request has been cancelled. Let me know if there's anything else I can help you with!",
+                clarification_question=cancellation_message(user_text),
             )
 
         # 5. Merge with prior slots

@@ -19,6 +19,29 @@ CANCELLATION_PATTERNS = [
     r"\b(?:never\s*mind|stop\s+(?:the)?\s*(?:ride|booking))\b",
 ]
 
+# "dont book me a cab", "I don't want a ride", "no need for a taxi": the customer
+# is declining a ride, so this must never be treated as a new booking request.
+_RIDE_WORD = r"(?:book|cab|ride|taxi|car|trip)\b"
+_FILLER = r"(?:(?:really|want|need|like|wish|to|please|me|you|a|an|the|any|my)\s+){0,4}"
+NEGATED_BOOKING_PATTERN = (
+    rf"\b(?:don'?t|dont|do\s+not)\s+{_FILLER}{_RIDE_WORD}"
+    rf"|\bno\s+need\s+(?:to|for)\s+{_FILLER}{_RIDE_WORD}"
+    rf"|\bnever\s+(?:book|get)\b"
+)
+# "don't cancel my ride" keeps the ride; it is not a cancellation.
+NEGATED_CANCEL_PATTERN = (
+    r"\b(?:don'?t|dont|do\s+not|never)\s+(?:want\s+to\s+|please\s+)?cancel\b"
+)
+
+CANCELLED_MESSAGE = (
+    "Your ride request has been cancelled. "
+    "Let me know if there's anything else I can help you with!"
+)
+DECLINED_MESSAGE = (
+    "No problem, I won't book anything. "
+    "Just tell me whenever you'd like a cab!"
+)
+
 # Conversational expressions with "go", "take", "home" that are NOT ride requests
 NON_RIDE_FALSE_POSITIVES = [
     r"^(?:i\s+(?:just\s+)?want\s+to\s+go\s+home|going\s+home)$",
@@ -111,12 +134,29 @@ def is_knowledge_base_query(user_input: str) -> bool:
     return False
 
 
+def is_negated_booking(user_input: str) -> bool:
+    """Returns True if the customer is declining a ride ("dont book me a cab")."""
+    text = user_input.strip().lower()
+    if is_knowledge_base_query(text) or re.search(NEGATED_CANCEL_PATTERN, text):
+        return False
+    return bool(re.search(NEGATED_BOOKING_PATTERN, text))
+
+
+def cancellation_message(user_input: str) -> str:
+    """Friendly reply for a cancellation, worded differently when the customer declined."""
+    return DECLINED_MESSAGE if is_negated_booking(user_input) else CANCELLED_MESSAGE
+
+
 def is_cancellation_intent(user_input: str) -> bool:
     """Returns True if the message expresses intent to cancel an active ride request."""
     text = user_input.strip().lower()
     # If it's a general question about the cancellation policy, it's KB, not cancellation!
     if is_knowledge_base_query(user_input):
         return False
+    if re.search(NEGATED_CANCEL_PATTERN, text):
+        return False
+    if is_negated_booking(text):
+        return True
     for pattern in CANCELLATION_PATTERNS:
         if re.search(pattern, text):
             return True

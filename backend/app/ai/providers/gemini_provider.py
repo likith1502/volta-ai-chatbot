@@ -93,6 +93,46 @@ class GeminiProvider(AIProvider):
             "Content-Type": "application/json",
         }
 
+        # Try the primary model first, then each fallback, so a busy or
+        # overloaded model never leaves the customer without an answer.
+        models = [self.model] + [
+            m for m in self._fallback_models() if m != self.model
+        ]
+        last_exc: Exception = ModelUnavailableException(
+            "No Gemini model could answer."
+        )
+        for model in models:
+            try:
+                return await self._call_model(model, payload, headers)
+            except (RateLimitException, ModelUnavailableException) as exc:
+                logger.warning(
+                    "Gemini model %s unavailable (%s); trying next model.",
+                    model,
+                    exc,
+                )
+                last_exc = exc
+        raise last_exc
+
+    @staticmethod
+    def _fallback_models() -> list[str]:
+        raw = getattr(settings, "GEMINI_FALLBACK_MODELS", "") or ""
+        return [m.strip() for m in raw.split(",") if m.strip()]
+
+    async def _call_model(
+        self, model: str, base_payload: dict[str, Any], headers: dict[str, str]
+    ) -> AIResponse:
+        """Calls one model; raises Rate-limit/Unavailable errors so the caller can fall back."""
+        payload = dict(base_payload)
+        payload["model"] = model
+        is_thinking = "gemini-3" in model.lower()
+        if is_thinking:
+            # Thinking tokens share the output budget; keep thinking short
+            # and the budget large so answers are never cut off mid-sentence.
+            effort = getattr(settings, "GEMINI_REASONING_EFFORT", "")
+            if effort:
+                payload["reasoning_effort"] = effort
+            payload["max_tokens"] = max(payload.get("max_tokens") or 0, 4096)
+
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.post(
@@ -101,8 +141,25 @@ class GeminiProvider(AIProvider):
                     json=payload,
                 )
 
+                if (
+                    response.status_code == 400
+                    and "reasoning_effort" in payload
+                    and "reasoning" in response.text.lower()
+                ):
+                    # This model doesn't accept the reasoning setting: retry without it.
+                    payload.pop("reasoning_effort", None)
+                    response = await client.post(
+                        "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+                        headers=headers,
+                        json=payload,
+                    )
+
                 if response.status_code == 429:
                     raise RateLimitException("Gemini API rate limit or quota exceeded.")
+                elif response.status_code == 404:
+                    raise ModelUnavailableException(
+                        f"Gemini model {model} is not available."
+                    )
                 elif response.status_code == 400:
                     raise PromptTooLargeException(
                         f"Gemini bad request: {response.text}"
@@ -119,13 +176,28 @@ class GeminiProvider(AIProvider):
 
                 data = response.json()
                 choice = data["choices"][0]
-                usage_data = data.get("usage", {})
+                message = choice.get("message") or {}
+                content = message.get("content")
+                finish_reason = choice.get("finish_reason", "stop")
+                if not content or not str(content).strip():
+                    # Empty answer (e.g. all tokens spent thinking): treat the
+                    # model as unavailable so the next one is tried.
+                    raise ModelUnavailableException(
+                        f"Gemini model {model} returned an empty reply "
+                        f"(finish_reason={finish_reason})."
+                    )
+                if finish_reason == "length":
+                    # Cut off mid-answer: never show a half sentence to a customer.
+                    raise ModelUnavailableException(
+                        f"Gemini model {model} reply was truncated."
+                    )
+                usage_data = data.get("usage") or {}
 
                 return AIResponse(
-                    content=choice["message"]["content"],
-                    role=choice["message"].get("role", "assistant"),
-                    model_used=data.get("model", self.model),
-                    finish_reason=choice.get("finish_reason", "stop"),
+                    content=content,
+                    role=message.get("role", "assistant"),
+                    model_used=data.get("model", model),
+                    finish_reason=finish_reason,
                     usage=AITokenUsage(
                         prompt_tokens=usage_data.get("prompt_tokens", 0),
                         completion_tokens=usage_data.get("completion_tokens", 0),

@@ -1,6 +1,6 @@
 from typing import Optional
 
-from app.ai.prompts.recommendation import is_cancellation_intent
+from app.ai.prompts.recommendation import CANCELLED_MESSAGE, is_cancellation_intent
 from app.ai.prompts.human_text import (
     extract_quoted_fares,
     format_inr,
@@ -73,11 +73,19 @@ class ResponseNode(BaseWorkflowNode):
                 or (ride_data.get("is_cancelled") and not cancelled_this_turn)
             )
         )
-        if ride_data and not ride_already_done:
+        # A message that has nothing to do with the ride (e.g. an off-topic
+        # question) is answered by the assistant, never by the leftover
+        # question or options from an earlier ride step.
+        ride_turn = not intent_result or intent_result.get("intent") in (
+            "ride_recommendation",
+            "ride_selection",
+            "ride_booking",
+        )
+        if ride_data and not ride_already_done and ride_turn:
             if ride_data.get("is_cancelled"):
                 content = (
                     ride_data.get("clarification_question")
-                    or "Your ride request has been cancelled. Let me know if there's anything else I can help you with!"
+                    or CANCELLED_MESSAGE
                 )
             elif (ride_data.get("is_booked") or ride_data.get("booking_reference")) and booking_this_turn:
                 ref = ride_data.get("booking_reference")
@@ -149,8 +157,11 @@ class ResponseNode(BaseWorkflowNode):
                                 lines.append(
                                     f"- **{vehicle_name(name)}**: {format_inr(fare)} (arrives in about {eta} min)"
                                 )
+                            lines.append("\nWhich car would you like?")
                             formatted_opts = "\n".join(lines)
-                            if content in (
+                            # Also covers the AI being unavailable: the customer
+                            # still gets the real cars and fares from our own data.
+                            if model_used == "unavailable" or content in (
                                 "I am here to assist you.",
                                 "I can help with that.",
                                 "I can assist you with your ride.",
@@ -165,6 +176,7 @@ class ResponseNode(BaseWorkflowNode):
         new_entities = None
         if (
             ride_data
+            and ride_turn
             and ride_data.get("status") == "resolved"
             and not ride_data.get("selected_tier")
             and ride_data.get("available_options")

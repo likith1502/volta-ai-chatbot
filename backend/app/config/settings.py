@@ -45,8 +45,17 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
     GOOGLE_API_KEY: str = ""
     GEMINI_MODEL: str = "gemini-2.5-flash"
+    # Comma-separated models tried in order when the primary model is
+    # overloaded (HTTP 429/503) or times out.
+    GEMINI_FALLBACK_MODELS: str = (
+        "gemini-3.6-flash,gemini-3.5-flash,gemini-3-flash-preview,gemini-3.1-flash-lite"
+    )
     GEMINI_TEMPERATURE: float = 0.7
-    GEMINI_MAX_TOKENS: int = 1000
+    # Gemini 3.x models "think" before answering and thinking tokens count
+    # against this limit, so keep it generous or replies get cut off.
+    GEMINI_MAX_TOKENS: int = 4096
+    # Cap on thinking effort for Gemini 3.x (low / medium / high / none).
+    GEMINI_REASONING_EFFORT: str = "low"
     GEMINI_TIMEOUT: float = 30.0
 
     # Enterprise LLM Runtime Engine Settings (Phase 7.0)

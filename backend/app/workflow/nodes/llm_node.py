@@ -41,6 +41,28 @@ class LLMNode(BaseWorkflowNode):
     provider: Optional[Any] = None
     prompt_builder: Optional[Any] = None
 
+    @staticmethod
+    def _ride_context(state: ConversationState) -> Optional[str]:
+        """Describes the trip being discussed right now so earlier trips in the chat are ignored."""
+        ride = state.memory.extracted_entities.get("ride")
+        if not isinstance(ride, dict) or ride.get("is_cancelled") or ride.get("is_booked"):
+            return None
+
+        def label(point_key: str, raw_key: str) -> Optional[str]:
+            point = ride.get(point_key)
+            point_label = point.get("label") if isinstance(point, dict) else None
+            return point_label or ride.get(raw_key)
+
+        pickup = label("pickup_point", "pickup_raw")
+        destination = label("destination_point", "destination_raw")
+        if not pickup or not destination:
+            return None
+        return (
+            f"Pickup: {pickup}\nDestination: {destination}\n"
+            "This is the ONLY trip the customer wants now. Do not mention or compare "
+            "any earlier trips from this conversation. Reply in plain, complete sentences."
+        )
+
     async def execute(
         self, state: ConversationState, context: Optional[NodeExecutionContext] = None
     ) -> ConversationState:
@@ -56,11 +78,16 @@ class LLMNode(BaseWorkflowNode):
         memories = state.memory.short_term_memory.get("memories", [])
         saved_locations = state.memory.short_term_memory.get("saved_locations", [])
 
+        build_kwargs: dict[str, Any] = {}
+        ride_context = self._ride_context(state)
+        if ride_context:
+            build_kwargs["ride_context"] = ride_context
         ai_request = prompt_builder.build(
             user_input=user_text,
             conversation_history=history,
             memories=memories,
             saved_locations=saved_locations,
+            **build_kwargs,
         )
 
         try:
